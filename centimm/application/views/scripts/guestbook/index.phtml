@@ -1,0 +1,8 @@
+<p><a href="<?php echo $this->url(array('controller' => 'Guestbook', 'action' => 'sign')) ?>">Dodaj wpisa</a></p>
+<h3>Lista wpisów</h3>
+<dl>
+	<?php foreach($this->entries as $entry): ?>
+	<dt><?php echo $this->escape($entry->email) ?></dt>
+	<dd><?php echo $this->escape($entry->comment) ?></dd>
+	<?php endforeach ?>
+</dl>
