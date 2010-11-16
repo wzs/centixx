@@ -1,0 +1,7 @@
+<h2>Użytkownik <?php echo $this->user ?></h2>
+<p>E-mail: <?php echo $this->user->email ?></p>
+<?php if ($this->user->group): ?>
+<p>Grupa: <a href="<?php echo $this->url(array('controller' => 'groups', 'action' => 'show', 'id' => $this->user->group->id), null, true) ?>"><?php echo $this->user->group->name ?></a></p>
+<?php else: ?>
+<p>Grupa: nie przypisany</p>
+<?php endif ?>

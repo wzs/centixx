@@ -1,22 +1,31 @@
-<?php echo $this->doctype() ?>
+<?php echo $this->doctype() . PHP_EOL ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>Zend Framework Quickstart Application</title>
-  <?php echo $this->headLink()->appendStylesheet('/css/global.css') ?>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<?php echo $this->headTitle() . PHP_EOL ?>
+	<?php echo $this->headLink() . PHP_EOL ?>
 </head>
 <body>
-<div id="header" style="background-color: #EEEEEE; height: 30px;">
-    <div id="header-logo" style="float: left">
-        <b>ZF Quickstart Application</b>
+<div id="header">
+	<div id="header-logo" style="float: left">
+        <a href="<?php echo $this->url(array('controller' => 'index'), null, true) ?>">Centixx</a>
     </div>
     <div id="header-navigation" style="float: right">
+        <a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'list'), null, true) ?>">Użytkownicy</a>
+        <a href="<?php echo $this->url(array('controller' => 'groups', 'action' => 'list'), null, true) ?>">Grupy</a>
         <a href="<?php echo $this->url(
-            array('controller'=>'guestbook'),
+            array('controller'=>'auth'),
             'default',
-            true) ?>">Guestbook</a>
+            true) ?>">Logowanko</a>
     </div>
 </div>
+<?php if ($this->messages): ?>
+<ul id="flashMessages">
+	<?php foreach ($this->messages as $message): ?>
+	<li><?php echo $message ?></li>
+	<?php endforeach; ?>
+</ul>
+<?php endif ?>
 <hr />
 <?php echo $this->layout()->content ?>
 

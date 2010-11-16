@@ -1,0 +1,8 @@
+<h2>Lista użytkowników</h2>
+<?php if ($this->users): ?>
+<ul>
+<?php foreach ($this->users as $user): ?>
+<li><a href="<?php echo $user->profileHref() ?>"><?php echo $user ?></a></li>
+<?php endforeach; ?>
+</ul>
+<?php endif ?>

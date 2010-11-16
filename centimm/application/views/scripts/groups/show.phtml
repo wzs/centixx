@@ -1,0 +1,17 @@
+<h2>Grupa <?php echo $this->group ?></h2>
+
+<?php if ($this->group->users): ?>
+<ul>
+<?php foreach ($this->group->users as $user): ?>
+	<li>
+		<a href="<?php echo $user->profileHref() ?>"><?php echo $user ?></a>
+		<?php if ($this->group->isManager($user)): ?>[kierownik]<?php endif ?>
+	</li>
+<?php endforeach ?>
+</ul>
+<?php endif ?>
+
+<?php
+	$this->form->setAction($this->url(array('controller' => 'groups', 'action' => 'add_user')));
+	echo $this->form
+?>

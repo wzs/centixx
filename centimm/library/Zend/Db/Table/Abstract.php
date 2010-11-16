@@ -1321,7 +1321,6 @@ abstract class Zend_Db_Table_Abstract
         } else {
             $select = $where;
         }
-
         $rows = $this->_fetch($select);
 
         $data  = array(
