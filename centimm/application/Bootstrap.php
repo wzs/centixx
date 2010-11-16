@@ -4,11 +4,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
 	protected function _initView()
 	{
+
 		// Initialize view
 		$view = new Zend_View();
 		$view->doctype('XHTML1_STRICT');
 		$view->headTitle('Centixx');
-		$view->headLink()->appendStylesheet('/styles/basic.css');
+
+		//set basePath
+		$this->bootstrap('layout');
+		$cfg = $this->getOption('resources');
+
+		$layout = $this->getResource('layout');
+		$layout->basePath = $cfg['layout']['basePath'];
 
 		// Add it to the ViewRenderer
 		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
@@ -29,6 +36,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	protected function _initNamespaces()
 	{
 		Zend_Loader_Autoloader::getInstance()->registerNamespace('Centixx_');
+	}
+
+	protected function _initRouter()
+	{
+
 	}
 
 	protected function _initDatabase()
