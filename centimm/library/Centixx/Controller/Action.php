@@ -2,7 +2,7 @@
 abstract class Centixx_Controller_Action extends Zend_Controller_Action
 {
 	/**
-	 * @var Zend_Db
+	 * @var Zend_Db_Adapter_Abstract
 	 */
 	protected $_db = null;
 
@@ -36,5 +36,9 @@ abstract class Centixx_Controller_Action extends Zend_Controller_Action
 		$this->_logger = $registry->get('log');
 		$this->_currentUser = $registry->get('currentUser');
 		$this->_flashMessenger = $this->getHelper('FlashMessenger');
+		$this->_config = Zend_Registry::get('config');
+
+		$this->view->currentUser = $this->_currentUser;
+		$this->view->messages = $this->_flashMessenger->getMessages();
     }
 }

@@ -1,40 +1,75 @@
 <?php
 class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 {
+
 	/**
-	 * Zwraca listę użytkowników, którzy nie są przypisani do danej grupy
+	 * Zwraca pełną nazwę roli użytkownika
+	 * @param Centixx_Model_User $model
+	 * @return string
+	 */
+	public function getRoleName(Centixx_Model_User $model)
+	{
+		//nie powinno mieć miejsca
+		if ($model->role == null) {
+			return 'Gość';
+		}
+		return Centixx_Model_Mapper_Role::factory()->find($model->role)->name;
+	}
+
+	/**
+	 * Zwraca użytkownika na podstawie adresu email
+	 * @param string $email
+	 * @return Centixx_Model_Abstract
+	 */
+	public function findByEmail($email)
+	{
+		return $this->findByField($email, 'user_email');
+	}
+
+
+	/**
+	 * Zwraca listę wszystkich użytkowników, którzy nie są przypisani do danej grupy
+	 * UWAGA: wbrew temu co sugeruje nazwa - zwraca tez użytkownikow przypisanych do innych grup!
+	 *
 	 * @param Centixx_Model_Group $excludedGroup
 	 * @return array<Centixx_Model_User>
 	 */
-	public function fetchUsersFromOtherGroups(Centixx_Model_Group $excludedGroup)
+	public function fetchUngroupedUsers(Centixx_Model_Group $excludedGroup)
+	{
+		/*
+		 * uzywana jest taka konstrukcja, bo nie chce wykonac proste
+		 * zapytanie sql z joinami bez posredniego udzialu Zend_Db_Table
+		 *
+		 * wersja z Zend_Db_Table - wykomentowana niżej
+		 */
+
+		$adapter = $this->getDbTable()->getAdapter();
+		$query = $adapter
+			->select()
+			->from(array('u' => 'users'))
+//			->joinLeft(array('g' => 'groups'), 'u.user_id = g.group_manager', array())
+//			->where('g.group_id IS NULL') // nie sa zwracani kierownicy innych zespolow
+			->where('user_group != ? OR user_group IS NULL', $excludedGroup->id)
+			->order('user_name')
+		;
+		return $this->_fetchAll($query, null, $adapter);
+	}
+	/*
+	public function fetchUngroupedUsers(Centixx_Model_Group $excludedGroup)
 	{
 		$query = $this->getDbTable()->select()
 			->where('user_group != ?', $excludedGroup->id)
 			->orWhere('user_group IS NULL')
 			->order('user_name');
-		return $this->_setArrayKeys($this->fetchAll($query));
+		return $this->fetchAll($query);
 	}
-
-	/**
-	 * Jeśli tablica zawiera obiektu modeli,
-	 * to zostanie przetworzona tak, aby identyfikator glowny obiektu byl kluczem w tabeli
-	 * @param array<Centixx_Model_Abastrac> $array
-	 * @return array
-	 */
-	protected function _setArrayKeys($array)
-	{
-		$newArray = array();
-		foreach ($array as $el) {
-			$newArray[$el->id] = $el;
-		}
-		return $newArray;
-	}
+	*/
 
 	/**
 	 * (non-PHPdoc)
 	 * @see library/Centixx/Model/Mapper/Centixx_Model_Mapper_Abstract::fillModel()
 	 */
-	protected function fillModel(Centixx_Model_Abstract $model, Zend_Db_Table_Row_Abstract $row)
+	protected function fillModel(Centixx_Model_Abstract $model, $row)
 	{
 		$model
 		->setId($row->user_id)
@@ -60,6 +95,11 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 			'user_group'		=> $this->_findId($model->group),
 		);
 
+		if ($model->password != null) {
+			$config = Zend_Registry::get('config');
+			$data['user_password'] = md5($config['security']['passwordSalt'] . $model->password);
+		}
+
 		$table = $this->_dbTable;
 		if ($model->id) {
 			$pk = $this->_getPrimaryKey();
@@ -68,8 +108,15 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 		} else {
 			$table->insert($data);
 		}
-
 		return $this;
+	}
+
+	/**
+	 * @return Centixx_Model_Mapper_User
+	 */
+	public static function factory()
+	{
+		return new Centixx_Model_Mapper_User();
 	}
 
 }

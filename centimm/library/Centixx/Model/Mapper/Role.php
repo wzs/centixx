@@ -1,19 +1,19 @@
 <?php
-class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
+class Centixx_Model_Mapper_Role extends Centixx_Model_Mapper_Abstract
 {
 
-	protected function fillModel(Centixx_Model_Abstract $model, Zend_Db_Table_Row_Abstract $row)
+	protected function fillModel(Centixx_Model_Abstract $model, $row)
 	{
 		$model
-			->setId($row->project_id)
-			->setName($row->project_name)
+			->setId($row->role_id)
+			->setName($row->role_name)
 		;
 	}
 
 	public function save(Centixx_Model_Abstract $model)
 	{
 		$data = array(
-			'project_name'		=> $model->name,
+			'role_name'		=> $model->name,
 		);
 
 		$table = $this->_dbTable;
@@ -24,15 +24,16 @@ class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
 		} else {
 			$table->insert($data);
 		}
+
 		return $this;
 	}
 
 	/**
 	 * Statyczna metoda fabrykująca
-	 * @return Centixx_Model_Mapper_Project
+	 * @return Centixx_Model_Mapper_Role
 	 */
 	public static function factory()
 	{
-		return new Centixx_Model_Mapper_Project();
+		return new Centixx_Model_Mapper_Role();
 	}
 }

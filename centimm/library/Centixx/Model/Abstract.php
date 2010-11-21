@@ -1,13 +1,34 @@
 <?php
-abstract class Centixx_Model_Abstract
+abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
 {
 	const CLASS_PATH_SEPARATOR = '_';
 	const CLASS_PREFIX = 'Centixx_Model_';
 
 	/**
+	 * Dostep do zasobu nie powinien być zabroniony
+	 * @var int
+	 */
+	const ASSERTION_FAILURE = -1;
+
+	/**
+	 * Nie rozstrzygnięto, czy udzielić dostępu do zasobu
+	 * @var int
+	 */
+	const ASSERTION_INCONCLUSIVE = 0;
+
+	/**
+	 * Dostep do zasobu powinien być udzielony
+	 * @var int
+	 */
+	const ASSERTION_SUCCESS = 1;
+
+
+	/**
 	 * @var Centixx_Model_Mapper_Abstract
 	 */
 	protected $_mapper = null;
+
+	protected $_resourceType = null;
 
 	public function setMapper(Centixx_Model_Mapper_Abstract $mapper)
 	{
@@ -67,9 +88,29 @@ abstract class Centixx_Model_Abstract
 		return $this->_id;
 	}
 
+	/**
+	 * Utrwala obiekt w bazie danych przy pomocy mappera
+	 * @return Centixx_Model_Abstract fluent interface
+	 */
 	public function save()
 	{
+		if ($this->_mapper == null) {
+			throw new Exception('Mapper nie został ustawiony dla ' . get_class());
+		}
 		$this->_mapper->save($this);
+		return $this;
+	}
+
+	/**
+	 * Usuwa obiekt z bazy danych przy pomocy mappera
+	 * @return Centixx_Model_Abstract fluent interface
+	 */
+	public function delete()
+	{
+		if ($this->_mapper == null) {
+			throw new Exception('Mapper nie został ustawiony dla ' . get_class());
+		}
+		$this->_mapper->delete($this);
 		return $this;
 	}
 
@@ -81,4 +122,88 @@ abstract class Centixx_Model_Abstract
 		return $this->id;
 	}
 
+	/**
+	 * Zwraca tablicową reprezentację istotnych parametrów modelu
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		/**
+		 * Enter Parametry, które nie powinny być uwzględniane w eksporcie modelu do tablicy
+		 * @var array<string>
+		 */
+		$excluded = array('_mapper', '_resourceType');
+
+		$tmp = array();
+		foreach ($this as $key => $value) {
+			if (!in_array($key, $excluded)) {
+				//pomijam znak podkreslenia
+				$tmp[substr($key, 1)] = $value;
+			}
+		}
+		return $tmp;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see library/Zend/Acl/Resource/Zend_Acl_Resource_Interface::getResourceId()
+	 */
+    public function getResourceId()
+    {
+    	return $this->_resourceType;
+    }
+
+    /**
+     *
+     * @param Zend_Acl_Role_Interface|null $role
+     * @param string|null $privilege
+     * @return int
+     */
+    protected function _customAclAssertion($role, $privilage = null)
+    {
+		return self::ASSERTION_INCONCLUSIVE;
+    }
+
+    /**
+     * Sprawdza, czy podana rola ma dostep do tego obiektu
+     * z uwzglednieniem globalnej ACL jak i specyficznych warunków
+     *
+     * @param Zend_Acl_Role_Interface $role
+     * @param string|null $privilege
+     * @param Zend_Acl|null $acl
+     * @return bool
+     */
+	public function isAllowed($role, $privilege = null, Zend_Acl $acl = null)
+	{
+		if ($acl == null) {
+			$acl = Zend_Registry::getInstance()->get('modelAcl');
+		}
+
+		if (!$acl->has($this)) {
+			$acl->addResource($this);
+		}
+
+		//domyślna rola
+		if ($role == null) {
+			$role = new Zend_Acl_Role(Centixx_Acl::ROLE_GUEST);
+		}
+
+
+		/*
+		 * Reguły szczegółowe, zdefiniowane w modelu,
+		 * są ważniejsze od reguł zdefiniowanych w ACL.
+		 *
+		 * Jeśli reguła szczegółowa nie rozstrzyga (zwraca ASSERTION_PENDING),
+		 * to dopiero wtedy używane są reguły ogólne
+		 */
+		$result = $this->_customAclAssertion($role, $privilege);
+		if ($result == self::ASSERTION_SUCCESS) {
+			return true;
+		} else if ($result == self::ASSERTION_FAILURE) {
+			return false;
+		}
+
+		return $acl->isAllowed($role, $this, $privilege);
+	}
 }

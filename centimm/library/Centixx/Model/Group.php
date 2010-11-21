@@ -1,6 +1,7 @@
 <?php
 class Centixx_Model_Group extends Centixx_Model_Abstract
 {
+	protected $_resourceType= 'group';
 	protected $_id;
 	protected $_name;
 
@@ -21,6 +22,7 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	protected $_users;
 
 	/**
+	 * Ustawia użytkowników dla grupy (kasuje poprzednią zawartość!)
 	 * @param array<Centixx_Model_User> $users
 	 * @return Centixx_Model_Group fluent interface
 	 */
@@ -36,14 +38,26 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	}
 
 	/**
+	 * Przypisuje użytkownika do grupy
+	 * Uwaga! Metoda natychmiast zapisuje stan uzytkownika!
+	 * @param Centixx_Model_User $user
+	 * @return Centixx_Model_Group fluent interface
+	 */
+	public function addUser(Centixx_Model_User $user)
+	{
+		$user->setGroup($this)->save();
+		return $this;
+	}
+
+	/**
 	 * Zwraca listę użytkowników przydzielonych do grupy
 	 * @return array<Centixx_Model_User>
 	 */
 	public function getUsers($raw = false)
 	{
 		return $raw ?
-			$this->_users :
-			$this->_mapper->getRelatedSet($this, 'users', 'User', array('user_group = ?', $this->_id));
+		$this->_users :
+		$this->_mapper->getRelatedSet($this, 'users', 'User', array('user_group = ?', $this->_id));
 	}
 
 	/**
@@ -84,7 +98,10 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 */
 	public function getManager($raw = false)
 	{
-		return $raw ? $this->_manager : $this->_mapper->getRelated($this, 'manager', 'User');
+		$ret = $raw
+			? $this->_manager
+			: $this->_mapper->getRelated($this, 'manager', 'User');
+		return $ret;
 	}
 
 	/**
@@ -111,11 +128,25 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 */
 	public function isManager(Centixx_Model_User $user)
 	{
-		return $this->getManager() == $user;
+		return $this->getManager()->id == $user->id;
 	}
 
 	public function __toString()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see library/Centixx/Model/Centixx_Model_Abstract::_customAclAssertion()
+	 */
+	protected function _customAclAssertion($role, $privilage = null)
+	{
+		//uzytkownik nalezacy do danej grupy moze ja ogladac
+		if ($role instanceof Centixx_Model_User && $privilage == 'view' && $role->group->id == $this->id) {
+			return self::ASSERTION_SUCCESS;
+		}
+
+		return self::ASSERTION_INCONCLUSIVE;
 	}
 }

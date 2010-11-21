@@ -72,10 +72,10 @@ abstract class Centixx_Model_Mapper_Abstract
 	 *
 	 * Tworzy nowy obiekt mapowanej klasy i jesli podany zostanie parametr $row
 	 * wypełnia go danymi
-	 * @param Zend_Db_Table_Row_Abstract|null $row
+	 * @param $row
 	 * @return Centixx_Model_Abstract
 	 */
-	protected function _getNewModelInstance(Zend_Db_Table_Row_Abstract $row = null, $classNameShort = null)
+	protected function _getNewModelInstance($row = null, $classNameShort = null)
 	{
 		if ($classNameShort) {
 			$className = self::CLASS_PREFIX . $classNameShort;
@@ -93,20 +93,33 @@ abstract class Centixx_Model_Mapper_Abstract
 
 	/**
 	 * Zwraca listę instacji wszystkich mapowanych obiektow
-	 * @param array $where
+	 * @param array $query
+	 * @param array $order
+	 * @param Zend_Db_Table_Abstract|Zend_Db_Adapter_Abstract $adapter adapter używany do wykonania zapytania
 	 * @return array<Centixx_Model_Abstract>
 	 */
-	public function fetchAll($query = null, $order = null)
+	public function _fetchAll($query = null, $order = null, $adapter = null)
 	{
 		if ($order == null) {
 			$order = $this->getDbTable()->getOrder();
 		}
-		$resultSet = $this->getDbTable()->fetchAll($query, $order);
+		$resultSet = $adapter->fetchAll($query, $order);
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entries[] = $this->_getNewModelInstance($row);
 		}
-		return $entries;
+		return $this->_setArrayKeys($entries);
+	}
+
+	/**
+	 * Zwraca listę instacji wszystkich mapowanych obiektow
+	 * @param array $query
+	 * @param array $order
+	 * @return array<Centixx_Model_Abstract>
+	 */
+	public function fetchAll($query = null, $order = null)
+	{
+		return $this->_fetchAll($query, $order, $this->getDbTable());
 	}
 
 	/**
@@ -148,7 +161,17 @@ abstract class Centixx_Model_Mapper_Abstract
 	}
 
 	abstract public function save(Centixx_Model_Abstract $model);
-	abstract protected function fillModel(Centixx_Model_Abstract $model, Zend_Db_Table_Row_Abstract $row);
+	abstract protected function fillModel(Centixx_Model_Abstract $model, $row);
+
+	/**
+	 * Usuwa obiekt z bazy danych
+	 * @param Centixx_Model_Abstract $model
+	 */
+	public function delete(Centixx_Model_Abstract $model)
+	{
+		return $this->_dbTable->delete($this->_getPrimaryKey() . ' = ' . $model->id);
+	}
+
 
 	/**
 	 * @param int $id identyfikator szukanego obiektu
@@ -195,11 +218,16 @@ abstract class Centixx_Model_Mapper_Abstract
 		$getMethod = 'get' . ucfirst($field);
 		$setMethod = 'set' . ucfirst($field);
 
+		//pobieram wartość dotychczas przechowywaną (objekt lub jego numeryczne id)
 		$value = call_user_method_array($getMethod, $model, array(true));
 
+		//jesli jest przechowywane tylko id
 		if (!$value instanceof Centixx_Model_Abstract && $value != null) {
+			//pobieram z odpowiedniego mapper objekt
 			$mapper = $this->_getClassMaper($mapperClassName);
 			$value = $mapper->find($value);
+
+			//ustawiam obiekt jako nową wartość parametru
 			call_user_method($setMethod, $model, $value);
 		}
 		return $value;
@@ -229,16 +257,43 @@ abstract class Centixx_Model_Mapper_Abstract
 		return $value;
 	}
 
+	/**
+	 * Jeśli tablica zawiera obiektu modeli,
+	 * to zostanie przetworzona tak, aby identyfikator glowny obiektu byl kluczem w tabeli
+	 * @param array<Centixx_Model_Abastrac> $array
+	 * @return array
+	 */
+	protected function _setArrayKeys($array)
+	{
+		$newArray = array();
+		foreach ($array as $el) {
+			$newArray[$el->id] = $el;
+		}
+		return $newArray;
+	}
 
 	/**
-	 * Zwraca identyfikator danego parametru
-	 * Rozpoznaje, czy jest to juz zainicjowany obiekt,
-	 * czy tylko jego id (na potrzeby lazy load).
+	 * Zwraca numeryczny identyfikator danego parametru
+	 *
+	 * Należy użyć tego np. w metodzie save(), gdy zapisywany model
+	 * używa lazy loadingu i nie jest pewne czy dany parametr
+	 * jest zainicjowanym obiektem czy tylko numerycznym id
 	 *
 	 * @param int|Centixx_Model_Abstract $property
 	 */
 	protected function _findId($property)
 	{
 		return ($property instanceof Centixx_Model_Abstract) ? $property->id : $property;
+	}
+
+	/**
+	 * Statyczna metoda fabrykująca
+	 * @return Centixx_Model_Mapper_Abstract
+	 */
+	abstract public static function factory();
+
+	public function isAllowed(Centixx_Model_User $user, $privilages = null, $acl = null)
+	{
+		return true;
 	}
 }

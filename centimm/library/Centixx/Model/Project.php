@@ -1,11 +1,11 @@
 <?php
 class Centixx_Model_Project extends Centixx_Model_Abstract
 {
+	protected $_resourceType = 'project';
 	protected $_id;
 	protected $_name;
 	protected $_dateStart;
 	protected $_dateEnd;
-
 
 	/**
 	 * @var Centixx_Model_User

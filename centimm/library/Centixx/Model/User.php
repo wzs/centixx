@@ -1,6 +1,7 @@
 <?php
-class Centixx_Model_User extends Centixx_Model_Abstract
+class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role_Interface
 {
+	protected $_resourceType = 'user';
 	protected $_id;
 	protected $_name;
 	protected $_surname;
@@ -33,6 +34,16 @@ class Centixx_Model_User extends Centixx_Model_Abstract
 			throw new Centixx_Model_Exception("Invalid property for name");
 		}
 		return $this;
+	}
+
+	public function getPassword()
+	{
+		return $this->_password;
+	}
+
+	public function setPassword($password)
+	{
+		$this->_password = $password;
 	}
 
 	public function getName()
@@ -81,6 +92,11 @@ class Centixx_Model_User extends Centixx_Model_Abstract
 		return $this->_role;
 	}
 
+	public function getRoleName()
+	{
+		return $this->_mapper->getRoleName($this);
+	}
+
 	public function setGroup($group)
 	{
 		$this->_group = $group;
@@ -99,9 +115,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract
 
 	public function profileHref()
 	{
-		//TODO sprawdzic jak uzywac helperow z zewnatrz
-		$helper = new Zend_View_Helper_Url();
-		return $helper->url(array('controller' => 'users', 'action' => 'show', 'id' => $this->id));
+		return Zend_View_Helper_Url::url(array('controller' => 'users', 'action' => 'show', 'id' => $this->id));
 	}
 
 	public function __toString()
@@ -109,5 +123,28 @@ class Centixx_Model_User extends Centixx_Model_Abstract
 		return $this->getName() . ' ' . $this->getSurname();
 	}
 
+	/**
+	 * (non-PHPdoc)
+	 * @see library/Zend/Acl/Role/Zend_Acl_Role_Interface::getRoleId()
+	 */
+	public function getRoleId()
+	{
+		return $this->_role;
+	}
 
+	/**
+	 * (non-PHPdoc)
+	 * @see library/Centixx/Model/Centixx_Model_Abstract::_customAclAssertion()
+	 */
+    protected function _customAclAssertion($role, $privilage = null)
+    {
+		if ($role instanceof Centixx_Model_User) {
+			 //swój profil można edytować
+			if ($role->id == $this->_id) {
+				return self::ASSERTION_SUCCESS;
+			}
+
+		}
+		return self::ASSERTION_INCONCLUSIVE;
+    }
 }
