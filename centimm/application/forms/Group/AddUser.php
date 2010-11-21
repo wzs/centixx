@@ -7,12 +7,8 @@ class Application_Form_Group_AddUser extends Zend_Form
 	{
 		$this->setMethod(self::METHOD_POST);
 
-		$this->addElement('hidden', 'action', array(
-			'value' => 'aa',
-		));
-
 		$this->addElement('select', 'new_user', array(
-			'label'		=> 'Dodaj użytkownika do grupy',
+			'label'		=> 'Przypisz użytkownika do grupy',
 			'required'	=> true,
 			'multiOptions' => $this->_users,
 		));
@@ -23,9 +19,15 @@ class Application_Form_Group_AddUser extends Zend_Form
 		));
 	}
 
-	public function setUsers($users) {
-		$this->_users = $users;
+	public function setValues($array) {
+		if (array_key_exists('users', $array)) {
+			$this->_users = $array['users'];
+		}
 		$this->rebuild();
 		return $this;
+	}
+
+	public function hasUsers() {
+		return count($this->_users) !== 0;
 	}
 }

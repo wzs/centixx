@@ -7,7 +7,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 		// Initialize view
 		$view = new Zend_View();
-		$view->doctype('XHTML1_STRICT');
+		$view->doctype(Zend_View_Helper_Doctype::HTML4_STRICT);
 		$view->headTitle('Centixx');
 
 		//set basePath
@@ -35,22 +35,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initNamespaces()
 	{
-		Zend_Loader_Autoloader::getInstance()->registerNamespace('Centixx_');
-	}
-
-	protected function _initRouter()
-	{
-
+		$autoloader = Zend_Loader_Autoloader::getInstance();
+		$autoloader->registerNamespace('Centixx_');
 	}
 
 	protected function _initDatabase()
 	{
 		$db = $this->bootstrap('db')->getResource('db');
-		Zend_Registry::getInstance()->set('db', $db);
-
-        $profiler = new Zend_Db_Profiler_Firebug('All DB Queries');
-        $profiler->setEnabled(true);
-        $db->setProfiler($profiler);
+		$db->setFetchMode(Zend_Db::FETCH_OBJ);
+		Zend_Registry::set('db', $db);
 
 		return $db;
 	}
@@ -60,41 +53,81 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$auth = Zend_Auth::getInstance();
 		$user = null;
 		if ($auth->hasIdentity()) {
-			$userMapper = new Centixx_Model_Mapper_User();
-			$user = $userMapper->findByField($auth->getIdentity(), 'user_email');
+			$user = Centixx_Model_Mapper_User::factory()->findByEmail($auth->getIdentity());
 		}
-		Zend_Registry::getInstance()->set('currentUser', $user);
+		Zend_Registry::set('currentUser', $user);
 		return $user;
 	}
 
 	protected function _initAcl()
 	{
-		//TODO wczytywanie uprawnien z xml'owego configu
-		$acl = new Zend_Acl();
-		Zend_Registry::getInstance()->set('acl', $acl);
-		return $acl;
+		$currentUser = $this->bootstrap('currentUser')->getResource('currentUser');
+		if ($currentUser == null) {
+		}
+
+		$actionResourceAcl = new Centixx_Acl_ActionResource();
+		Zend_Registry::set('actionAcl', $actionResourceAcl);
+
+		$modelResourceAcl = new Centixx_Acl_ModelResource();
+		Zend_Registry::set('modelAcl', $modelResourceAcl);
+
+		$frontController = Zend_Controller_Front::getInstance();
+		$frontController->registerPlugin(new Centixx_Controller_Plugin_Acl($currentUser, $actionResourceAcl));
+
+		return array('action' => $actionResourceAcl, 'model' => $modelResourceAcl);
 	}
 
 	protected function _initConfig()
 	{
 		$config = $this->getOptions();
-	    Zend_Registry::set('config', $config);
-	    return $config;
+		Zend_Registry::set('config', $config);
+		return $config;
 	}
+
+	protected function _initNavigation()
+	{
+		$acl = $this->bootstrap('acl')->getResource('acl');
+		$currentUser = $this->bootstrap('currentUser')->getResource('currentUser');
+
+		$navi = new Centixx_Navigation();
+		Zend_Registry::set('Zend_Navigation', $navi);
+
+		Zend_View_Helper_Navigation_Menu::setDefaultAcl($acl['action']);
+		Zend_View_Helper_Navigation_Menu::setDefaultRole($currentUser);
+
+		return $navi;
+	}
+
 
 	protected function _initLog()
 	{
 		$this->bootstrap('config');
-		$e = Zend_Registry::getInstance()->get('config');
-		$log = Zend_Log::factory(array($e['resources']['log']));
+		$config = Zend_Registry::getInstance()->get('config');
+		$log = Zend_Log::factory(array($config['resources']['log']));
 
 		//ustawiam logowanie tylko zdarzen specyficznych dla aplikacji
 		$log->addPriority('Centixx', Centixx_Log::CENTIXX);
 		$log->addFilter(new Zend_Log_Filter_Priority(Centixx_Log::CENTIXX, '='));
 
-		Zend_Registry::getInstance()->set('log', $log);
+		Zend_Registry::set('log', $log);
+
+		//dodatkowo do debugowania przez FirePHP
+		$firePhpLog = new Zend_Log(new Zend_Log_Writer_Firebug());
+		Zend_Registry::set('firephplog', $firePhpLog);
 
 		return $log;
+	}
+
+	protected function _initCache()
+	{
+
+		$frontendOptions = array('automatic_serialization' => true);
+		$backendOptions  = array('cache_dir' => APPLICATION_PATH . '/../data/cache');
+		$cache = Zend_Cache::factory('Core', 'File', $frontendOptions, $backendOptions);
+
+		Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
+
+		return $cache;
 	}
 }
 

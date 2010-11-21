@@ -2,7 +2,6 @@
 
 class AuthController extends Centixx_Controller_Action
 {
-
 	public function indexAction()
 	{
 		if (Zend_Auth::getInstance()->getIdentity()) {
@@ -54,8 +53,10 @@ class AuthController extends Centixx_Controller_Action
 	protected function _authenticate(Zend_Form $loginForm)
 	{
 		$auth = Zend_Auth::getInstance();
-		$adapter = new Zend_Auth_Adapter_DbTable($this->_db, 'users', 'user_email', 'user_password', 'MD5(?)');
 
+		$salt = $this->_config['security']['passwordSalt'];
+
+		$adapter = new Zend_Auth_Adapter_DbTable($this->_db, 'users', 'user_email', 'user_password', "MD5(CONCAT('{$salt}', ?))");
 		$adapter->setIdentity($loginForm->getValue('email'));
 		$adapter->setCredential($loginForm->getValue('password'));
 
@@ -67,8 +68,7 @@ class AuthController extends Centixx_Controller_Action
 	 */
 	protected function _setCurrentUser($identify)
 	{
-		$userMapper = new Centixx_Model_Mapper_User();
-		$this->_currentUser = $userMapper->findByField($identify, 'user_email');
+		$this->_currentUser = Centixx_Model_Mapper_User::factory()->findByEmail($identify);
 	}
 }
 
