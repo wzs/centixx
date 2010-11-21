@@ -66,7 +66,7 @@ class AuthController extends Centixx_Controller_Action
 	}
 
 	/**
-	 * Przeładowuje obecnie zalogowanego użytkownika
+	 * Przeładowuje obecnie zalogowanego użytkownika ala ma kota
 	 */
 	protected function _setCurrentUser($identify)
 	{
