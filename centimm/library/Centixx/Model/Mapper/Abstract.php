@@ -67,6 +67,16 @@ abstract class Centixx_Model_Mapper_Abstract
 		$parts[count($parts) - 2] = 'DbTable';
 		return join(self::CLASS_PATH_SEPARATOR, $parts);
 	}
+	
+	/**
+	 * Zwraca kanoniczną nazwę mapowanego modelu, np. 'User' czy 'Group'
+	 * @return string
+	 */
+	public function getModelName()
+	{
+		$parts = explode(self::CLASS_PATH_SEPARATOR, get_class($this));
+		return $parts[count($parts) - 1];
+	}
 
 	/**
 	 *
@@ -208,7 +218,7 @@ abstract class Centixx_Model_Mapper_Abstract
 	/**
 	 * Zwraca i ładuje powiązany z modelem obiekt
 	 * @param Centixx_Model_Abstract $model
-	 * @param string $field nazwa żądanego pola
+	 * @param string $field nazwa żądanego pola, które zostanie ustawione w modelu
 	 * @param string $mapperClassName krótka nazwa mappera
 	 * @return Centixx_Model_Abstract
 	 */

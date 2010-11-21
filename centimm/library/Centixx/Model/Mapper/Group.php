@@ -10,6 +10,30 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 	protected $_saveUsers = false;
 
 	/**
+	 * Zwraca listę grup nieprzypisanych do danego projektu
+	 * @param Centixx_Model_Project $excludedProject
+	 * @return array<Centixx_Model_Group>
+	 */
+	public function fetchFreeGroups(Centixx_Model_Project $excludedProject)
+	{
+		/*
+		 * uzywana jest taka konstrukcja, bo nie chce wykonac proste
+		 * zapytanie sql z joinami bez posredniego udzialu Zend_Db_Table
+		 *
+		 * wersja z Zend_Db_Table - wykomentowana niżej
+		 */
+
+		$adapter = $this->getDbTable()->getAdapter();
+		$query = $adapter
+			->select()
+			->from(array('g' => 'groups'))
+			->where('group_project != ? OR group_project IS NULL', $excludedProject->id)
+			->order('group_name')
+		;
+		return $this->_fetchAll($query, null, $adapter);
+	}
+	
+	/**
 	 * Zwraca grupę, której przypisano danego użytkownika jako kierownika
 	 * @param Centixx_Model_User|int $manager
 	 * @return Centixx_Model_Group
@@ -41,7 +65,7 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 	{
 		$data = array(
 			'group_name'		=> $model->name,
-			//'group_project'		=> $this->_findId($model->project),
+			'group_project'		=> $this->_findId($model->project),
 			'group_manager'		=> $this->_findId($model->manager),
 		);
 
