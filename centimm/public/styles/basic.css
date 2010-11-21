@@ -1,25 +1,76 @@
 @CHARSET "UTF-8";
 
-@font-face{font-family:'Essays 1743';src:local('Essays 1743'),url('f/essays1743-webfont.ttf') format('truetype');font-weight:normal;font-style:normal}
-html{overflow-y:scroll;-webkit-font-smoothing:antialiased}
-html,body{background:#fff;color:#000;margin:0;padding:0}
-body{font:large/1.556 Palatino,'Palatino Linotype','Book Antiqua',Georgia,'Times New Roman',serif;word-spacing:.1em;max-width:960px;margin:0 auto;padding-bottom:2em}
-p{font-size:large; margin:1.556em 0; overflow: hidden;}
-a{text-decoration:none}
-h1,h2,h4{font-family:'Essays 1743',Palatino,'Palatino Linotype','Book Antiqua',Georgia,'Times New Roman',serif;font-weight:normal; text-transform:uppercase; text-shadow:0 0 1px #667}
-h1{font-size:266.7%;line-height:1.1;text-align:center;width:100%;margin:1em 0}
-h2{font-size:210%;line-height:1.3125;margin:1.167em 0;text-align:center;clear:both}
-time {float: right; margin-right: 1em; margin-top: 0.4em; color: gray;}
+@font-face {
+	font-family: 'Essays 1743';
+	src: local('Essays 1743'), format('truetype');
+	font-weight: normal;
+	font-style: normal
+}
 
+html {
+	overflow-y: scroll;
+	-webkit-font-smoothing: antialiased
+}
+
+html,body {
+	background: #fff;
+	color: #000;
+	margin: 0;
+	padding: 0
+}
+
+body {
+	font: large/1.556 Palatino, 'Palatino Linotype', 'Book Antiqua', Georgia,
+		'Times New Roman', serif;
+	word-spacing: .1em;
+	max-width: 960px;
+	margin: 0 auto;
+	padding-bottom: 2em;
+}
+
+p {
+	font-size: large;
+	margin: 1.556em 0;
+	overflow: hidden;
+}
+
+a {
+	text-decoration: none
+}
+
+h1,h2,h4 {
+	font-family: 'Essays 1743', Palatino, 'Palatino Linotype',
+		'Book Antiqua', Georgia, 'Times New Roman', serif;
+	font-weight: normal;
+	text-transform: uppercase;
+	text-shadow: 0 0 1px #667
+}
+
+h1 {
+	font-size: 200%;
+	line-height: 1.1;
+	text-align: center;
+	width: 100%;
+	margin: 1em 0
+}
+
+h2 {
+	font-size: 170%;
+	line-height: 1.3125;
+	margin: 0.8em 0;
+	text-align: center;
+	clear: both
+}
+
+time {
+	float: right;
+	margin-right: 1em;
+	margin-top: 0.4em;
+	color: gray;
+}
 
 body {
 	margin-top: 1em;
-}
-#header {
-	background: whitesmoke;
-	padding: 0.3em 2em;
-	overflow: hidden;
-	border-radius: 10px;
 }
 
 hr {
@@ -27,13 +78,85 @@ hr {
 }
 
 a {
-    color: #0398CA;
+	color: #0398CA;
+	outline: none;
+}
+
+a:hover {
+	color: #14536F;
 }
 
 #flashMessages {
 	overflow: hidden;
 	list-style-type: none;
 }
+
 #flashMessages li {
-	color: red;	
+	color: red;
+}
+
+.navi-menu {
+	list-style-type: none;
+	overflow: hidden;
+	background: whitesmoke;
+	overflow: hidden;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	padding: 0px 5px;
+	border: 1px solid #E8E8E8;
+	font-family: verdana, arial, sans-serif;
+	font-size: 90%;
+}
+
+.navi-menu li {
+	float: right;
+	margin-left: 5px;
+	padding: 5px 0;
+}
+
+.navi-menu li.active {
+	background-image: url('../img/menu-indicator.png');
+	background-repeat: no-repeat;
+	background-position: center bottom;
+}
+
+.navi-menu li a {
+	display: block;
+	padding: 0.1em 0.5em;
+	border: 1px solid transparent;
+}
+
+
+.navi-menu li a:hover {
+	bbackground-color: #E2E2E2;
+	border: 1px solid #CFCFCF;
+	box-shadow: inset 0px 5px 15px #CFCFCF;
+	-moz-box-shadow: inset 0px 5px 15px #CFCFCF;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+}
+
+/* Home */
+.navi-menu li:first-child a {
+	padding: 0.1em 1em;
+}
+
+.navi-menu li:first-child {
+	float: left;
+	margin-left: 0px;
+}
+
+.group-users .manager a {
+	font-weight: bold;
+}
+
+.mainWrapper {
+	border: 1px solid whitesmoke;
+	background: whitesmoke;
+	padding: 0.5em 2em;
+	padding-bottom: 2em;
+	overflow: hidden;
+	border-radius: 15px;
+	-moz-border-radius: 15px;
+	border: 1px solid #E8E8E8;
 }
