@@ -1,0 +1,10 @@
+<h2>Lista projektów</h2>
+<?php if ($this->projects): ?>
+<ul>
+<?php foreach ($this->projects as $project): ?>
+<li>
+	<a href="<?php echo $this->url(array('controller' => 'projects', 'action' => 'show', 'id' => $project->id)) ?>"><?php echo $project ?></a>
+</li>
+<?php endforeach; ?>
+</ul>
+<?php endif ?>
