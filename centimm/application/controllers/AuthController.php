@@ -52,6 +52,8 @@ class AuthController extends Centixx_Controller_Action
 	 */
 	protected function _authenticate(Zend_Form $loginForm)
 	{
+		debug($this->_config);
+
 		$auth = Zend_Auth::getInstance();
 
 		$salt = $this->_config['security']['passwordSalt'];
