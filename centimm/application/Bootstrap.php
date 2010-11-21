@@ -24,6 +24,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		//Pass the flash messages to the main layout
 		$view->messages = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages();
 
+//		$view->addHelperPath("ZendX/JQuery/View/Helper", "ZendX_JQuery_View_Helper");
+		
 		// Return it, so that it can be stored by the bootstrap
 		return $view;
 	}
@@ -128,6 +130,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
 
 		return $cache;
+	}
+	
+	protected function _initLocale()
+	{
+		$this->bootstrap('config');
+		$config = Zend_Registry::getInstance()->get('config');
+
+		date_default_timezone_set($cofig['locale']['timezone']);
+		$locale = new Zend_Locale($config['locale']['locale']);
+
+		Zend_Registry::set('Zend_Locale', $locale);
+		return $locale;
 	}
 }
 
