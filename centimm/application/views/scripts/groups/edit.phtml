@@ -1,0 +1,26 @@
+<h2>Edycja grupy <?php echo $this->group ?></h2>
+<?php
+	if ($this->group->isAllowed($this->currentUser, 'edit')):
+		echo $this->form->setAction($this->url(array('controller' => 'groups', 'action' => 'edit')));
+
+		echo '<hr />';
+
+		if ($this->addUserForm->hasUsers()):
+			echo $this->addUserForm->setAction($this->url(array('controller' => 'groups', 'action' => 'add_user')));
+		endif;
+
+		echo '<hr />';
+
+		$deleteForm = new Zend_Form();
+		$deleteForm->addElement('submit', 'submit', array(
+			'label' => 'Usuń grupę',
+		));
+
+		$deleteForm->addElement('hidden', 'group_id', array(
+			'value' => $this->group->id
+		));
+
+		echo $deleteForm->setAction($this->url(array('controller' => 'groups', 'action' => 'delete', 'id' => $this->group->id)));
+
+	endif;
+?>

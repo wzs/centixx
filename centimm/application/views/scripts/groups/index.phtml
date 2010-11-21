@@ -1,1 +1,10 @@
-<br /><br /><center>View script for controller <b>Groups</b> and script/action name <b>index</b></center>
+<h2>Lista grup</h2>
+<?php if ($this->groups): ?>
+<ul>
+<?php foreach ($this->groups as $group): ?>
+<li>
+	<a href="<?php echo $this->url(array('controller' => 'groups', 'action' => 'show', 'id' => $group->id)) ?>"><?php echo $group ?></a>
+</li>
+<?php endforeach; ?>
+</ul>
+<?php endif ?>
