@@ -113,11 +113,6 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		return $raw ? $this->_group : $this->_mapper->getRelated($this, 'group', 'Group');
 	}
 
-	public function profileHref()
-	{
-		return Zend_View_Helper_Url::url(array('controller' => 'users', 'action' => 'show', 'id' => $this->id));
-	}
-
 	public function __toString()
 	{
 		return $this->getName() . ' ' . $this->getSurname();

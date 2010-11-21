@@ -206,4 +206,16 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
 
 		return $acl->isAllowed($role, $this, $privilege);
 	}
+	
+	/**
+	 * Zwraca kanoniczny adres URL do danego obiektu
+	 * @param string $action akcja do wykonania - domyślnie wyświetlenie obiektu: 'show'
+	 * @return string URL
+	 */	
+	public function getUrl($action = 'show')
+	{
+		 //odwoluje się do metody mappera, bo zwykłe get_class() nie zadziała w PHP < 5.3 (brak LSB)
+		$controllerName = strtolower($this->_mapper->getModelName() . 's');
+		return Zend_View_Helper_Url::url(array('controller' => $controllerName, 'action' => $action, 'id' => $this->id));
+	}
 }

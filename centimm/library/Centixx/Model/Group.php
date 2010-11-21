@@ -119,7 +119,7 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 */
 	public function getProject($raw = false)
 	{
-		return $raw ? $this->_project : $this->_mapper->getRelated($this, 'project');
+		return $raw ? $this->_project : $this->_mapper->getRelated($this, 'project', 'Project');
 	}
 
 	/**

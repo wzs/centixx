@@ -42,6 +42,18 @@ class Centixx_Navigation extends Zend_Navigation
 		        'controller' => 'groups',
 		        'resource' => 'groups:index',
 		    ),
+		    
+			array(
+		        'label' => 'Projekty',
+		        'controller' => 'projects',
+		        'resource' => 'projects:index',
+		    ),
+		    
+			array(
+		        'label' => 'Panel Administracyjny',
+		        'controller' => 'admin',
+		        'resource' => 'admin:index',
+		    ),
 
 		    array(
 		        'label' => 'Logowanie',
