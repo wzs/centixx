@@ -38,7 +38,7 @@ a {
 	text-decoration: none
 }
 
-h1,h2,h4 {
+h1,h2,h3 {
 	font-family: 'Essays 1743', Palatino, 'Palatino Linotype',
 		'Book Antiqua', Georgia, 'Times New Roman', serif;
 	font-weight: normal;
@@ -132,6 +132,8 @@ a:hover {
 	border: 1px solid #CFCFCF;
 	box-shadow: inset 0px 5px 15px #CFCFCF;
 	-moz-box-shadow: inset 0px 5px 15px #CFCFCF;
+	-webkit-box-shadow: inset 0px 5px 15px #CFCFCF;
+	
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 }
@@ -159,4 +161,62 @@ a:hover {
 	border-radius: 15px;
 	-moz-border-radius: 15px;
 	border: 1px solid #E8E8E8;
+}
+
+.logViewer {
+	max-height: 110px;
+	overflow-y: scroll;
+	background: white;
+	border: 1px solid lightgray;
+	padding: 0;
+	font-size: 11px;
+}
+.logViewer div {
+	padding: 0px;
+	padding-left: 4px;
+	
+}
+.logViewer div:hover {
+	background: #F8FFBF;
+}
+
+form ul.errors {
+	list-style-type: none;
+	position: relative;
+	left: 120px;
+	top: -27px;
+	margin-bottom: -20px;
+	color: red;
+}
+
+form dl {
+	overflow: hidden;
+}
+
+form dt {
+	float: left;
+	width: 160px;
+	clear: left;
+}
+
+
+form dd {
+	float: left;
+}
+
+form #submit-element {
+	margin-top: 10px;
+}
+
+#loginForm {
+	margin: 0 auto;
+	width: 300px;
+	padding: 1px 20px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	border: 1px solid #CFCFCF;
+}
+
+#loginForm dt {
+	width: 60px;
 }

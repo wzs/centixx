@@ -36,9 +36,13 @@ class Centixx_Acl_ActionResource extends Centixx_Acl
 		$controllers = array(
 			'auth' 		=> array('index', 'logout'),
 			'error'		=> array('error'),
-			'groups' 	=> array('index', 'show', 'add_user', 'edit', 'delete'),
 			'index'		=> array('index'),
 			'users' 	=> array('index', 'show', 'edit'),
+			'groups' 	=> array('index', 'show', 'add_user', 'edit', 'delete'),
+			'projects' 	=> array('index', 'show', 'add_group', 'edit', 'delete'),
+			'admin' 	=> array('index'),
+		
+		
 		);
 
 		//inicjuję zasoby dla kazdej kombinacji
@@ -62,17 +66,25 @@ class Centixx_Acl_ActionResource extends Centixx_Acl
 		$this->deny(null, null);
 
 		$this->allow(null, 'index:index');
-
 		$this->allow(null, 'error:error');
-		$this->allow(self::ROLE_USER, 'groups:index');
-		$this->allow(self::ROLE_USER, 'groups:show');
-		$this->allow(self::ROLE_USER, 'users:index');
-		$this->allow(self::ROLE_USER, 'users:show');
+		
+		$this->allow(self::ROLE_GROUP_MANAGER, 'groups:index');
+		$this->allow(self::ROLE_GROUP_MANAGER, 'groups:show');
+		
+		$this->allow(self::ROLE_GROUP_MANAGER, 'users:index');
+		$this->allow(self::ROLE_GROUP_MANAGER, 'users:show');
 
 		$this->allow(self::ROLE_PROJECT_MANAGER, 'groups:edit');
 		$this->allow(self::ROLE_PROJECT_MANAGER, 'groups:delete');
 		$this->allow(self::ROLE_PROJECT_MANAGER, 'groups:add_user');
-
+	
+		$this->allow(self::ROLE_PROJECT_MANAGER, 'projects:index');
+		$this->allow(self::ROLE_PROJECT_MANAGER, 'projects:show');
+		$this->allow(self::ROLE_PROJECT_MANAGER, 'projects:edit');
+		$this->allow(self::ROLE_PROJECT_MANAGER, 'projects:add_group');
+		
+		
+		$this->allow(self::ROLE_ADMIN, 'admin:index');
 
 		$this->allow(self::ROLE_USER, 'users:edit'); //tmp
 

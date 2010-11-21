@@ -21,8 +21,10 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 
 		$this->allow($roles[self::ROLE_USER], 'group', 'view');
 		$this->allow($roles[self::ROLE_PROJECT_MANAGER], 'group', 'edit');
-
-
+		
+		$this->allow($roles[self::ROLE_PROJECT_MANAGER], 'project', 'view');
+		$this->allow($roles[self::ROLE_PROJECT_MANAGER], 'project', 'edit');
+		
 	}
 
 	protected function _initModelTypeResources()

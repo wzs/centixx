@@ -42,7 +42,7 @@ class GroupsController extends Centixx_Controller_Action
 		if ($request->isPost()) {
 
 			$groupId = $request->getParam('id');
-			$userId =  $request->getParam('new_user');
+			$userId =  $request->getParam('new_item');
 
 			$user  = Centixx_Model_Mapper_User::factory()->find($userId);
 			$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
@@ -58,6 +58,7 @@ class GroupsController extends Centixx_Controller_Action
 			Centixx_Log::CENTIXX
 			);
 			$this->_forward('edit', null, null, $request->getParams());
+			$this->_redirect($group->getUrl('edit'));
 		} else {
 			$this->_forward('show', null, null, $request->getParams());
 		}
@@ -77,10 +78,12 @@ class GroupsController extends Centixx_Controller_Action
 		$form = new Application_Form_Group_Edit();
 		$form->setValues(array('group' => $group));
 
-		$addUserForm = new Application_Form_Group_AddUser();
-		$addUserForm->setValues(array('users' => $usersFromOtherGroups));
+		$addUserForm = new Centixx_Form_AddItem();
+		$addUserForm->submitLabel = 'Przypisz';
+		$addUserForm->setValues(array('items' => $usersFromOtherGroups));
 
-		if ($this->getRequest()->isPost() && !$this->getRequest()->getParam('new_user')) {
+		//drugi warunek jest po to, aby po akcji dodania uzytkownika
+		if ($this->getRequest()->isPost()) {
 			try {
 				$data = $this->getRequest()->getPost();
 				if ($form->isValid($data)) {

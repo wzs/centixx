@@ -23,7 +23,12 @@ require_once 'Centixx/functions.php';
 // Create application, bootstrap, and run
 $application = new Zend_Application(
     APPLICATION_ENV,
-    APPLICATION_PATH . '/configs/application.ini'
+    array(
+    	'config' => APPLICATION_PATH . '/configs/application.ini',
+//    	'pluginPaths' => array(
+//            'ZendX_Application_Resource' => 'ZendX/Application/Resource',
+//        ),
+    )
 );
 $application->bootstrap()
             ->run();
