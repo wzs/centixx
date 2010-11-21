@@ -4,7 +4,7 @@
 
 <?php if (isset($this->user)): ?>
 <p>
-	Zalogowany jako <a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'show', 'id' => $this->user->id)) ?>"><?php echo $this->user ?></a>
+	Zalogowany jako <?php echo $this->user ?>
 	(<?php echo $this->user->getroleName() ?>)
 </p>
 <?php endif ?>

@@ -2,25 +2,24 @@
 <?php
 	if ($this->group->isAllowed($this->currentUser, 'edit')):
 		echo $this->form->setAction($this->url(array('controller' => 'groups', 'action' => 'edit')));
-
-		echo '<hr />';
-
-		if ($this->addUserForm->hasUsers()):
+?>
+		<hr />
+		<h4>Przypisz użytkownika do grupy</h4>
+<?php
+		if ($this->addUserForm->hasItems()):
 			echo $this->addUserForm->setAction($this->url(array('controller' => 'groups', 'action' => 'add_user')));
 		endif;
-
-		echo '<hr />';
-
+?>
+		<hr />
+<?php
 		$deleteForm = new Zend_Form();
 		$deleteForm->addElement('submit', 'submit', array(
 			'label' => 'Usuń grupę',
 		));
-
 		$deleteForm->addElement('hidden', 'group_id', array(
 			'value' => $this->group->id
 		));
-
-		echo $deleteForm->setAction($this->url(array('controller' => 'groups', 'action' => 'delete', 'id' => $this->group->id)));
+		echo $deleteForm->setAction($this->group->getUrl('delete'));
 
 	endif;
 ?>
