@@ -12,6 +12,10 @@ class UsersController extends Centixx_Controller_Action
 		$userId = $this->getRequest()->getParam('id');
 		$user = Centixx_Model_Mapper_User::factory()->find($userId);
 
+		if (!$user->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_SHOW)) {
+			throw new Centixx_Acl_AuthenticationException();
+		}
+
 		$this->view->headTitle()->prepend($user . ' - ');
 		$this->view->user = $user;
 	}
@@ -36,15 +40,20 @@ class UsersController extends Centixx_Controller_Action
 		$this->view->user = $user;
 
 		if ($this->getRequest()->isPost()) {
-			try {
-				$data = $this->getRequest()->getPost();
-				if ($form->isValid($data)) {
-					$user->setOptions($data)->save();
-					$this->view->messages[] = 'Dane zostały zaktualizowane';
+
+			$data = $this->getRequest()->getPost();
+			if ($form->isValid($data)) {
+					
+				//gdy rola uzytkownika zmieniana jest na członka zarządu
+				//trzeba sprawdzic czy są na to przyznane odpowiednie ustawienia
+				if ($data['role'] !== $user->getRole() && $data['role'] == Centixx_Acl::ROLE_CEO) {
+
 				}
-			} catch (Exception $e) {
-				echo $e->getMessage();
+					
+				$user->setOptions($data)->save();
+				$this->view->messages[] = 'Dane zostały zaktualizowane';
 			}
+
 		} else {
 			$form->setDefaults($user->toArray());
 		}

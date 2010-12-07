@@ -64,12 +64,46 @@ class GroupsController extends Centixx_Controller_Action
 		}
 	}
 
+	public function newAction()
+	{
+		$this->_helper->viewRenderer('edit');
+		
+		$group = new Centixx_Model_Group();
+		$group->setMapper(new Centixx_Model_Mapper_Group());
+
+		if (!$group->isAllowed($this->_currentUser, 'edit')) {
+			throw new Centixx_Acl_AuthenticationException();
+		}
+
+		$form = new Application_Form_Group_Edit();
+		$form->setValues(array('group' => $group));
+
+		if ($this->getRequest()->isPost()) {
+			try {
+				$data = $this->getRequest()->getPost();
+				if ($form->isValid($data)) {
+					$group->setOptions($data)->save();
+					$this->_flashMessenger->addMessage('Grupa została utworzona');
+					$this->_redirect($group->getUrl('edit'));
+				}
+			} catch (Exception $e) {
+				echo $e->getMessage();
+			}
+		} else {
+			$form->setDefaults($group->toArray());
+		}
+
+		$this->view->form = $form;
+		$this->view->formAction = 'new';
+		$this->view->group = $group;
+	}
+	
 	public function editAction()
 	{
 		$groupId = $this->getRequest()->getParam('id');
 		$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
 
-		$usersFromOtherGroups = Centixx_Model_Mapper_User::factory()->fetchUngroupedUsers($group);
+		$usersFromOtherGroups = Centixx_Model_Mapper_User::factory()->fetchAvailableUsers($group);
 
 		if (!$group->isAllowed($this->_currentUser, 'edit')) {
 			throw new Centixx_Acl_AuthenticationException();
@@ -98,6 +132,7 @@ class GroupsController extends Centixx_Controller_Action
 		}
 
 		$this->view->form = $form;
+		$this->view->formAction = 'edit';
 		$this->view->addUserForm = $addUserForm;
 		$this->view->group = $group;
 	}

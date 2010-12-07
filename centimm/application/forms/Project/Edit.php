@@ -50,22 +50,23 @@ class Application_Form_Project_Edit extends Zend_Form
 
 		$this->addElement('text', 'dateStart', array(
 			'label'		=> 'Data rozpoczęcia',
+			'title' => 'rrrr-mm-dd',
 			'required'	=> true,
 			'maxLength' => 11,
-			'dateFormat' => 'yyyy-dd-dd',
-			'validators' => array(
-				'date',
-			),
+			'dateFormat' => 'yyyy-mm-dd',
+//			'validators' => array(
+//				'date',
+//			),
 			'errorMessages'  => array('Wymagana jest poprawna data rozpoczęcia'),
 		));
 		$this->addElement('text', 'dateEnd', array(
 			'label'		=> 'Data zakończenia',
 			'required'	=> true,
 			'maxLength' => 11,
-			'dateFormat' => 'yyyy-dd-dd',
-			'validators' => array(
-				'date',
-			),
+			'dateFormat' => 'yyyy-mm-dd',
+//			'validators' => array(
+//				'date',
+//			),
 			'errorMessages'  => array('Wymagana jest poprawna data zakończenia'),
 		));
 		

@@ -5,28 +5,23 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	protected function _initView()
 	{
 
-		// Initialize view
 		$view = new Zend_View();
 		$view->doctype(Zend_View_Helper_Doctype::HTML4_STRICT);
 		$view->headTitle('Centixx');
 
-		//set basePath
 		$this->bootstrap('layout');
 		$cfg = $this->getOption('resources');
 
 		$layout = $this->getResource('layout');
 		$layout->basePath = $cfg['layout']['basePath'];
 
-		// Add it to the ViewRenderer
 		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
 		$viewRenderer->setView($view);
 
-		//Pass the flash messages to the main layout
 		$view->messages = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages();
 
 //		$view->addHelperPath("ZendX/JQuery/View/Helper", "ZendX_JQuery_View_Helper");
 		
-		// Return it, so that it can be stored by the bootstrap
 		return $view;
 	}
 
@@ -63,20 +58,21 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initAcl()
 	{
-		$currentUser = $this->bootstrap('currentUser')->getResource('currentUser');
-		if ($currentUser == null) {
-		}
-
-		$actionResourceAcl = new Centixx_Acl_ActionResource();
-		Zend_Registry::set('actionAcl', $actionResourceAcl);
+		$this->bootstrap('currentUser');
+		$currentUser = $this->getResource('currentUser');
 
 		$modelResourceAcl = new Centixx_Acl_ModelResource();
-		Zend_Registry::set('modelAcl', $modelResourceAcl);
+		Zend_Registry::set('Zend_Acl', $modelResourceAcl);
 
+		//rejestrowanie pluginu, w którym automatycznie sprawdzane są uprawnienia 
+		//do wykonania akcji w kontrolerze
+		
+//		$actionResourceAcl = new Centixx_Acl_ActionResource();
+//		Zend_Registry::set('actionAcl', $actionResourceAcl);
 		$frontController = Zend_Controller_Front::getInstance();
-		$frontController->registerPlugin(new Centixx_Controller_Plugin_Acl($currentUser, $actionResourceAcl));
+		$frontController->registerPlugin(new Centixx_Controller_Plugin_Acl($currentUser, $modelResourceAcl));
 
-		return array('action' => $actionResourceAcl, 'model' => $modelResourceAcl);
+		return $modelResourceAcl;
 	}
 
 	protected function _initConfig()
@@ -88,13 +84,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initNavigation()
 	{
-		$acl = $this->bootstrap('acl')->getResource('acl');
-		$currentUser = $this->bootstrap('currentUser')->getResource('currentUser');
+		$this->bootstrap('acl');
+		$acl = $this->getResource('acl');
+		
+		$this->bootstrap('currentUser');
+		$currentUser = $this->getResource('currentUser');
 
 		$navi = new Centixx_Navigation();
 		Zend_Registry::set('Zend_Navigation', $navi);
 
-		Zend_View_Helper_Navigation_Menu::setDefaultAcl($acl['action']);
+		//ustawiam ACL'a używanego przez menu
+		Zend_View_Helper_Navigation_Menu::setDefaultAcl($acl);
 		Zend_View_Helper_Navigation_Menu::setDefaultRole($currentUser);
 
 		return $navi;
@@ -125,8 +125,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 		$frontendOptions = array('automatic_serialization' => true);
 		$backendOptions  = array('cache_dir' => APPLICATION_PATH . '/../data/cache');
+		
+		//cache dla schematów bazy danych
 		$cache = Zend_Cache::factory('Core', 'File', $frontendOptions, $backendOptions);
-
 		Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
 
 		return $cache;

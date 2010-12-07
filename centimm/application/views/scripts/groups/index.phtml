@@ -3,9 +3,11 @@
 <?php if ($this->groups): ?>
 <ul>
 <?php foreach ($this->groups as $group): ?>
+<?php if ($group->isAllowed($this->currentUser, 'show')): ?>
 <li>
 	<a href="<?php echo $group->getUrl() ?>"><?php echo $group ?></a>
 </li>
+<?php endif ?>
 <?php endforeach; ?>
 </ul>
 <?php endif ?>

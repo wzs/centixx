@@ -1,25 +1,23 @@
 <h2>Edycja grupy <?php echo $this->group ?></h2>
 <?php
 	if ($this->group->isAllowed($this->currentUser, 'edit')):
-		echo $this->form->setAction($this->url(array('controller' => 'groups', 'action' => 'edit')));
-?>
-		<hr />
-		<h4>Przypisz użytkownika do grupy</h4>
-<?php
-		if ($this->addUserForm->hasItems()):
+		echo $this->form->setAction($this->url(array('controller' => 'groups', 'action' => $this->formAction)));
+
+		if ($this->addUserForm && $this->addUserForm->hasItems()):
+			echo '<hr /><h4>Przypisz użytkownika do grupy</h4>';
 			echo $this->addUserForm->setAction($this->url(array('controller' => 'groups', 'action' => 'add_user')));
 		endif;
-?>
-		<hr />
-<?php
-		$deleteForm = new Zend_Form();
-		$deleteForm->addElement('submit', 'submit', array(
-			'label' => 'Usuń grupę',
-		));
-		$deleteForm->addElement('hidden', 'group_id', array(
-			'value' => $this->group->id
-		));
-		echo $deleteForm->setAction($this->group->getUrl('delete'));
 
+		if ($this->group->id):
+			$deleteForm = new Zend_Form();
+			$deleteForm->addElement('submit', 'submit', array(
+				'label' => 'Usuń grupę',
+			));
+			$deleteForm->addElement('hidden', 'group_id', array(
+				'value' => $this->group->id
+			));
+			echo '<hr />';
+			echo $deleteForm->setAction($this->group->getUrl('delete'));
+		endif;
 	endif;
 ?>

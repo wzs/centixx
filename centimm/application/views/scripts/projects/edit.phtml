@@ -1,28 +1,31 @@
 <h2>Edycja projektu <?php echo $this->project ?></h2>
 <?php
 	if ($this->project->isAllowed($this->currentUser, 'edit')):
-		echo $this->form->setAction($this->url(array('controller' => 'projects', 'action' => 'edit')));
+		echo $this->form->setAction($this->url(array('controller' => 'projects', 'action' => $this->formAction)));
+?>
+
+<?php
+		if ($this->addGroupForm->hasItems()):
 ?>
 		<hr />
 		<h4>Przypisz grupę do projektu</h4>
-<?php
-		if ($this->addGroupForm->hasItems()):
-			echo $this->addGroupForm->setAction($this->url(array('controller' => 'projects', 'action' => 'add_group')));
+		<?php echo $this->addGroupForm->setAction($this->url(array('controller' => 'projects', 'action' => 'add-group'))); ?>
+<?php 	
 		endif;
 ?>
-		<hr />
-		
 <?php	
-		$deleteForm = new Zend_Form();
-		$deleteForm->addElement('submit', 'submit', array(
-			'label' => 'Usuń projekt',
-		));
-
-		$deleteForm->addElement('hidden', 'project_id', array(
-			'value' => $this->project->id
-		));
-
-		echo $deleteForm->setAction($this->url(array('controller' => 'projects', 'action' => 'delete', 'id' => $this->project->id)));
-
+		if ($this->project->id != null):
+			$deleteForm = new Zend_Form();
+			$deleteForm->addElement('submit', 'submit', array(
+				'label' => 'Usuń projekt',
+			));
+	
+			$deleteForm->addElement('hidden', 'project_id', array(
+				'value' => $this->project->id
+			));
+			echo '<hr />';
+			echo $deleteForm->setAction($this->url(array('controller' => 'projects', 'action' => 'delete', 'id' => $this->project->id)));
+		endif;
+		
 	endif;
 ?>

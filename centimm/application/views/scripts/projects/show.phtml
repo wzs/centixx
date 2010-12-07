@@ -5,7 +5,7 @@
 <?php endif ?>
 
 <p>Kierownik: <?php echo $this->project->getManager() ?></p>
-<p>Czas trwania: <span><?php echo $this->project->dateStart->get(Zend_Date::DATE_LONG) ?></span> - <span><?php echo $this->project->dateEnd->get(Zend_Date::DATE_LONG) ?></span></p>
+<p>Czas trwania: <span><?php echo $this->project->dateStart ?></span> - <span><?php echo $this->project->dateEnd ?></span></p>
 
 <?php if ($this->project->groups): ?>
 <h3>Grupy w projekcie:</h3>

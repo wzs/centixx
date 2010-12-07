@@ -5,3 +5,6 @@
 <pre><?php foreach ($this->logs as $logLine){ echo '<div>' . $logLine . PHP_EOL . '</div>'; } ?></pre>
 </div>
 <h3>Kopia zapasowa bazy danych</h3>
+<form method="POST" action="<?php echo $this->url(array('controller' => 'admin', 'action' => 'make-backup')) ?>">
+	<input type="submit" value="Utwórz kopię" />
+</form>

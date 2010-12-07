@@ -1,6 +1,6 @@
 <?php
 
-class ErrorController extends Zend_Controller_Action
+class ErrorController extends Centixx_Controller_Action
 {
 	public function errorAction()
 	{
@@ -9,6 +9,9 @@ class ErrorController extends Zend_Controller_Action
 			$this->_response->clearBody(); //layout generował się dwa razy
 			$this->getResponse()->setHttpResponseCode(403);
 			$this->view->message = 'Dostęp zabroniony';
+			
+			$uri = $errors->request->getRequestUri();
+			$this->_logger->log("Próba nieautoryzowanego dostępu do {$uri} przez {$this->_currentUser}", Centixx_Log::CENTIXX);
 
 		} else {
 			switch ($errors->type) {
@@ -28,12 +31,6 @@ class ErrorController extends Zend_Controller_Action
 			}
 		}
 
-		//Log exception, if logger available
-		if ($log = $this->getLog()) {
-			$log->crit($this->view->message, $errors->exception);
-		}
-
-
 		// conditionally display exceptions
 		if ($this->getInvokeArg('displayExceptions') == true) {
 			$this->view->exception = $errors->exception;
@@ -42,14 +39,6 @@ class ErrorController extends Zend_Controller_Action
 		$this->view->request   = $errors->request;
 	}
 
-	public function getLog()
-	{
-		$bootstrap = $this->getInvokeArg('bootstrap');
-		if (!$bootstrap->hasPluginResource('Log')) {
-			return false;
-		}
-		$log = $bootstrap->getResource('Log');
-		return $log;
-	}
+
 }
 
