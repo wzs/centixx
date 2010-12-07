@@ -1,6 +1,7 @@
 <?php
 /**
  * Definiuje reguły dostępu dla zasobów rozumianych jako akcje w kontrolerach
+ * UWAGA: narazie nieuzywany
  * @author wzs
  *
  */

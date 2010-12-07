@@ -30,7 +30,6 @@ class Centixx_Form_AddItem extends Zend_Form
 	}
 
 	public function hasItems() {
-		debug($this->_items);
 		return count($this->_items) !== 0;
 	}
 }

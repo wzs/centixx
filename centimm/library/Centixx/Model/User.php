@@ -112,10 +112,28 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	{
 		return $raw ? $this->_group : $this->_mapper->getRelated($this, 'group', 'Group');
 	}
+	
+	public function getAccount() 
+	{	
+		return $this->_account;
+	}
+	
+	/**
+	 * @param int $account
+	 */
+	public function setAccount($account) 
+	{
+		$this->_account = $account;
+	}
+	
+	public function getHourRate()
+	{
+
+	}
 
 	public function __toString()
 	{
-		return $this->getName() . ' ' . $this->getSurname();
+		return $this->getName() .  ' ' . $this->getSurname();
 	}
 
 	/**
@@ -134,12 +152,36 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
     protected function _customAclAssertion($role, $privilage = null)
     {
 		if ($role instanceof Centixx_Model_User) {
-			 //swój profil można edytować
-			if ($role->id == $this->_id) {
+//			 //swój profil można edytować
+//			if ($role->id == $this->_id) {
+//				return self::ASSERTION_SUCCESS;
+//			}
+
+			//HR może edytować profil użytkownika
+			if ($role->getRole() == Centixx_Acl::ROLE_HR) {
 				return self::ASSERTION_SUCCESS;
 			}
-
+			
+			//kierownik grupy moze ogladac profil podwladnego
+			if ($privilage == self::ACTION_SHOW && $role->getRole() == Centixx_Acl::ROLE_GROUP_MANAGER
+				&& $this->group->manager->id == $role->id) {
+				return self::ASSERTION_SUCCESS;
+			}
+			
+			//kierownik projektu moze ogladac profil podwladnego
+			if ($privilage == self::ACTION_SHOW && $role->getRole() == Centixx_Acl::ROLE_PROJECT_MANAGER
+				&& $this->group->project->manager->id == $role->id) {
+				return self::ASSERTION_SUCCESS;
+			}
+		
+			//TODO sprawdzic czy dziala prawidlowo po dodaniu modelu department
+			//kierownik dzialu moze ogladac wszystkich swoich podwladnych
+			if ($privilage == self::ACTION_SHOW && $role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF
+				&& in_array($this->role, array(Centixx_Acl::ROLE_USER, Centixx_Acl::ROLE_GROUP_MANAGER, Centixx_Acl::ROLE_PROJECT_MANAGER))) {
+				return self::ASSERTION_SUCCESS;
+			}
+			
 		}
-		return self::ASSERTION_INCONCLUSIVE;
+		return parent::_customAclAssertion($role, $privilage);
     }
 }

@@ -26,44 +26,34 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 		return $this->findByField($email, 'user_email');
 	}
 
-
 	/**
-	 * Zwraca listę wszystkich użytkowników, którzy nie są przypisani do danej grupy
-	 * UWAGA: wbrew temu co sugeruje nazwa - zwraca tez użytkownikow przypisanych do innych grup!
+	 * Zwraca listę wszystkich użytkowników, których można przypisać do grupy
+	 * w szczególności nie są zwracanie użytkownicy już przypisani do danej grupy,
+	 * kierownicy innych grup ani użytkownicy przypisani do innych stanowisk
 	 *
 	 * @param Centixx_Model_Group $excludedGroup
 	 * @return array<Centixx_Model_User>
 	 */
-	public function fetchUngroupedUsers(Centixx_Model_Group $excludedGroup)
+	public function fetchAvailableUsers(Centixx_Model_Group $excludedGroup)
 	{
 		/*
-		 * uzywana jest taka konstrukcja, bo nie chce wykonac proste
+		 * uzywana jest taka konstrukcja, bo chce wykonac proste
 		 * zapytanie sql z joinami bez posredniego udzialu Zend_Db_Table
-		 *
-		 * wersja z Zend_Db_Table - wykomentowana niżej
 		 */
 
 		$adapter = $this->getDbTable()->getAdapter();
 		$query = $adapter
 			->select()
 			->from(array('u' => 'users'))
-//			->joinLeft(array('g' => 'groups'), 'u.user_id = g.group_manager', array())
-//			->where('g.group_id IS NULL') // nie sa zwracani kierownicy innych zespolow
-			->where('user_group != ? OR user_group IS NULL', $excludedGroup->id)
+			->joinLeft(array('g' => 'groups'), 'u.user_id = g.group_manager', array())
+			->where('g.group_id IS NULL') // kierownicy innych zespolow
+			->where('user_group != ? OR user_group IS NULL', $excludedGroup->id) //uzytkownicy juz przypisani do tej grupy
+			->where("user_role IN (".Centixx_Acl::ROLE_USER.", ".Centixx_Acl::ROLE_GROUP_MANAGER.") ") //tylko code-monkeys
+			
 			->order('user_name')
 		;
 		return $this->_fetchAll($query, null, $adapter);
 	}
-	/*
-	public function fetchUngroupedUsers(Centixx_Model_Group $excludedGroup)
-	{
-		$query = $this->getDbTable()->select()
-			->where('user_group != ?', $excludedGroup->id)
-			->orWhere('user_group IS NULL')
-			->order('user_name');
-		return $this->fetchAll($query);
-	}
-	*/
 
 	/**
 	 * (non-PHPdoc)
@@ -100,13 +90,13 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 			$data['user_password'] = md5($config['security']['passwordSalt'] . $model->password);
 		}
 
-		$table = $this->_dbTable;
+		$table = $this->getDbTable();
 		if ($model->id) {
 			$pk = $this->_getPrimaryKey();
 			$where = $table->getAdapter()->quoteInto($pk . ' = ?', $model->id);
 			$table->update($data, $where);
 		} else {
-			$table->insert($data);
+			$model->id = $table->insert($data);
 		}
 		return $this;
 	}

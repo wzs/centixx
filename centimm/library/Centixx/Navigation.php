@@ -19,7 +19,7 @@ class Centixx_Navigation extends Zend_Navigation
     	//TODO wczytać z configu
 		return array(
 		    array(
-		        'label' => '¢entixx',
+		        'label' => 'Centixx',
 		    	'title' => 'Strona główna',
 		        'controller' => 'index',
 		    	'order'	=> -1,
@@ -29,36 +29,42 @@ class Centixx_Navigation extends Zend_Navigation
 		    	'class' => 'logout',
 		        'controller' => 'auth',
 		    	'action'	=> 'logout',
-		        'resource' => 'auth:logout',
+		        'resource' => 'page-logout',
 		    ),
 		    array(
-		        'label' => 'Users',
+		        'label' => 'Pracownicy',
 		        'controller' => 'users',
-    	        'resource' => 'users:index',
+    	        'resource' => 'page-users',
 		    ),
 
 		    array(
 		        'label' => 'Grupy',
 		        'controller' => 'groups',
-		        'resource' => 'groups:index',
+		        'resource' => 'page-groups',
 		    ),
 		    
 			array(
 		        'label' => 'Projekty',
 		        'controller' => 'projects',
-		        'resource' => 'projects:index',
+		        'resource' => 'page-projects',
 		    ),
 		    
 			array(
 		        'label' => 'Panel Administracyjny',
 		        'controller' => 'admin',
-		        'resource' => 'admin:index',
+		        'resource' => 'page-admin',
 		    ),
 
+			array(
+		        'label' => 'Czas pracy',
+		        'controller' => 'timesheet',
+		        'resource' => 'page-timesheet',
+		    ),
+		    
 		    array(
 		        'label' => 'Logowanie',
 		        'controller' => 'auth',
-		        'resource' => 'auth:index',
+		        'resource' => 'page-login',
 		    ),
 
 		);

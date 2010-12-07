@@ -253,6 +253,12 @@ abstract class Centixx_Model_Mapper_Abstract
 	 */
 	public function getRelatedSet(Centixx_Model_Abstract $model, $field, $mapperClassName, $where)
 	{
+		
+		//dla nowych modeli
+		if ($model->id == null) {
+			return null;
+		}
+		
 		$getMethod = 'get' . ucfirst($field);
 		$setMethod = 'set' . ucfirst($field);
 

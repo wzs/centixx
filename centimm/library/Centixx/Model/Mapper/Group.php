@@ -69,13 +69,13 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 			'group_manager'		=> $this->_findId($model->manager),
 		);
 
-		$table = $this->_dbTable;
+		$table = $this->getDbTable();
 		if ($model->id) {
 			$pk = $this->_getPrimaryKey();
 			$where = $table->getAdapter()->quoteInto($pk . ' = ?', $model->id);
 			$table->update($data, $where);
 		} else {
-			$table->insert($data);
+			$model->id = $table->insert($data);
 		}
 
 		//zapisanie użytkowników przypisanych do grupy
@@ -86,7 +86,27 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 			}
 		}
 
+		$this->_updateManager($model);
+
 		return $this;
+	}
+
+	/**
+	 * Dokonuje wszelkich zmian zwiazanych ze zmiana kierownika grupy
+	 * @param Centixx_Model_Group $model
+	 */
+	protected function _updateManager(Centixx_Model_Group $model)
+	{
+		$adapter = $this->getDbTable()->getAdapter();
+
+		//usuwam poprzedniego managera
+		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_group` = ? AND `user_role` = ?", 
+			array(Centixx_Acl::ROLE_USER, $model->id, Centixx_Acl::ROLE_GROUP_MANAGER));
+		
+		//ustawiam nowego manadzera
+		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_id` = ?", 
+			array(Centixx_Acl::ROLE_GROUP_MANAGER, $this->_findId($model->manager)));
+		
 	}
 
 	/**

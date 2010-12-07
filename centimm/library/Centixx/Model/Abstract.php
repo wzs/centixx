@@ -1,5 +1,5 @@
 <?php
-abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
+abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Centixx_Model_Interface
 {
 	const CLASS_PATH_SEPARATOR = '_';
 	const CLASS_PREFIX = 'Centixx_Model_';
@@ -22,6 +22,9 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
 	 */
 	const ASSERTION_SUCCESS = 1;
 
+	const ACTION_EDIT = 'edit';
+	const ACTION_SHOW = 'show';
+
 
 	/**
 	 * @var Centixx_Model_Mapper_Abstract
@@ -35,42 +38,42 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
 		$this->_mapper = $mapper;
 	}
 
-    public function __construct(array $options = null)
-    {
-        if (is_array($options)) {
-            $this->setOptions($options);
-        }
-    }
+	public function __construct(array $options = null)
+	{
+		if (is_array($options)) {
+			$this->setOptions($options);
+		}
+	}
 
-    public function __set($name, $value)
-    {
-        $method = 'set' . $name;
-        if (!method_exists($this, $method)) {
-            throw new Centixx_Model_Exception('Invalid property');
-        }
-        $this->$method($value);
-    }
+	public function __set($name, $value)
+	{
+		$method = 'set' . $name;
+		if (!method_exists($this, $method)) {
+			throw new Centixx_Model_Exception('Invalid property');
+		}
+		$this->$method($value);
+	}
 
-    public function __get($name)
-    {
-        $method = 'get' . $name;
-        if (!method_exists($this, $method)) {
-            throw new Centixx_Model_Exception('Invalid property');
-        }
-        return $this->$method();
-    }
+	public function __get($name)
+	{
+		$method = 'get' . $name;
+		if (!method_exists($this, $method)) {
+			throw new Centixx_Model_Exception('Invalid property');
+		}
+		return $this->$method();
+	}
 
-    public function setOptions(array $options)
-    {
-        $methods = get_class_methods($this);
-        foreach ($options as $key => $value) {
-            $method = 'set' . ucfirst($key);
-            if (in_array($method, $methods)) {
-                $this->$method($value);
-            }
-        }
-        return $this;
-    }
+	public function setOptions(array $options)
+	{
+		$methods = get_class_methods($this);
+		foreach ($options as $key => $value) {
+			$method = 'set' . ucfirst($key);
+			if (in_array($method, $methods)) {
+				$this->$method($value);
+			}
+		}
+		return $this;
+	}
 
 	public function setId($id)
 	{
@@ -133,13 +136,19 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
 		 * Enter Parametry, które nie powinny być uwzględniane w eksporcie modelu do tablicy
 		 * @var array<string>
 		 */
-		$excluded = array('_mapper', '_resourceType');
+		$excluded = array('_mapper', '_resourceType', '_dateFormat');
 
 		$tmp = array();
 		foreach ($this as $key => $value) {
 			if (!in_array($key, $excluded)) {
-				//pomijam znak podkreslenia
-				$tmp[substr($key, 1)] = $value;
+				//pomijam poczatkowy znak podkreslenia
+				$propName = substr($key, 1);
+
+				//wywoluje gettera
+				$getterName = 'get' . camelCase($propName, true);
+				if (method_exists($this, $getterName)) {
+					$tmp[$propName] = call_user_method($getterName, $this);
+				}
 			}
 		}
 		return $tmp;
@@ -149,35 +158,35 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
 	 * (non-PHPdoc)
 	 * @see library/Zend/Acl/Resource/Zend_Acl_Resource_Interface::getResourceId()
 	 */
-    public function getResourceId()
-    {
-    	return $this->_resourceType;
-    }
+	public function getResourceId()
+	{
+		return $this->_resourceType;
+	}
 
-    /**
-     *
-     * @param Zend_Acl_Role_Interface|null $role
-     * @param string|null $privilege
-     * @return int
-     */
-    protected function _customAclAssertion($role, $privilage = null)
-    {
+	/**
+	 *
+	 * @param Zend_Acl_Role_Interface|null $role
+	 * @param string|null $privilege
+	 * @return int
+	 */
+	protected function _customAclAssertion($role, $privilage = null)
+	{
 		return self::ASSERTION_INCONCLUSIVE;
-    }
+	}
 
-    /**
-     * Sprawdza, czy podana rola ma dostep do tego obiektu
-     * z uwzglednieniem globalnej ACL jak i specyficznych warunków
-     *
-     * @param Zend_Acl_Role_Interface $role
-     * @param string|null $privilege
-     * @param Zend_Acl|null $acl
-     * @return bool
-     */
+	/**
+	 * Sprawdza, czy podana rola ma dostep do tego obiektu
+	 * z uwzglednieniem globalnej ACL jak i specyficznych warunków
+	 *
+	 * @param Zend_Acl_Role_Interface $role
+	 * @param string|null $privilege
+	 * @param Zend_Acl|null $acl
+	 * @return bool
+	 */
 	public function isAllowed($role, $privilege = null, Zend_Acl $acl = null)
 	{
 		if ($acl == null) {
-			$acl = Zend_Registry::getInstance()->get('modelAcl');
+			$acl = Zend_Registry::getInstance()->get('Zend_Acl');
 		}
 
 		if (!$acl->has($this)) {
@@ -194,27 +203,29 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface
 		 * Reguły szczegółowe, zdefiniowane w modelu,
 		 * są ważniejsze od reguł zdefiniowanych w ACL.
 		 *
-		 * Jeśli reguła szczegółowa nie rozstrzyga (zwraca ASSERTION_PENDING),
+		 * Jeśli reguła szczegółowa nie rozstrzyga (zwraca ASSERTION_INCONCLUSIVE),
 		 * to dopiero wtedy używane są reguły ogólne
 		 */
-		$result = $this->_customAclAssertion($role, $privilege);
-		if ($result == self::ASSERTION_SUCCESS) {
-			return true;
-		} else if ($result == self::ASSERTION_FAILURE) {
-			return false;
+		try {
+			$result = $this->_customAclAssertion($role, $privilege);
+			if ($result == self::ASSERTION_SUCCESS) {
+				return true;
+			} else if ($result == self::ASSERTION_FAILURE) {
+				return false;
+			}
+		} catch (Centixx_Model_Exception $e) {
 		}
-
 		return $acl->isAllowed($role, $this, $privilege);
 	}
-	
+
 	/**
 	 * Zwraca kanoniczny adres URL do danego obiektu
 	 * @param string $action akcja do wykonania - domyślnie wyświetlenie obiektu: 'show'
 	 * @return string URL
-	 */	
-	public function getUrl($action = 'show')
+	 */
+	public function getUrl($action = self::ACTION_SHOW)
 	{
-		 //odwoluje się do metody mappera, bo zwykłe get_class() nie zadziała w PHP < 5.3 (brak LSB)
+		//odwoluje się do metody mappera, bo zwykłe get_class() nie zadziała w PHP < 5.3 (brak LSB)
 		$controllerName = strtolower($this->_mapper->getModelName() . 's');
 		return Zend_View_Helper_Url::url(array('controller' => $controllerName, 'action' => $action, 'id' => $this->id));
 	}

@@ -1,21 +1,25 @@
 <?php
-class Centixx_Model_Mapper_Role extends Centixx_Model_Mapper_Abstract
+class Centixx_Model_Mapper_Permission extends Centixx_Model_Mapper_Abstract
 {
-
 	protected function fillModel(Centixx_Model_Abstract $model, $row)
 	{
 		$model
-			->setId($row->role_id)
-			->setName($row->role_name)
+			->setId($row->permission_id)
+			->setFrom($row->permission_from)
+			->setFor($row->permission_for)
+			->setType($row->permission_type)
 		;
 	}
 
 	public function save(Centixx_Model_Abstract $model)
 	{
 		$data = array(
-			'role_name'		=> $model->name,
+			'project_from'		=> $this->_findId($model->from),
+			'project_for'		=> $this->_findId($model->for),
+			'project_type'		=> $model->type,
 		);
-
+		
+		
 		$table = $this->getDbTable();
 		if ($model->id) {
 			$pk = $this->_getPrimaryKey();
@@ -24,16 +28,16 @@ class Centixx_Model_Mapper_Role extends Centixx_Model_Mapper_Abstract
 		} else {
 			$model->id = $table->insert($data);
 		}
-
+		
 		return $this;
 	}
 
 	/**
 	 * Statyczna metoda fabrykująca
-	 * @return Centixx_Model_Mapper_Role
+	 * @return Centixx_Model_Mapper_Permission
 	 */
 	public static function factory()
 	{
-		return new Centixx_Model_Mapper_Role();
+		return new Centixx_Model_Mapper_Permission();
 	}
 }

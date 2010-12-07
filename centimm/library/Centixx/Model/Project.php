@@ -2,6 +2,13 @@
 class Centixx_Model_Project extends Centixx_Model_Abstract
 {
 	protected $_resourceType = 'project';
+	
+	/**
+	 * W jaki sposób ma być formatowana data
+	 * @var string
+	 */
+	protected $_dateFormat = 'Y-MM-dd';
+	
 	protected $_id;
 	protected $_name;
 	
@@ -103,30 +110,44 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	public function setDateStart($dateStart)
 	{
 		if (!$dateStart instanceof Zend_Date) {
-			$dateStart = new Zend_Date($dateStart, Zend_Date::ISO_8601);
+			//parsowanie daty w formie yyyy-mm-dd
+			$tmp = explode('-', $dateStart);
+			$dateStart = new Zend_Date(array('year' => $tmp[0], 'month' => $tmp[1], 'day' => $tmp[2]));
 		}
 
 		$this->_dateStart = $dateStart;
 		return $this;
 	}
 
-	public function getDateStart($format = null)
+	/**
+	 * Zwraca datę rozpoczęcia projektu
+	 * @param bool $raw czy ma być zwrócone jako Zend_Date
+	 * @return Zend_Date|string 
+	 */
+	public function getDateStart($raw = false)
 	{
-		return $this->_dateStart;
+		return $raw ? $this->_dateStart : $this->_dateStart ? $this->_dateStart->toString($this->_dateFormat) : null;
 	}
 
 	public function setDateEnd($dateEnd)
 	{
 		if (!$dateEnd instanceof Zend_Date) {
-			$dateEnd = new Zend_Date($dateEnd, Zend_Date::ISO_8601);
+			//parsowanie daty w formie yyyy-mm-dd
+			$tmp = explode('-', $dateEnd);
+			$dateEnd = new Zend_Date(array('year' => $tmp[0], 'month' => $tmp[1], 'day' => $tmp[2]));
 		}
 		$this->_dateEnd = $dateEnd;
 		return $this;
 	}
 
-	public function getDateEnd($format = null)
+	/**
+	 * Zwraca datę zakonczenia projektu
+	 * @param bool $raw czy ma być zwrócone jako Zend_Date
+	 * @return Zend_Date|string 
+	 */
+	public function getDateEnd($raw = false)
 	{
-		return $this->_dateEnd;
+		return $raw ? $this->_dateEnd : $this->_dateEnd ? $this->_dateEnd->toString($this->_dateFormat) : null;
 	}
 	
 	/**
@@ -163,11 +184,23 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 
 	public function __toString()
 	{
-		return $this->name;
+		return (string)$this->name;
 	}
 	
     protected function _customAclAssertion($role, $privilage = null)
     {
-		return self::ASSERTION_INCONCLUSIVE;
+    	if ($role instanceof Centixx_Model_User) {
+    		//kierownik działu ma pełny wgląd do wszystkich projektów
+			if ($role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {
+				return self::ASSERTION_SUCCESS;
+			}
+			
+			//kierownik projektu ma wgląd do swoich projektów
+			if ($role->getRole() == Centixx_Acl::ROLE_PROJECT_MANAGER && $privilage == 'view') {
+				return self::ASSERTION_SUCCESS;
+			}
+    	}
+    	
+    	return parent::_customAclAssertion($role, $privilage);
     }
 }

@@ -20,8 +20,8 @@ class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
 		$model
 			->setId($row->project_id)
 			->setName($row->project_name)
-			->setDateStart($row->project_start)
-			->setDateEnd($row->project_stop)
+			->setDateStart(new Zend_Date($row->project_start, Zend_Date::ISO_8601))
+			->setDateEnd(new Zend_Date($row->project_stop, Zend_Date::ISO_8601))
 			->setManager($row->project_manager)
 		;
 	}
@@ -31,17 +31,50 @@ class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
 		$data = array(
 			'project_name'		=> $model->name,
 			'project_manager'	=> $this->_findId($model->manager),
+			'project_start'		=> $model->dateStart,
+			'project_stop'		=> $model->dateEnd,
 		);
-
-		$table = $this->_dbTable;
+		
+		
+		$table = $this->getDbTable();
 		if ($model->id) {
 			$pk = $this->_getPrimaryKey();
 			$where = $table->getAdapter()->quoteInto($pk . ' = ?', $model->id);
+			$this->_updateManager($model); //wazne aby wykonac to przed updatem
 			$table->update($data, $where);
 		} else {
-			$table->insert($data);
+			$model->id = $table->insert($data);
 		}
+		
 		return $this;
+	}
+	
+	/**
+	 * Dokonuje wszelkich zmian zwiazanych ze zmiana kierownika grupy
+	 * @param Centixx_Model_Group $model
+	 */
+	protected function _updateManager(Centixx_Model_Project $model)
+	{
+		//TODO trzeba napisac jakas funkcje w sql'u ktora automatycznie poustawia odpowiednie prawa dostepu przy zmianach
+		//tzn. dla wszystkich projektow znajdzie kierownikow i ustawi im user_role = 4 i analogicznie dla kierownikow grup
+		
+		$adapter = $this->getDbTable()->getAdapter();
+
+		//usuwam poprzedniego managera
+		$adapter->query("
+UPDATE projects p 
+JOIN users u ON u.user_id = p.project_manager
+SET u.user_role = ?
+WHERE p.project_id = ?", 
+			array(Centixx_Acl::ROLE_USER, $model->id));
+		
+		//ustawiam nowego manadzera
+		$adapter->query("
+UPDATE users u 
+SET u.user_role = ?
+WHERE u.user_id = ?", 
+			array(Centixx_Acl::ROLE_PROJECT_MANAGER, $this->_findId($model->manager)));
+		
 	}
 
 	/**
