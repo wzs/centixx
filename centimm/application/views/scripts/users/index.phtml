@@ -8,3 +8,7 @@
 <?php endforeach; ?>
 </ul>
 <?php endif ?>
+
+<?php if ($this->currentUser->role == Centixx_Acl::ROLE_HR): ?>
+<a href="<?php echo $this->url(array('action' => 'add')); ?>">Dodaj nowego</a>
+<?php endif ?>

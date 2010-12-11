@@ -9,6 +9,9 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	protected $_email;
 	protected $_role;
 
+	const ACTION_ADD_CEO = 'add_ceo';
+
+
 	/**
 	 * @var Centixx_Model_Group|int
 	 */
@@ -174,8 +177,14 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 //				return self::ASSERTION_SUCCESS;
 //			}
 
-			//HR może edytować profil użytkownika
+			//HR może edytować/dodawac profil użytkownika
 			if ($role->getRole() == Centixx_Acl::ROLE_HR) {
+
+				//dla ustawienia CEO potrzebna jest cesja
+				if ($privilage == self::ACTION_ADD_CEO) {
+					return $role->hasPermission(self::ACTION_ADD_CEO) ? self::ASSERTION_SUCCESS : self::ASSERTION_FAILURE;
+				}
+
 				return self::ASSERTION_SUCCESS;
 			}
 

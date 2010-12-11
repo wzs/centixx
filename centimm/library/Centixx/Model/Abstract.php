@@ -24,6 +24,8 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 
 	const ACTION_EDIT = 'edit';
 	const ACTION_SHOW = 'show';
+	const ACTION_NEW  = 'edit';
+
 
 
 	/**

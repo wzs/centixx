@@ -161,13 +161,4 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 	{
 		return (string)$this->id;
 	}
-
-    protected function _customAclAssertion($role, $privilage = null)
-    {
-    	if ($role->getRole() == Centixx_Acl::ROLE_CEO) {
-    		return self::ASSERTION_SUCCESS;
-    	}
-
-    	return parent::_customAclAssertion($role, $privilage);
-    }
 }

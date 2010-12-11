@@ -58,7 +58,7 @@ class Application_Form_User_Edit extends Zend_Form
 			));
 		}
 
-		$this->addelement('submit', 'submit', array(
+		$this->addElement('submit', 'submit', array(
 			'label'		=> 'Zapisz',
 			'ignore'	=> true,
 		));
