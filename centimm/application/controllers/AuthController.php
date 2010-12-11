@@ -20,7 +20,7 @@ class AuthController extends Centixx_Controller_Action
 					$this->_logger->log($this->_currentUser . " zalogował się", Centixx_Log::CENTIXX);
 					$this->_redirect('/');
 				} else {
-					$this->_flashMessenger->addMessage('Niepoprawne dane logowania ' . join(' ', $auth->getMessages()));
+					$this->_flashMessenger->addMessage('Niepoprawne dane logowania ');
 					$this->_logger->log("Nieudana próba logowania na konto {$loginForm->getValue('email')}", Centixx_Log::CENTIXX);
 				}
 			} else {

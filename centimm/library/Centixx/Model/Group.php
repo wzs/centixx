@@ -142,23 +142,23 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 */
 	protected function _customAclAssertion($role, $privilage = null)
 	{
-				
+
 		if ($role instanceof Centixx_Model_User) {
 			//uzytkownik (w tym kierownik grupy) nalezacy do danej grupy moze ja ogladac
 			if ($privilage == 'view' && $role->group->id == $this->id) {
 				return self::ASSERTION_SUCCESS;
 			}
-			
+
 			//kierownik grupy moze ogladac swoja grupe
 			if ($role->role == Centixx_Acl::ROLE_GROUP_MANAGER && $this->manager->id == $role->id && $privilage == self::ACTION_SHOW) {
 				return self::ASSERTION_SUCCESS;
 			}
-			
+
 			//kierownik projektu ma pelny dostep do grup w swoim projekcie
 			if ($role->role == Centixx_Acl::ROLE_PROJECT_MANAGER && $this->project->manager->id == $role->id ) {
 				return self::ASSERTION_SUCCESS;
 			}
-			
+
 			//kierownik działu ma dostep do wszystkich grup
 			//TODO ograniczyc tylko do programistow
 			if ($role->role == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {

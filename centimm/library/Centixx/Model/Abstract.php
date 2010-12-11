@@ -43,6 +43,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 		if (is_array($options)) {
 			$this->setOptions($options);
 		}
+
 	}
 
 	public function __set($name, $value)

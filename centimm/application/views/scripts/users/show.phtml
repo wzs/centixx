@@ -7,8 +7,12 @@
 <p>E-mail: <?php echo $this->user->email ?></p>
 <p>Rola: <?php echo $this->user->getRoleName() ?></p>
 
-<?php if ($this->user->group): ?>
+<?php if ($this->user->group ): ?>
+<!--
 <p>Grupa: <a href="<?php echo $this->url(array('controller' => 'groups', 'action' => 'show', 'id' => $this->user->group->id), null, true) ?>"><?php echo $this->user->group->name ?></a></p>
+ -->
+<p>Grupa: <?php echo $this->user->group->name ?></p>
+
 <?php else: ?>
 <p>Grupa: nie przypisany</p>
 <?php endif ?>

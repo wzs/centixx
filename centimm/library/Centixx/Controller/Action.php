@@ -39,6 +39,6 @@ abstract class Centixx_Controller_Action extends Zend_Controller_Action
 		$this->_config = Zend_Registry::get('config');
 
 		$this->view->currentUser = $this->_currentUser;
-		$this->view->messages = $this->_flashMessenger->getMessages();
+		$this->view->messages += $this->_flashMessenger->getMessages();
     }
 }

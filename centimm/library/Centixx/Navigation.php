@@ -42,13 +42,13 @@ class Centixx_Navigation extends Zend_Navigation
 		        'controller' => 'groups',
 		        'resource' => 'page-groups',
 		    ),
-		    
+
 			array(
 		        'label' => 'Projekty',
 		        'controller' => 'projects',
 		        'resource' => 'page-projects',
 		    ),
-		    
+
 			array(
 		        'label' => 'Panel Administracyjny',
 		        'controller' => 'admin',
@@ -60,7 +60,13 @@ class Centixx_Navigation extends Zend_Navigation
 		        'controller' => 'timesheet',
 		        'resource' => 'page-timesheet',
 		    ),
-		    
+
+		    array(
+		        'label' => 'Uprawnienia',
+		        'controller' => 'permissions',
+		        'resource' => 'page-permissions',
+		    ),
+
 		    array(
 		        'label' => 'Logowanie',
 		        'controller' => 'auth',

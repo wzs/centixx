@@ -43,11 +43,11 @@ CREATE TABLE IF NOT EXISTS `roles` (
 
 DROP TABLE IF EXISTS `timesheets`;
 CREATE TABLE IF NOT EXISTS `timesheets` (
-  `users_user_id` int(11) NOT NULL,
-  `projects_project_id` int(11) NOT NULL,
+  `timesheet_user` int(11) NOT NULL,
+  `timesheet_project` int(11) NOT NULL,
   `timesheet_hours` decimal(10,0) NOT NULL,
   `timesheet_date` date NOT NULL,
-  PRIMARY KEY (`users_user_id`,`projects_project_id`)
+  PRIMARY KEY (`timesheet_user`,`timesheet_project`,`timesheet_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
 DROP TABLE IF EXISTS `transactions`;
@@ -67,10 +67,25 @@ CREATE TABLE IF NOT EXISTS `users` (
   `user_surname` varchar(45) COLLATE utf8_polish_ci NOT NULL,
   `user_hour_rate` decimal(10,0) NOT NULL,
   `user_account` decimal(10,0) NOT NULL,
-  `user_role` int(11) NOT NULL,
+  `user_role` int(11) NOT NULL DEFAULT 1,
   `user_group` int(11) DEFAULT NULL,
   `user_email` varchar(100) COLLATE utf8_polish_ci NOT NULL,
   `user_password` char(32) COLLATE utf8_polish_ci NOT NULL,
   PRIMARY KEY (`user_id`),
   KEY `user_email` (`user_email`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
+
+DROP TABLE IF EXISTS `permissions`;
+CREATE TABLE IF NOT EXISTS `permissions` (
+  `permission_id` int(11) NOT NULL AUTO_INCREMENT,
+  `permission_from` int(11) NOT NULL,
+  `permission_to` int(11) NOT NULL,
+  `permission_type` enum('add_ceo') COLLATE utf8_polish_ci DEFAULT NULL,
+  `permission_starts` date NOT NULL,
+  `permission_ends` date NOT NULL,
+  `permission_count` smallint(6) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`permission_id`),
+  UNIQUE KEY `permission_from_2` (`permission_from`,`permission_to`,`permission_type`,`permission_starts`,`permission_ends`),
+  KEY `permission_from` (`permission_from`),
+  KEY `permission_to` (`permission_to`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;

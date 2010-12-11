@@ -8,7 +8,6 @@ class Application_Form_Project_Edit extends Zend_Form
 
 	public function rebuild()
 	{
-//		ZendX_JQuery::enableForm($this);
 		$this->setMethod(self::METHOD_POST);
 
 		$this->addElement('hidden', 'project_id', array(
@@ -21,55 +20,30 @@ class Application_Form_Project_Edit extends Zend_Form
 			'maxLength' => 64,
 			'errorMessages'  => array('Nazwa jest wymagana'),
 		));
-		
-		/* //jQuery datepicker
-		$datePickerStart = new ZendX_JQuery_Form_Element_DatePicker('dateStart', array(
-			'label'		=> 'Data rozpoczęcia',
-			'required'	=> true,
-			'maxLength' => 11,
-			'dateFormat' => 'yyyy-mm-dd',
-			'validators' => array(
-				'date',
-			),
-			'errorMessages'  => array('Wymagana jest poprawna data rozpoczęcia'),
-		));
-		$this->addElement($datePickerStart);
 
-		$datePicker = new ZendX_JQuery_Form_Element_DatePicker('dateEnd', array(
-			'label'		=> 'Data zakończenia',
-			'required'	=> true,
-			'maxLength' => 11,
-			'dateFormat' => 'yyyy-dd-dd',
-			'validators' => array(
-				'date',
-			),
-			'errorMessages'  => array('Wymagana jest poprawna data zakończenia'),
-		));
-		$this->addElement($datePicker);
-		*/
-
-		$this->addElement('text', 'dateStart', array(
+		$dateStart = $this->createElement('text', 'dateStart', array(
 			'label'		=> 'Data rozpoczęcia',
+			'class'		=> 'date',
 			'title' => 'rrrr-mm-dd',
 			'required'	=> true,
 			'maxLength' => 11,
 			'dateFormat' => 'yyyy-mm-dd',
-//			'validators' => array(
-//				'date',
-//			),
 			'errorMessages'  => array('Wymagana jest poprawna data rozpoczęcia'),
 		));
-		$this->addElement('text', 'dateEnd', array(
+		$dateStart>addValidator('date', false, array('format' => 'yyyy-mm-dd'));
+		$this->addElement($dateStart);
+
+		$dateEnd = $this->createElement('text', 'dateEnd', array(
 			'label'		=> 'Data zakończenia',
+			'class'		=> 'date',
 			'required'	=> true,
 			'maxLength' => 11,
 			'dateFormat' => 'yyyy-mm-dd',
-//			'validators' => array(
-//				'date',
-//			),
 			'errorMessages'  => array('Wymagana jest poprawna data zakończenia'),
 		));
-		
+		$dateEnd->addValidator('date', false, array('format' => 'yyyy-mm-dd'));
+		$this->addElement($dateEnd);
+
 		$users = $this->_project->getUsers();
 		if (count($users)) {
 			$this->addElement('radio', 'manager', array(

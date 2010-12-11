@@ -17,10 +17,8 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 	public function fetchFreeGroups(Centixx_Model_Project $excludedProject)
 	{
 		/*
-		 * uzywana jest taka konstrukcja, bo nie chce wykonac proste
+		 * uzywana jest taka konstrukcja, bo  chce wykonac proste
 		 * zapytanie sql z joinami bez posredniego udzialu Zend_Db_Table
-		 *
-		 * wersja z Zend_Db_Table - wykomentowana niżej
 		 */
 
 		$adapter = $this->getDbTable()->getAdapter();
@@ -32,7 +30,7 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 		;
 		return $this->_fetchAll($query, null, $adapter);
 	}
-	
+
 	/**
 	 * Zwraca grupę, której przypisano danego użytkownika jako kierownika
 	 * @param Centixx_Model_User|int $manager
@@ -100,13 +98,13 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 		$adapter = $this->getDbTable()->getAdapter();
 
 		//usuwam poprzedniego managera
-		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_group` = ? AND `user_role` = ?", 
+		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_group` = ? AND `user_role` = ?",
 			array(Centixx_Acl::ROLE_USER, $model->id, Centixx_Acl::ROLE_GROUP_MANAGER));
-		
+
 		//ustawiam nowego manadzera
-		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_id` = ?", 
+		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_id` = ?",
 			array(Centixx_Acl::ROLE_GROUP_MANAGER, $this->_findId($model->manager)));
-		
+
 	}
 
 	/**

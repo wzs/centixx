@@ -27,6 +27,22 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 	}
 
 	/**
+	 * Zwraca listę wszystkich użytkowników pełniacych daną rolę
+	 * @param int $roleId
+	 * @return array<Centixx_Model_User>
+	 */
+	public function fetchUsersByRole($roleId)
+	{
+		$adapter = $this->getDbTable()->getAdapter();
+		$query = $adapter
+			->select()
+			->from(array('u' => 'users'))
+			->where("user_role  = ?", $roleId)
+		;
+		return $this->_fetchAll($query, null, $adapter);
+	}
+
+	/**
 	 * Zwraca listę wszystkich użytkowników, których można przypisać do grupy
 	 * w szczególności nie są zwracanie użytkownicy już przypisani do danej grupy,
 	 * kierownicy innych grup ani użytkownicy przypisani do innych stanowisk
@@ -49,7 +65,7 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 			->where('g.group_id IS NULL') // kierownicy innych zespolow
 			->where('user_group != ? OR user_group IS NULL', $excludedGroup->id) //uzytkownicy juz przypisani do tej grupy
 			->where("user_role IN (".Centixx_Acl::ROLE_USER.", ".Centixx_Acl::ROLE_GROUP_MANAGER.") ") //tylko code-monkeys
-			
+
 			->order('user_name')
 		;
 		return $this->_fetchAll($query, null, $adapter);

@@ -11,10 +11,10 @@ class Centixx_Model_DbTable_Permission extends Centixx_Db_Table_Abstract
             'refColumns'        => 'user_id'
         ),
         'For' => array(
-            'columns'           => 'permission_for',
+            'columns'           => 'permission_to',
             'refTableClass'     => 'Centixx_Model_DbTable_User',
             'refColumns'        => 'user_id'
         ),
-        
+
     );
 }

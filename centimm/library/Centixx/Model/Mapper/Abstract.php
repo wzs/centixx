@@ -67,7 +67,7 @@ abstract class Centixx_Model_Mapper_Abstract
 		$parts[count($parts) - 2] = 'DbTable';
 		return join(self::CLASS_PATH_SEPARATOR, $parts);
 	}
-	
+
 	/**
 	 * Zwraca kanoniczną nazwę mapowanego modelu, np. 'User' czy 'Group'
 	 * @return string
@@ -108,12 +108,17 @@ abstract class Centixx_Model_Mapper_Abstract
 	 * @param Zend_Db_Table_Abstract|Zend_Db_Adapter_Abstract $adapter adapter używany do wykonania zapytania
 	 * @return array<Centixx_Model_Abstract>
 	 */
-	public function _fetchAll($query = null, $order = null, $adapter = null)
+	public function _fetchAll($query = null, $order = null, $dbTable = null)
 	{
 		if ($order == null) {
 			$order = $this->getDbTable()->getOrder();
 		}
-		$resultSet = $adapter->fetchAll($query, $order);
+
+		if ($dbTable == null) {
+			$dbTable = $this->getDbTable();
+		}
+
+		$resultSet = $dbTable->fetchAll($query, $order);
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entries[] = $this->_getNewModelInstance($row);
@@ -253,12 +258,12 @@ abstract class Centixx_Model_Mapper_Abstract
 	 */
 	public function getRelatedSet(Centixx_Model_Abstract $model, $field, $mapperClassName, $where)
 	{
-		
+
 		//dla nowych modeli
 		if ($model->id == null) {
 			return null;
 		}
-		
+
 		$getMethod = 'get' . ucfirst($field);
 		$setMethod = 'set' . ucfirst($field);
 
@@ -304,9 +309,15 @@ abstract class Centixx_Model_Mapper_Abstract
 
 	/**
 	 * Statyczna metoda fabrykująca
+	 * @param $shortName krótka nazwa żądanego mapper
 	 * @return Centixx_Model_Mapper_Abstract
 	 */
-	abstract public static function factory();
+	public static function factory($shortName) {
+		$className = 'Centixx_Model_Mapper_' . $shortName;
+		if (class_exists($className)) {
+			return new $className;
+		}
+	}
 
 	public function isAllowed(Centixx_Model_User $user, $privilages = null, $acl = null)
 	{

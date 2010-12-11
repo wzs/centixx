@@ -21,7 +21,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$view->messages = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages();
 
 //		$view->addHelperPath("ZendX/JQuery/View/Helper", "ZendX_JQuery_View_Helper");
-		
+
 		return $view;
 	}
 
@@ -64,9 +64,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$modelResourceAcl = new Centixx_Acl_ModelResource();
 		Zend_Registry::set('Zend_Acl', $modelResourceAcl);
 
-		//rejestrowanie pluginu, w którym automatycznie sprawdzane są uprawnienia 
+		//rejestrowanie pluginu, w którym automatycznie sprawdzane są uprawnienia
 		//do wykonania akcji w kontrolerze
-		
+
 //		$actionResourceAcl = new Centixx_Acl_ActionResource();
 //		Zend_Registry::set('actionAcl', $actionResourceAcl);
 		$frontController = Zend_Controller_Front::getInstance();
@@ -86,7 +86,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$this->bootstrap('acl');
 		$acl = $this->getResource('acl');
-		
+
 		$this->bootstrap('currentUser');
 		$currentUser = $this->getResource('currentUser');
 
@@ -125,20 +125,20 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 		$frontendOptions = array('automatic_serialization' => true);
 		$backendOptions  = array('cache_dir' => APPLICATION_PATH . '/../data/cache');
-		
+
 		//cache dla schematów bazy danych
 		$cache = Zend_Cache::factory('Core', 'File', $frontendOptions, $backendOptions);
 		Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
 
 		return $cache;
 	}
-	
+
 	protected function _initLocale()
 	{
 		$this->bootstrap('config');
 		$config = Zend_Registry::getInstance()->get('config');
 
-		date_default_timezone_set($cofig['locale']['timezone']);
+		date_default_timezone_set($config['locale']['timezone']);
 		$locale = new Zend_Locale($config['locale']['locale']);
 
 		Zend_Registry::set('Zend_Locale', $locale);

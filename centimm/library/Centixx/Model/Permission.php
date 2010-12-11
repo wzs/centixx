@@ -1,10 +1,12 @@
 <?php
 class Centixx_Model_Permission extends Centixx_Model_Abstract
 {
+	const TYPE_ADD_CEO = 'add_ceo';
+
 	protected $_resourceType = 'permission';
-	
+
 	protected $_id;
-	
+
 	/**
 	 * @var Zend_Date
 	 */
@@ -24,14 +26,14 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 	 * @var Centixx_Model_User
 	 */
 	protected $_to;
-	
+
 	protected $_type;
-	
+
 	/**
 	 * @var int
 	 */
 	protected $_count;
-	
+
 	/**
 	 * W jaki sposób ma być formatowana data
 	 * @var string
@@ -43,7 +45,7 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 		$this->_type = $type;
 		return $this;
 	}
-	
+
 	public function getType()
 	{
 		return $this->_type;
@@ -57,7 +59,7 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 		$this->_count = $count;
 		return $this;
 	}
-	
+
 	/**
 	 * @return int
 	 */
@@ -65,8 +67,8 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 	{
 		return $this->_count;
 	}
-	
-	
+
+
 	/**
 	 * @param Centixx_Model_User|int $from
 	 * @return Centixx_Model_Group provides fluent interface
@@ -87,25 +89,25 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 		: $this->_mapper->getRelated($this, 'from', 'User');
 		return $ret;
 	}
-	
+
 	/**
-	 * @param Centixx_Model_User|int $for
+	 * @param Centixx_Model_User|int $to
 	 * @return Centixx_Model_Group provides fluent interface
 	 */
-	public function setFor($for)
+	public function setTo($to)
 	{
-		$this->_for = $for;
+		$this->_to = $to;
 		return $this;
 	}
 
 	/**
 	 * @return Centixx_Model_User
 	 */
-	public function getFor($raw = false)
+	public function getTo($raw = false)
 	{
 		$ret = $raw
-		? $this->_for
-		: $this->_mapper->getRelated($this, 'for', 'User');
+		? $this->_to
+		: $this->_mapper->getRelated($this, 'to', 'User');
 		return $ret;
 	}
 
@@ -115,8 +117,8 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 			//parsowanie daty w formie yyyy-mm-dd
 			$tmp = explode('-', $dateStart);
 			$dateStart = new Zend_Date(array(
-				'year' 	=> $tmp[0], 
-				'month' => $tmp[1], 
+				'year' 	=> $tmp[0],
+				'month' => $tmp[1],
 				'day' 	=> $tmp[2],
 			));
 		}
@@ -127,7 +129,7 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 
 	/**
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
-	 * @return Zend_Date|string 
+	 * @return Zend_Date|string
 	 */
 	public function getDateStart($raw = false)
 	{
@@ -148,7 +150,7 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 	/**
 	 * Zwraca datę zakonczenia projektu
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
-	 * @return Zend_Date|string 
+	 * @return Zend_Date|string
 	 */
 	public function getDateEnd($raw = false)
 	{
@@ -159,9 +161,13 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 	{
 		return (string)$this->id;
 	}
-	
+
     protected function _customAclAssertion($role, $privilage = null)
     {
+    	if ($role->getRole() == Centixx_Acl::ROLE_CEO) {
+    		return self::ASSERTION_SUCCESS;
+    	}
+
     	return parent::_customAclAssertion($role, $privilage);
     }
 }

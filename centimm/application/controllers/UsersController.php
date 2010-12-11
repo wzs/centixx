@@ -29,11 +29,16 @@ class UsersController extends Centixx_Controller_Action
 			throw new Centixx_Acl_AuthenticationException();
 		}
 
+		//czy uzytkownik ma uprawnienia do dodania czlonka zarzadu
+		$hasPermission = $this->_currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO);
+
 		$form = new Application_Form_User_Edit();
+
+		$roles = Centixx_Model_Mapper_Role::factory()->fetchAll();
 
 		$form->setValues(array(
 			'user' => $user,
-			'roles' => Centixx_Model_Mapper_Role::factory()->fetchAll()
+			'roles' => $roles,
 		));
 
 		$this->view->headTitle()->prepend($user . ' - Edycja - ');
@@ -43,13 +48,16 @@ class UsersController extends Centixx_Controller_Action
 
 			$data = $this->getRequest()->getPost();
 			if ($form->isValid($data)) {
-					
-				//gdy rola uzytkownika zmieniana jest na członka zarządu
-				//trzeba sprawdzic czy są na to przyznane odpowiednie ustawienia
-				if ($data['role'] !== $user->getRole() && $data['role'] == Centixx_Acl::ROLE_CEO) {
 
+				//jezeli obecny uzytkownik nie ma nadanych uprawnien,
+				//nie powinien miec mozliwosci zmiany uprawnien CEO
+				if ($data['role'] !== $user->getRole() && $data['role'] == Centixx_Acl::ROLE_CEO) {
+					if (!$hasPermission) {
+						throw new Centixx_Acl_AuthenticationException("Nie masz uprawnień do dodania członka zarządu");
+					}
+					$this->_currentUser->removePermission(Centixx_Model_Permission::TYPE_ADD_CEO);
 				}
-					
+
 				$user->setOptions($data)->save();
 				$this->view->messages[] = 'Dane zostały zaktualizowane';
 			}
