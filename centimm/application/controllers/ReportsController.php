@@ -3,20 +3,23 @@ class ReportsController extends Centixx_Controller_Action {
 	
 	public function indexAction() {
 		$this->view->headScript()->appendFile(
-    		'js/jquery.js',
+    		$this->baseUrl() . 'js/jquery.js',
     		'text/javascript',
 			array()
 		);
 		$this->view->headScript()->appendFile(
-    		'js/highcharts.js',
+    		$this->baseUrl() . 'js/highcharts.js',
     		'text/javascript',
 			array()
 		);
 		$this->view->headScript()->appendFile(
-    		'js/yetii.js',
+    		$this->baseUrl() . 'js/yetii.js',
     		'text/javascript',
 			array()
 		);
+		
+		$this->view->headLink()->appendStylesheet($this->baseUrl() . 'styles/white.css');
+		$this->view->headLink()->appendStylesheet($this->baseUrl() . 'styles/custom.css');
 		
 		$this->chartOverallTime();
 		$this->chartOverallCash();
@@ -25,6 +28,16 @@ class ReportsController extends Centixx_Controller_Action {
 		$this->chartOverallCash_end();
 		
 	}
+	
+	protected function baseUrl() {
+        $protocol = $_SERVER['HTTPS'] ? 'https' : 'http';
+        $server = $_SERVER['HTTP_HOST'];
+        $port = $_SERVER['SERVER_PORT'] != 80 ? ":{$_SERVER['SERVER_PORT']}" : '';
+        $path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';             
+        return "$protocol://$server$port$path";
+    }
+	
+	
 	
 	protected function chartOverallTime() {
 		$db = $this->_db;
