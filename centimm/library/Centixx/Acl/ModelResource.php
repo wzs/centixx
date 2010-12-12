@@ -59,6 +59,7 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->addResource('page-index');
 		$this->addResource('page-timesheet');
 		$this->addResource('page-permissions');
+		$this->addResource('page-reports');
 
 	}
 
@@ -96,6 +97,9 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 
 
 		$this->allow(self::ROLE_CEO, 'page-permissions');
+		
+		$this->allow(self::ROLE_ACCOUNTANT, 'page-reports');
+		$this->allow(self::ROLE_GROUP_MANAGER, 'page-reports');
 
 	}
 }

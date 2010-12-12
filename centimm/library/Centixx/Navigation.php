@@ -72,6 +72,12 @@ class Centixx_Navigation extends Zend_Navigation
 		        'controller' => 'auth',
 		        'resource' => 'page-login',
 		    ),
+		    
+		    array(
+		        'label' => 'Raporty',
+		        'controller' => 'reports',
+		        'resource' => 'page-reports',
+		    )
 
 		);
     }
