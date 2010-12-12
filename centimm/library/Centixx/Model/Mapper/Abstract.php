@@ -94,7 +94,6 @@ abstract class Centixx_Model_Mapper_Abstract
 		}
 
 		$model = new $className();
-		$model->setMapper($this);
 		if ($row != null) {
 			$this->fillModel($model, $row);
 		}
@@ -184,7 +183,7 @@ abstract class Centixx_Model_Mapper_Abstract
 	 */
 	public function delete(Centixx_Model_Abstract $model)
 	{
-		return $this->_dbTable->delete($this->_getPrimaryKey() . ' = ' . $model->id);
+		return $this->getDbTable()->delete($this->_getPrimaryKey() . ' = ' . $model->id);
 	}
 
 

@@ -40,6 +40,8 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->addResource('user');
 		$this->addResource('group');
 		$this->addResource('project');
+		$this->addResource('department');
+
 	}
 
 	/**
@@ -77,7 +79,6 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		//widocznosc stron logowania / wylogowania
 		$this->allow(null, 'page-login');
 		$this->deny(self::ROLE_LOGGED_USER, 'page-login');
-
 		$this->deny(null, 'page-logout');
 		$this->allow(self::ROLE_LOGGED_USER, 'page-logout');
 
@@ -89,7 +90,7 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->allow(self::ROLE_HR, 'page-users');
 
 		//widocznosc swoich projektow dla menadzera projektu
-		$this->allow(self::ROLE_PROJECT_MANAGER, 'page-projects');
+		$this->allow(self::ROLE_DEPARTMENT_CHIEF, 'page-projects');
 
 		$this->allow(self::ROLE_ADMIN, 'page-admin');
 
@@ -97,7 +98,7 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 
 
 		$this->allow(self::ROLE_CEO, 'page-permissions');
-		
+
 		$this->allow(self::ROLE_ACCOUNTANT, 'page-reports');
 		$this->allow(self::ROLE_GROUP_MANAGER, 'page-reports');
 

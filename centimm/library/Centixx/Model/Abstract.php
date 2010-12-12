@@ -35,16 +35,16 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 
 	protected $_resourceType = null;
 
-	public function setMapper(Centixx_Model_Mapper_Abstract $mapper)
-	{
-		$this->_mapper = $mapper;
-	}
-
 	public function __construct(array $options = null)
 	{
 		if (is_array($options)) {
 			$this->setOptions($options);
 		}
+
+		//ustawiam mappera
+		$parts = explode(self::CLASS_PATH_SEPARATOR, get_class($this));
+		$classShortName = $parts[count($parts) - 1];
+		$this->_mapper = Centixx_Model_Mapper_Abstract::factory($classShortName);
 
 	}
 
