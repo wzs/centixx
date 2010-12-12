@@ -68,6 +68,18 @@ class Centixx_Navigation extends Zend_Navigation
 		    ),
 
 		    array(
+		        'label' => 'Moduł kadrowy',
+		        'controller' => 'staffing',
+		        'resource' => 'page-staffing',
+		    ),
+		    
+		    array(
+		        'label' => 'Moduł księgowy',
+		        'controller' => 'accounting',
+		        'resource' => 'page-accounting',
+		    ),
+		    
+		    array(
 		        'label' => 'Logowanie',
 		        'controller' => 'auth',
 		        'resource' => 'page-login',

@@ -84,6 +84,8 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 		->setSurname($row->user_surname)
 		->setRole($row->user_role)
 		->setGroup($row->user_group)
+		->setHourRate($row->user_hour_rate)
+		->setAccount($row->user_account)
 		;
 	}
 

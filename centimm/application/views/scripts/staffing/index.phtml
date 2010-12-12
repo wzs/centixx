@@ -1,0 +1,133 @@
+<h2>Pracownicy</h2>
+<?php if ($this->users): ?>
+<?php $index = 1 ?>
+<table>
+<thead>
+<tr>
+	<td>
+		Id	
+	</td>
+	<td>
+		Nazwisko 
+	</td>
+	<td>
+		Imie	
+	</td>
+	<td>
+		Email
+	</td>
+	<td>
+		Stanowisko
+	</td>
+	<td>
+		Grupa
+	</td>
+	<td>
+		Stawka
+	</td>
+	<td>
+		Nr konta
+	</td>
+</tr>
+</thead>
+<tbody>
+<?php foreach ($this->users as $user): ?>
+<?php if ($user->isAllowed($this->currentUser, 'show')): ?>
+<tr>
+	<td>
+		<?php echo $index++;?>	
+	</td>
+	<td>
+		<?php echo $user->getSurname() ?>
+	</td>
+	<td>
+		<?php echo $user->getName() ?>
+	</td>
+	<td>
+		<?php echo $user->getEmail()?>
+	</td>
+	<td>
+		<?php echo $user->getRoleName() ?>
+	</td>
+	<td>
+		<?php if ($user->getGroup() == null): ?>
+			-----------------------
+		<?php else: ?>
+			<?php echo $user->getGroup() ?>
+		<?php endif?>
+	</td>
+	<td>
+		<?php if($user->getRole()==Centixx_Acl::ROLE_CEO):?>
+			<?php if($this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
+				<?php echo $user->getHourRate() . "zł"?>
+				<?php else: ?>
+				-----
+			<?php endif?>
+		<?php else: ?>
+			<?php echo $user->getHourRate() . "zł"?>
+		<?php endif?>
+	</td>
+	<td>
+		<?php if($user->getRole()==Centixx_Acl::ROLE_CEO):?>
+			<?php if($this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
+				<?php echo $user->getAccount()?>
+			<?php else: ?>
+				------------
+			<?php endif?>
+		<?php else: ?>
+			<?php echo $user->getAccount()?>
+		<?php endif?>
+		
+	</td>
+	<td>
+		<?php if($user->getRole()==Centixx_Acl::ROLE_CEO):?>
+			<?php if($this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
+				<a href = <?php echo $user->getUrl('edit')?>>
+					<img src="../public/img/edit.png" alt="E" ></img>
+				</a>
+			<?php else: ?>
+				---
+			<?php endif?>
+		<?php else: ?>
+			<a href = <?php echo $user->getUrl('edit')?>>
+				<img src="../public/img/edit.png" alt="E" ></img>
+			</a>
+		<?php endif?>
+	</td>
+	<td>
+		<?php if($user->getRole()==Centixx_Acl::ROLE_CEO):?>
+			<?php if($this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
+				<a href = <?php echo $user->getUrl('delete')?>>
+					<img src="../public/img/action_delete.png" alt="X"></img>
+				</a>
+			<?php else: ?>
+				---
+			<?php endif?>
+		<?php else: ?>
+			<a href = <?php echo $user->getUrl('delete')?>>
+				<img src="../public/img/action_delete.png" alt="X"></img>
+			</a>
+		<?php endif?>
+	</td>
+</tr>
+<?php endif ?>
+<?php endforeach; ?>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td>
+<!--		<img src="../public/img/link.gif" alt="D" onclick="createUser('<?php echo $user->getUrl('add')?>')"></img>-->
+		<a href = <?php echo $user->getUrl('add')?>>
+			<img src="../public/img/link.gif" alt="D"></img>
+		</a>
+	</td>
+</tr>
+</tbody>
+</table>
+<?php endif ?>

@@ -25,6 +25,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	const ACTION_EDIT = 'edit';
 	const ACTION_SHOW = 'show';
 	const ACTION_NEW  = 'edit';
+	const ACTION_DELETE = 'delete';
 
 
 
@@ -34,6 +35,11 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	protected $_mapper = null;
 
 	protected $_resourceType = null;
+
+	public function setMapper(Centixx_Model_Mapper_Abstract $mapper)
+	{
+		$this->_mapper = $mapper;
+	}
 
 	public function __construct(array $options = null)
 	{

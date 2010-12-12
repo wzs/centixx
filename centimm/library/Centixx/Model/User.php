@@ -7,7 +7,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	protected $_surname;
 	protected $_password;
 	protected $_email;
-	protected $_role;
+	protected $_role = 1;
 
 	const ACTION_ADD_CEO = 'add_ceo';
 
@@ -129,11 +129,19 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	public function setAccount($account)
 	{
 		$this->_account = $account;
+		return $this;
 	}
+	
+	public function setHourRate($hourRate)
+	{
+		$this->_hour_rate = $hourRate;
+		return $this;
+	}
+	
 
 	public function getHourRate()
 	{
-
+		return $this->_hour_rate;
 	}
 
 	public function __toString()

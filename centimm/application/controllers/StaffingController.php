@@ -1,13 +1,50 @@
 <?php
 
-class UsersController extends Centixx_Controller_Action
+class StaffingController extends Centixx_Controller_Action
 {
 	public function indexAction()
 	{
 		$this->view->users = Centixx_Model_Mapper_User::factory()->fetchAll();
+//		$grid = Bvb_Grid::factory('table',array(),'');
+//		
+//		$grid->setImagesUrl($this->_config['resources']['layout']['basePath'] . 'Bvb/extras/images/');
+//		
+//		$select = $this->_db->select()
+//			->from(
+//				array('u' => 'users'), 
+//				array(
+//					'Nr kadrowy' => 'u.user_id',
+//					'Nazwisko' => 'user_surname',
+//					'Imię' => 'user_name',
+//					'E-mail' => 'user_email',
+//					'Nr konta' => 'user_account'))
+//			->join(
+//				array('r' => 'roles'), 
+//				'u.user_role = r.role_id',
+//				array('Stanowisko' => 'role_name')
+//			)
+//			->join(
+//				array('g' => 'groups'),
+//				'u.user_group = g.group_id',
+//				array('Grupa' => 'group_name')
+//			);
+//										
+//		$grid->setSource(new Bvb_Grid_Source_Zend_Select($select));
+//		//do czego export
+//		$grid->setExport(array('xml','odt','pdf'));
+//		
+//		$form = new Bvb_Grid_Form('Application_Form_User_Edit', array());
+//		$form->setAdd(true);
+//    	$form->setEdit(true);
+//    	$form->setDelete(true);
+//    	$form->setAddButton(true);
+//    	
+//    	$grid->setForm($form);
+		
+//		$this->view->grid = $grid->deploy();
 	}
 
-	public function showAction()
+public function showAction()
 	{
 		$userId = $this->getRequest()->getParam('id');
 		$user = Centixx_Model_Mapper_User::factory()->find($userId);
@@ -23,24 +60,17 @@ class UsersController extends Centixx_Controller_Action
 
 	public function addAction()
 	{
-		$this->_helper->viewRenderer('add');
+ 		$this->_helper->viewRenderer('edit');
 
-		$form = new Application_Form_User_Add();
+		$form = new Application_Form_User_Edit();
 
 		$roles = Centixx_Model_Mapper_Role::factory()->fetchAll();
-		
-		$user = new Centixx_Model_User();
-		$user->setMapper(new Centixx_Model_Mapper_User());
-		
-		if (!$user->hasPermission(Centixx_Model_User::ACTION_ADD_CEO)){
-			unset($roles[Centixx_Acl::ROLE_CEO]);
-		}
-		
+
 		//przy dodawaniu użytkownika ustawiana jest mu domyślna rola
 		$form->setValues(array(
 			'roles' => null,
 		));
-		
+
 		$this->view->headTitle()->prepend('Dodawanie użytkownika ');
 		$this->view->header = 'Dodawanie użytkownika';
 
@@ -48,9 +78,10 @@ class UsersController extends Centixx_Controller_Action
 
 			$data = $this->getRequest()->getPost();
 			if ($form->isValid($data)) {
-				
+				$user = new Centixx_Model_User();
+				$user->setMapper(new Centixx_Model_Mapper_User());
 
-				if (!$user->isAllowed($this->_currentUser, Centixx_Model_User::ACTION_ADD)) {
+				if (!$user->isAllowed($this->_currentUser, Centixx_Model_User::ACTION_EDIT)) {
 					throw new Centixx_Acl_AuthenticationException('Nie masz uprawnień do tworzenia nowych użytkowników');
 				}
 
@@ -66,11 +97,10 @@ class UsersController extends Centixx_Controller_Action
 
 				$user->setOptions($data)->save();
 				$this->view->messages[] = 'Użytkownik został dodany';
-				$this->_redirect('staffing');
 			}
 		}
 
-		$this->view->addForm = $form;
+		$this->view->editForm = $form;
 
 	}
 
@@ -86,11 +116,7 @@ class UsersController extends Centixx_Controller_Action
 		$form = new Application_Form_User_Edit();
 
 		$roles = Centixx_Model_Mapper_Role::factory()->fetchAll();
-		
-		if (!$user->hasPermission(Centixx_Model_User::ACTION_ADD_CEO)){
-			unset($roles[Centixx_Acl::ROLE_CEO]);
-		}
-		
+
 		$form->setValues(array(
 			'user' => $user,
 			'roles' => $roles,
@@ -117,7 +143,6 @@ class UsersController extends Centixx_Controller_Action
 
 				$user->setOptions($data)->save();
 				$this->view->messages[] = 'Dane zostały zaktualizowane';
-				$this->_redirect('staffing');
 			}
 
 		} else {
@@ -126,17 +151,18 @@ class UsersController extends Centixx_Controller_Action
 
 		$this->view->editForm = $form;
 	}
-
+	
 	public function deleteAction(){
 		$userId = $this->getRequest()->getParam('id');
-
+		
 		$user = Centixx_Model_Mapper_User::factory()->find($userId);
-
+		
 		if (!$user->isAllowed($this->_currentUser, 'delete')) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
-		
-		$user->delete();
+		else{
+			$user = Centixx_Model_Mapper_User::factory()->delete($user);
+		}
 		$this->_redirect('staffing');
 	}
 }

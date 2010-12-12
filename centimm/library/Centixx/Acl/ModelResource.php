@@ -60,7 +60,10 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->addResource('page-logout');
 		$this->addResource('page-index');
 		$this->addResource('page-timesheet');
+		$this->addResource('page-staffing');
+		$this->addResource('page-accounting');
 		$this->addResource('page-permissions');
+
 		$this->addResource('page-reports');
 
 	}
@@ -88,7 +91,10 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 
 		//widczonosc listy uzytkownika dla kadr
 		$this->allow(self::ROLE_HR, 'page-users');
+		$this->allow(self::ROLE_HR, 'page-staffing');
 
+		$this->allow(self::ROLE_ACCOUNTANT, 'page-accounting');
+		
 		//widocznosc swoich projektow dla menadzera projektu
 		$this->allow(self::ROLE_DEPARTMENT_CHIEF, 'page-projects');
 

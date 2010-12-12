@@ -1,5 +1,5 @@
 <?php
-class Application_Form_User_Edit extends Zend_Form
+class Application_Form_User_Add extends Zend_Form
 {
 	/**
 	 * @var Centixx_Model_User
@@ -39,20 +39,16 @@ class Application_Form_User_Edit extends Zend_Form
 			'errorMessages'  => array('Wprowadź prawidłowy email'),
 		));
 
-		$this->addElement('text', 'hour_rate', array(
-			'label' => 'Sawka',
+		$this->addElement('password', 'password', array(
+			'label' => 'Hasło',
 			'validators' => array(
-				new Zend_Validate_Float(),
+				array('StringLength', false, array('min' => 3)),
 			),
-			'errorMessages'  => array('Wprowadź prawidłową stawkę'),
 		));
 
-		$this->addElement('text', 'account_number', array(
-			'label' => 'Nr konta',
-          	'validators' => array(
-				new Zend_Validate_Float(),
-			),
-			'errorMessages'  => array('Wprowadź prawidłowy nr konta'),
+		$this->addElement('password', 'password_retype', array(
+			'label' => 'Powtórz hasło',
+          	'errorMessages'  => array('Podane hasła nie są identyczne'),
 		));
 
 		if ($this->_roles) {
