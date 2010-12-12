@@ -8,10 +8,15 @@
     </ul>
 
     <div class="tab" id="tab1">
-	    <h2></h2>
+	    <h2>TRWAJĄCE</h2>
 	    <p>
 	    	<div id="container-zb-cash" style="width: 800px; height: 400px; margin: 0 auto"></div>
 	    	<div id="container-zb-time" style="width: 800px; height: 400px; margin: 0 auto"></div>
+		</p>
+	    <h2>ZAKOŃCZONE</h2>
+	    <p>
+	    	<div id="container-zb-cash_end" style="width: 800px; height: 400px; margin: 0 auto"></div>
+	    	<div id="container-zb-time_end" style="width: 800px; height: 400px; margin: 0 auto"></div>
 		</p>
     </div>
     
@@ -124,6 +129,108 @@ active: 1
 					<?php $count = count($this->chartOverallCash);
 					$i = 0;
 					foreach ($this->chartOverallCash as $key => $value) {
+						$i++;
+						echo '[\''.$key.'\','.$value.']';
+						if($count != $i) echo ',';
+					} ?>
+				]
+			}]
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	var chart;
+	$(document).ready(function() {
+		chart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'container-zb-time_end'
+			},
+			title: {
+				text: 'Czasochłonność projektów'
+			},
+			plotArea: {
+				shadow: null,
+				borderWidth: null,
+				backgroundColor: null
+			},
+			tooltip: {
+				formatter: function() {
+					return '<b>'+ this.point.name +'</b>: '+ this.y +' godzin';
+				}
+			},
+			plotOptions: {
+				pie: {
+					allowPointSelect: true,
+					cursor: 'pointer',
+					dataLabels: {
+						enabled: true,
+						color: '#000000',
+						connectorColor: '#000000',
+						formatter: function() {
+							return '<b>'+ this.point.name +'</b>: '+ this.y +' godzin';
+						}
+					}
+				}
+			},
+		    series: [{
+				type: 'pie',
+				name: 'Browser share',
+				data: [
+					<?php $count = count($this->chartOverallTime);
+					$i = 0;
+					foreach ($this->chartOverallTime_end as $key => $value) {
+						$i++;
+						echo '[\''.$key.'\','.$value.']';
+						if($count != $i) echo ',';
+					} ?>
+				]
+			}]
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	var chart;
+	$(document).ready(function() {
+		chart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'container-zb-cash_end'
+			},
+			title: {
+				text: 'Koszt projektów'
+			},
+			plotArea: {
+				shadow: null,
+				borderWidth: null,
+				backgroundColor: null
+			},
+			tooltip: {
+				formatter: function() {
+					return '<b>'+ this.point.name +'</b>: '+ this.y +' zł';
+				}
+			},
+			plotOptions: {
+				pie: {
+					allowPointSelect: true,
+					cursor: 'pointer',
+					dataLabels: {
+						enabled: true,
+						color: '#000000',
+						connectorColor: '#000000',
+						formatter: function() {
+							return '<b>'+ this.point.name +'</b>: '+ this.y +' zł';
+						}
+					}
+				}
+			},
+		    series: [{
+				type: 'pie',
+				name: 'Browser share',
+				data: [
+					<?php $count = count($this->chartOverallCash);
+					$i = 0;
+					foreach ($this->chartOverallCash_end as $key => $value) {
 						$i++;
 						echo '[\''.$key.'\','.$value.']';
 						if($count != $i) echo ',';
