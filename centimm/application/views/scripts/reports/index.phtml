@@ -80,7 +80,7 @@
 <!-- tabs -->
 
 <script type="text/javascript">
-	if(!$('#container-zb-time')) {
+	if($('#container-zb-time').size()) {
 		var chart;
 		$(document).ready(function() {
 			chart = new Highcharts.Chart({
@@ -133,7 +133,7 @@
 </script>
 
 <script type="text/javascript">
-if(!$('#container-zb-cash')) {
+if($('#container-zb-cash').size()) {
 	var chart;
 	$(document).ready(function() {
 		chart = new Highcharts.Chart({
@@ -186,7 +186,7 @@ if(!$('#container-zb-cash')) {
 </script>
 
 <script type="text/javascript">
-if(!$('#container-zb-time_end')) {
+if($('#container-zb-time_end').size()) {
 	var chart;
 	$(document).ready(function() {
 		chart = new Highcharts.Chart({
@@ -239,7 +239,7 @@ if(!$('#container-zb-time_end')) {
 </script>
 <div id="container"></div>
 <script type="text/javascript">
-if(!$('#container-zb-cash_end')) {
+if($('#container-zb-cash_end').size()) {
 	var chart;
 	$(document).ready(function() {
 		chart = new Highcharts.Chart({
