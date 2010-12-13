@@ -6,6 +6,11 @@ class Application_Form_Group_Edit extends Zend_Form
 	 */
 	protected $_group;
 
+	/**
+	 * @var array<Centixx_Model_User>
+	 */
+	protected $_availableUsers;
+
 	public function rebuild()
 	{
 		$this->setMethod(self::METHOD_POST);
@@ -21,11 +26,18 @@ class Application_Form_Group_Edit extends Zend_Form
 			'errorMessages'  => array('Nazwa jest wymagana'),
 		));
 
-		$users = $this->_group->getUsers();
-		if (count($users)) {
-			$this->addElement('radio', 'manager', array(
-				'label'	=> 'Kierownik grupy',
-				'multiOptions' => $users,
+		if ($this->_group->id) {
+			$this->addElement('select', 'manager', array(
+				'label'	=> 'Kierownik:',
+				'multiOptions' => array('' => ' - ') + $this->_group->users,
+			));
+		}
+
+		if (count($this->_availableUsers)) {
+			$this->addElement('multiCheckbox', 'users', array(
+				'label'	=> 'Użytkownicy',
+				'multiOptions' => $this->_availableUsers,
+				'required' => true,
 			));
 		}
 
@@ -43,6 +55,10 @@ class Application_Form_Group_Edit extends Zend_Form
 	public function setValues($array) {
 		if (array_key_exists('group', $array)) {
 			$this->_group = $array['group'];
+		}
+
+		if (array_key_exists('availableUsers', $array)) {
+			$this->_availableUsers = $array['availableUsers'];
 		}
 
 		$this->rebuild();

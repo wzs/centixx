@@ -12,8 +12,7 @@ class GroupsController extends Centixx_Controller_Action
 		$groupId = $this->getRequest()->getParam('group_id');
 		$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
 
-
-		if (!$group->isAllowed($this->_currentUser, 'edit')) {
+		if (!$group->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
 		$group->delete();
@@ -28,7 +27,7 @@ class GroupsController extends Centixx_Controller_Action
 		$groupId = $this->getRequest()->getParam('id');
 		$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
 
-		if (!$group->isAllowed($this->_currentUser, 'view')) {
+		if (!$group->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_READ)) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
 
@@ -47,7 +46,7 @@ class GroupsController extends Centixx_Controller_Action
 			$user  = Centixx_Model_Mapper_User::factory()->find($userId);
 			$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
 
-			if (!$group->isAllowed($this->_currentUser, 'edit')) {
+			if (!$group->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
 				throw new Centixx_Acl_AuthenticationException();
 			}
 
@@ -62,59 +61,21 @@ class GroupsController extends Centixx_Controller_Action
 		} else {
 			$this->_forward('show', null, null, $request->getParams());
 		}
+
 	}
 
-	public function newAction()
+	protected function prepare($group, $mode)
 	{
 		$this->_helper->viewRenderer('edit');
-		
-		$group = new Centixx_Model_Group();
-		$group->setMapper(new Centixx_Model_Mapper_Group());
 
-		if (!$group->isAllowed($this->_currentUser, 'edit')) {
+
+		if (!$group->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
 
+		$availableUsers = Centixx_Model_Mapper_User::factory()->fetchForGroup($group);
 		$form = new Application_Form_Group_Edit();
-		$form->setValues(array('group' => $group));
-
-		if ($this->getRequest()->isPost()) {
-			try {
-				$data = $this->getRequest()->getPost();
-				if ($form->isValid($data)) {
-					$group->setOptions($data)->save();
-					$this->_flashMessenger->addMessage('Grupa została utworzona');
-					$this->_redirect($group->getUrl('edit'));
-				}
-			} catch (Exception $e) {
-				echo $e->getMessage();
-			}
-		} else {
-			$form->setDefaults($group->toArray());
-		}
-
-		$this->view->form = $form;
-		$this->view->formAction = 'new';
-		$this->view->group = $group;
-	}
-	
-	public function editAction()
-	{
-		$groupId = $this->getRequest()->getParam('id');
-		$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
-
-		$usersFromOtherGroups = Centixx_Model_Mapper_User::factory()->fetchAvailableUsers($group);
-
-		if (!$group->isAllowed($this->_currentUser, 'edit')) {
-			throw new Centixx_Acl_AuthenticationException();
-		}
-
-		$form = new Application_Form_Group_Edit();
-		$form->setValues(array('group' => $group));
-
-		$addUserForm = new Centixx_Form_AddItem();
-		$addUserForm->submitLabel = 'Przypisz';
-		$addUserForm->setValues(array('items' => $usersFromOtherGroups));
+		$form->setValues(array('group' => $group, 'availableUsers' => $availableUsers));
 
 		//drugi warunek jest po to, aby po akcji dodania uzytkownika
 		if ($this->getRequest()->isPost()) {
@@ -122,18 +83,55 @@ class GroupsController extends Centixx_Controller_Action
 				$data = $this->getRequest()->getPost();
 				if ($form->isValid($data)) {
 					$group->setOptions($data)->save();
-					$this->view->messages[] = 'Dane zostały zaktualizowane';
+
+					if ($mode == 'edit') {
+						$this->_flashMessenger->addMessage('Dane zostały zaktualizowane');
+					} else {
+						$this->_flashMessenger->addMessage('Grupa została utworzona');
+					}
+					$this->_redirect($group->getUrl('edit'));
 				}
 			} catch (Exception $e) {
 				echo $e->getMessage();
 			}
 		} else {
 			$form->setDefaults($group->toArray());
+			//potrzebne ze wzgledu na "dziwne" zachowanie multicheckboksa
+			$form->setDefaults(array(
+				'users' => $group->users ? array_keys($group->users) : null,
+				'manager' => $group->manager->id,
+			));
 		}
 
+
 		$this->view->form = $form;
-		$this->view->formAction = 'edit';
-		$this->view->addUserForm = $addUserForm;
+		$this->view->formAction = $mode;
 		$this->view->group = $group;
+	}
+
+	public function newAction()
+	{
+		$group = new Centixx_Model_Group();
+		$group->project = $this->_currentUser->project;
+
+		$this->prepare($group, 'new');
+	}
+
+	public function editAction()
+	{
+		$groupId = $this->getRequest()->getParam('id');
+		$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
+
+		$this->prepare($group, 'edit');
+
+//		$usersFromOtherGroups = Centixx_Model_Mapper_User::factory()->fetchAvailableUsers($group);
+//
+//		$addUserForm = new Centixx_Form_AddItem();
+//		$addUserForm->submitLabel = 'Przypisz';
+//		$addUserForm->setValues(array('items' => $usersFromOtherGroups));
+//
+//
+//		$this->view->addUserForm = $addUserForm;
+
 	}
 }

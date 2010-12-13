@@ -6,12 +6,17 @@ class Application_Form_Project_Edit extends Zend_Form
 	 */
 	protected $_project;
 
+	/**
+	 * @var array<Centixx_Model_User>
+	 */
+	protected $_availableUsers;
+
 	public function rebuild()
 	{
 		$this->setMethod(self::METHOD_POST);
 
-		$this->addElement('hidden', 'project_id', array(
-			'value' => $this->_project->id,
+		$this->addElement('hidden', 'department', array(
+			'value' => $this->_project->getDepartment()->getId(),
 		));
 
 		$this->addElement('text', 'name', array(
@@ -23,19 +28,19 @@ class Application_Form_Project_Edit extends Zend_Form
 
 		$dateStart = $this->createElement('text', 'dateStart', array(
 			'label'		=> 'Data rozpoczęcia',
-			'class'		=> 'date',
+			'class'		=> 'datepicker',
 			'title' => 'rrrr-mm-dd',
 			'required'	=> true,
 			'maxLength' => 11,
 			'dateFormat' => 'yyyy-mm-dd',
 			'errorMessages'  => array('Wymagana jest poprawna data rozpoczęcia'),
 		));
-		$dateStart>addValidator('date', false, array('format' => 'yyyy-mm-dd'));
+		$dateStart->addValidator('date', false, array('format' => 'yyyy-mm-dd'));
 		$this->addElement($dateStart);
 
 		$dateEnd = $this->createElement('text', 'dateEnd', array(
 			'label'		=> 'Data zakończenia',
-			'class'		=> 'date',
+			'class'		=> 'datepicker',
 			'required'	=> true,
 			'maxLength' => 11,
 			'dateFormat' => 'yyyy-mm-dd',
@@ -44,11 +49,18 @@ class Application_Form_Project_Edit extends Zend_Form
 		$dateEnd->addValidator('date', false, array('format' => 'yyyy-mm-dd'));
 		$this->addElement($dateEnd);
 
-		$users = $this->_project->getUsers();
-		if (count($users)) {
-			$this->addElement('radio', 'manager', array(
-				'label'	=> 'Kierownik projektu',
-				'multiOptions' => $users,
+		if ($this->_project->id) {
+			$this->addElement('select', 'manager', array(
+				'label'	=> 'Kierownik',
+				'multiOptions' => array('' => ' - ') + $this->_project->getUsers(),
+			));
+		}
+
+		if (count($this->_availableUsers)) {
+			$this->addElement('multiCheckbox', 'users', array(
+				'label'	=> 'Użytkownicy',
+				'multiOptions' => $this->_availableUsers,
+				'required' => true,
 			));
 		}
 
@@ -66,6 +78,10 @@ class Application_Form_Project_Edit extends Zend_Form
 	public function setValues($array) {
 		if (array_key_exists('project', $array)) {
 			$this->_project = $array['project'];
+		}
+
+		if (array_key_exists('availableUsers', $array)) {
+			$this->_availableUsers = $array['availableUsers'];
 		}
 
 		$this->rebuild();

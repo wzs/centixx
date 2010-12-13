@@ -1,3 +1,24 @@
+<?php
+$this->headScript()->appendFile($this->basePath . '/js/jquery.shiftcheckbox.js', 'text/javascript');
+?>
+<script type="text/javascript">
+$(document).ready (function () {
+	$('input[type=checkbox]').shiftcheckbox();
+});
+</script>
+
+<script type="text/javascript">
+$(function(){
+
+	//zablokowanie odchaczania kierownika
+	$('input[type=checkbox]').click(function() {
+		if (!$(this).attr('checked') && $(this).attr('id') == 'users-' + $('#manager :selected').val()) {
+			alert('Aby usunąć tego użytkownika, musisz najpierw wybrać innego kierownika');
+			return false;
+		}
+	});
+});
+</script>
 <h2>Edycja grupy <?php echo $this->group ?></h2>
 <?php
 	if ($this->group->isAllowed($this->currentUser, 'edit')):

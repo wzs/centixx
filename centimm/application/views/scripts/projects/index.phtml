@@ -2,9 +2,13 @@
 <?php if ($this->projects): ?>
 <ul>
 <?php foreach ($this->projects as $project): ?>
+<?php if ($project->isAllowed($this->currentUser)): ?>
 <li>
 	<a href="<?php echo $this->url(array('controller' => 'projects', 'action' => 'show', 'id' => $project->id)) ?>"><?php echo $project ?></a>
 </li>
+<?php endif ?>
 <?php endforeach; ?>
 </ul>
 <?php endif ?>
+
+<a href="<?php echo $this->url(array('action' => 'new')); ?>">Dodaj nowy</a>

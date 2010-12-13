@@ -26,13 +26,23 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 * @param array<Centixx_Model_User> $users
 	 * @return Centixx_Model_Group fluent interface
 	 */
+	/**
+	 * Set users
+	 * @param Centixx_Model_User $users
+	 * @throws Centixx_Model_Exception
+	 */
 	public function setUsers($users)
 	{
+		if (!is_array($users)) {
+			throw new Centixx_Model_Exception('Users must be an array');
+		}
+
 		$this->_users = array();
 		foreach ($users as $user) {
-			if ($user instanceof Centixx_Model_User) {
-				$this->_users[$user->id] = $user;
+			if (!$user instanceof Centixx_Model_User) {
+				$user = new Centixx_Model_User(array('id' => $user));
 			}
+			$this->_users[] = $user;
 		}
 		return $this;
 	}
@@ -53,11 +63,12 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 * Zwraca listę użytkowników przydzielonych do grupy
 	 * @return array<Centixx_Model_User>
 	 */
-	public function getUsers($raw = false)
+	public function getUsers()
 	{
-		return $raw ?
-		$this->_users :
-		$this->_mapper->getRelatedSet($this, 'users', 'User', array('user_group = ?', $this->_id));
+		if ($this->_users == null) {
+			$this->_users = $this->_mapper->getGroupUsers($this);
+		}
+		return $this->_users;
 	}
 
 	/**
@@ -89,7 +100,8 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 */
 	public function setManager($manager)
 	{
-		$this->_manager = $manager;
+		if ($manager != '')
+			$this->_manager = $manager;
 		return $this;
 	}
 
@@ -144,24 +156,9 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	{
 
 		if ($role instanceof Centixx_Model_User) {
-			//uzytkownik (w tym kierownik grupy) nalezacy do danej grupy moze ja ogladac
-			if ($privilage == 'view' && $role->group->id == $this->id) {
-				return self::ASSERTION_SUCCESS;
-			}
 
-			//kierownik grupy moze ogladac swoja grupe
-			if ($role->role == Centixx_Acl::ROLE_GROUP_MANAGER && $this->manager->id == $role->id && $privilage == self::ACTION_SHOW) {
-				return self::ASSERTION_SUCCESS;
-			}
-
-			//kierownik projektu ma pelny dostep do grup w swoim projekcie
-			if ($role->role == Centixx_Acl::ROLE_PROJECT_MANAGER && $this->project->manager->id == $role->id ) {
-				return self::ASSERTION_SUCCESS;
-			}
-
-			//kierownik działu ma dostep do wszystkich grup
-			//TODO ograniczyc tylko do programistow
-			if ($role->role == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {
+			//kierownik projektu moze dowolnie zmieniac grupy nalezace do jego projektu
+			if ($role->role == Centixx_Acl::ROLE_PROJECT_MANAGER && $this->project->manager->id == $role->id) {
 				return self::ASSERTION_SUCCESS;
 			}
 		}

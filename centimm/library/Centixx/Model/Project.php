@@ -2,23 +2,23 @@
 class Centixx_Model_Project extends Centixx_Model_Abstract
 {
 	protected $_resourceType = 'project';
-	
+
 	/**
 	 * W jaki sposób ma być formatowana data
 	 * @var string
 	 */
 	protected $_dateFormat = 'Y-MM-dd';
-	
+
 	protected $_id;
 	protected $_name;
-	
+
 	/**
 	 * Lista wszystkich pracowników przypisanych do projektu.
 	 * LazyLoading!
 	 * @var array<Centixx_Model_User>
 	 */
 	protected $_users = array();
-	
+
 	/**
 	 * @var Zend_Date
 	 */
@@ -33,6 +33,11 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	 * @var Centixx_Model_User
 	 */
 	protected $_manager;
+
+	/**
+	 * @var Centixx_Model_Department
+	 */
+	protected $_department;
 
 	protected $_groups;
 
@@ -65,7 +70,7 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	 */
 	public function getGroups($raw = false)
 	{
-		return $raw 
+		return $raw
 			? $this->_groups
 			: $this->_mapper->getRelatedSet($this, 'groups', 'Group', array('group_project = ?', $this->_id));
 	}
@@ -88,11 +93,12 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 
 	/**
 	 * @param Centixx_Model_User|int $manager
-	 * @return Centixx_Model_Group provides fluent interface
+	 * @return Centixx_Model_Project provides fluent interface
 	 */
 	public function setManager($manager)
 	{
-		$this->_manager = $manager;
+		if ($manager != '')
+			$this->_manager = $manager;
 		return $this;
 	}
 
@@ -102,8 +108,29 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	public function getManager($raw = false)
 	{
 		$ret = $raw
-		? $this->_manager
-		: $this->_mapper->getRelated($this, 'manager', 'User');
+			? $this->_manager
+			: $this->_mapper->getRelated($this, 'manager', 'User');
+		return $ret;
+	}
+
+	/**
+	 * @param Centixx_Model_Department|int $department
+	 * @return Centixx_Model_Project provides fluent interface
+	 */
+	public function setDepartment($department)
+	{
+		$this->_department = $department;
+		return $this;
+	}
+
+	/**
+	 * @return Centixx_Model_Department
+	 */
+	public function getDepartment($raw = false)
+	{
+		$ret = $raw
+			? $this->_department
+			: $this->_mapper->getRelated($this, 'department', 'Department');
 		return $ret;
 	}
 
@@ -122,7 +149,7 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	/**
 	 * Zwraca datę rozpoczęcia projektu
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
-	 * @return Zend_Date|string 
+	 * @return Zend_Date|string
 	 */
 	public function getDateStart($raw = false)
 	{
@@ -143,13 +170,13 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	/**
 	 * Zwraca datę zakonczenia projektu
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
-	 * @return Zend_Date|string 
+	 * @return Zend_Date|string
 	 */
 	public function getDateEnd($raw = false)
 	{
 		return $raw ? $this->_dateEnd : $this->_dateEnd ? $this->_dateEnd->toString($this->_dateFormat) : null;
 	}
-	
+
 	/**
 	 * Zwraca listę wszystkich pracowników pracujących w projekcie
 	 * @return array<Centixx_Model_User>
@@ -157,19 +184,32 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	public function getUsers()
 	{
 		if ($this->_users == null) {
-			// zamiast wersji iterującej po wszystkich grupach,
-			// wersja o nizszej zlozonosci obliczeniowej, oparta o jedno zapytanie sql
-			/*
-			$groups = $this->getGroups();
-			foreach ($groups as $group) {
-				$this->_users += $group->getUsers();
-			}
-			*/
 			$this->_users = $this->_mapper->getProjectUsers($this);
 		}
 		return $this->_users;
 	}
-	
+
+	/**
+	 * Set users
+	 * @param Centixx_Model_User $users
+	 * @throws Centixx_Model_Exception
+	 */
+	public function setUsers($users)
+	{
+		if (!is_array($users)) {
+			throw new Centixx_Model_Exception('Users must be an array');
+		}
+
+		$this->_users = array();
+		foreach ($users as $user) {
+			if (!$user instanceof Centixx_Model_User) {
+				$user = new Centixx_Model_User(array('id' => $user));
+			}
+			$this->_users[] = $user;
+		}
+		return $this;
+	}
+
 	/**
 	 * Przypisuje grupę do projektu
 	 * Uwaga! Metoda natychmiast zapisuje stan grupy!
@@ -186,21 +226,21 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	{
 		return (string)$this->name;
 	}
-	
+
     protected function _customAclAssertion($role, $privilage = null)
     {
     	if ($role instanceof Centixx_Model_User) {
-    		//kierownik działu ma pełny wgląd do wszystkich projektów
-			if ($role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {
-				return self::ASSERTION_SUCCESS;
+
+    		if ($role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {
+
+    			//kierownik działu ma dostep do wszelkich działan na projekcie nalezacym do jego dzialu
+    			if ($this->department->manager->id == $role->id) {
+					return self::ASSERTION_SUCCESS;
+    			}
 			}
-			
-			//kierownik projektu ma wgląd do swoich projektów
-			if ($role->getRole() == Centixx_Acl::ROLE_PROJECT_MANAGER && $privilage == 'view') {
-				return self::ASSERTION_SUCCESS;
-			}
+
     	}
-    	
+
     	return parent::_customAclAssertion($role, $privilage);
     }
 }

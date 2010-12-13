@@ -31,6 +31,7 @@ class Centixx_Navigation extends Zend_Navigation
 		    	'action'	=> 'logout',
 		        'resource' => 'page-logout',
 		    ),
+
 		    array(
 		        'label' => 'Pracownicy',
 		        'controller' => 'users',
@@ -84,7 +85,8 @@ class Centixx_Navigation extends Zend_Navigation
 		        'controller' => 'auth',
 		        'resource' => 'page-login',
 		    ),
-		    
+
+
 		    array(
 		        'label' => 'Raporty',
 		        'controller' => 'reports',

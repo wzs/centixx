@@ -43,29 +43,79 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 	}
 
 	/**
+	 * Pobiera liste uzytkowników do wyswietlenia na liscie do projektu
+	 * (nalezacych do danego projektu - jesli podany, oraz nieprzydzielonych do zadnych projektów)
+	 * @param Centixx_Model_Project|null $project
+	 */
+	public function fetchForProject($project = null)
+	{
+
+		$adapter = $this->getDbTable()->getAdapter();
+		$query = $adapter
+			->select()
+			->from(array('u' => 'users'))
+			->where("user_role = ?", array(Centixx_Acl::ROLE_USER))
+			->where("user_project IS NULL")
+		;
+
+		if ($project instanceof Centixx_Model_Project) {
+			$query = $query->orWhere('user_project = ?', array($project->id));
+		}
+
+		return $this->_fetchAll($query, null, $adapter);
+	}
+
+	/**
+	 * Zwraca liste uzytkowników nie przypisanych do zadnej grupy (ale przypisanych do tego samego projektu)
+	 * + uzytkowników z tej samej grupy
+	 * @param Centixx_Model_Group $group
+	 */
+	public function fetchForGroup(Centixx_Model_Group $group )
+	{
+		if (!$group->id) {
+			$group->id = 0;
+		}
+
+		$adapter = $this->getDbTable()->getAdapter();
+		$query = $adapter
+			->select()
+			->from(array('u' => 'users'))
+			->where("user_role = ".Centixx_Acl::ROLE_USER." OR (user_role = ".Centixx_Acl::ROLE_GROUP_MANAGER." AND user_group = ".$group->id.") ")
+			->where("user_project = ?", array($group->project->id))
+			->where('user_group IS NULL OR user_group = ?', array($group->id));
+
+		return $this->_fetchAll($query, null, $adapter);
+	}
+
+	/**
 	 * Zwraca listę wszystkich użytkowników, których można przypisać do grupy
 	 * w szczególności nie są zwracanie użytkownicy już przypisani do danej grupy,
 	 * kierownicy innych grup ani użytkownicy przypisani do innych stanowisk
 	 *
 	 * @param Centixx_Model_Group $excludedGroup
 	 * @return array<Centixx_Model_User>
+	 * @deprecated używać fetchForGroup()
 	 */
-	public function fetchAvailableUsers(Centixx_Model_Group $excludedGroup)
+	public function fetchAvailableUsers($excludedGroup = null)
 	{
+		if ($excludedGroup == null) {
+			$excludedGroup = 0;
+		} else {
+			$excludedGroup = $excludedGroup->id;
+		}
+
 		/*
 		 * uzywana jest taka konstrukcja, bo chce wykonac proste
 		 * zapytanie sql z joinami bez posredniego udzialu Zend_Db_Table
 		 */
-
 		$adapter = $this->getDbTable()->getAdapter();
 		$query = $adapter
 			->select()
 			->from(array('u' => 'users'))
 			->joinLeft(array('g' => 'groups'), 'u.user_id = g.group_manager', array())
 			->where('g.group_id IS NULL') // kierownicy innych zespolow
-			->where('user_group != ? OR user_group IS NULL', $excludedGroup->id) //uzytkownicy juz przypisani do tej grupy
+			->where('user_group != ? OR user_group IS NULL', $excludedGroup) //uzytkownicy juz przypisani do tej grupy
 			->where("user_role IN (".Centixx_Acl::ROLE_USER.", ".Centixx_Acl::ROLE_GROUP_MANAGER.") ") //tylko code-monkeys
-
 			->order('user_name')
 		;
 		return $this->_fetchAll($query, null, $adapter);
@@ -78,14 +128,15 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 	protected function fillModel(Centixx_Model_Abstract $model, $row)
 	{
 		$model
-		->setId($row->user_id)
-		->setEmail($row->user_email)
-		->setName($row->user_name)
-		->setSurname($row->user_surname)
-		->setRole($row->user_role)
-		->setGroup($row->user_group)
-		->setHourRate($row->user_hour_rate)
-		->setAccount($row->user_account)
+			->setId($row->user_id)
+			->setEmail($row->user_email)
+			->setName($row->user_name)
+			->setSurname($row->user_surname)
+			->setRole($row->user_role)
+			->setGroup($row->user_group)
+			->setProject($row->user_project)
+			->setHourRate($row->user_hour_rate)
+			->setAccount($row->user_account)
 		;
 	}
 
@@ -100,7 +151,9 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 			'user_name'			=> $model->name,
 			'user_surname'		=> $model->surname,
 			'user_role'			=> $model->role,
+			'user_hour_rate'	=> $model->hourRate,
 			'user_group'		=> $this->_findId($model->group),
+			'user_project'		=> $this->_findId($model->project),
 		);
 
 		if ($model->password != null) {

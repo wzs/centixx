@@ -39,19 +39,18 @@ class Application_Form_User_Edit extends Zend_Form
 			'errorMessages'  => array('Wprowadź prawidłowy email'),
 		));
 
-		$this->addElement('text', 'hour_rate', array(
-			'label' => 'Sawka',
+		$this->addElement('text', 'hourRate', array(
+			'label' => 'Stawka',
 			'validators' => array(
 				new Zend_Validate_Float(),
 			),
+			'required' => true,
 			'errorMessages'  => array('Wprowadź prawidłową stawkę'),
 		));
 
-		$this->addElement('text', 'account_number', array(
+		$this->addElement('text', 'account', array(
 			'label' => 'Nr konta',
-          	'validators' => array(
-				new Zend_Validate_Float(),
-			),
+          	'required' => true,
 			'errorMessages'  => array('Wprowadź prawidłowy nr konta'),
 		));
 

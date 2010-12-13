@@ -16,11 +16,11 @@ class PermissionsController extends Centixx_Controller_Action
 			$data = $form->getValues() + array(
 				'from' => $this->_currentUser,
 				'type' => Centixx_Model_Permission::TYPE_ADD_CEO,
+				'count' => 1,
 			);
 
 			try {
 				$permission = new Centixx_Model_Permission($data);
-				$permission->setMapper(new Centixx_Model_Mapper_Permission());
 				$permission->save();
 
 				$this->view->messages[] = 'Uprawnienie zostało nadane';

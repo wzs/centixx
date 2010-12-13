@@ -12,10 +12,10 @@ abstract class Centixx_Acl extends Zend_Acl
 	const ROLE_HR 				= 	6;
 	const ROLE_ACCOUNTANT 		= 	7;
 	const ROLE_CEO 				= 	8;
-	
+
 	//tego nie ma w bazie
 	const ROLE_LOGGED_USER		= 	9;
-	
+
 
 	public function __construct()
 	{
@@ -39,14 +39,13 @@ abstract class Centixx_Acl extends Zend_Acl
 			$roles[$i] = new Zend_Acl_Role($i);
 		}
 
-		//TODO sprawdzic czy to jest poprawne
 		$this->addRole($roles[self::ROLE_GUEST]);
 		$this->addRole($roles[self::ROLE_LOGGED_USER]);
 		$this->addRole($roles[self::ROLE_USER], $roles[self::ROLE_LOGGED_USER]);
 		$this->addRole($roles[self::ROLE_ADMIN], $roles[self::ROLE_LOGGED_USER]);
-		$this->addRole($roles[self::ROLE_GROUP_MANAGER], $roles[self::ROLE_USER]);
-		$this->addRole($roles[self::ROLE_PROJECT_MANAGER], $roles[self::ROLE_GROUP_MANAGER]);
-		$this->addRole($roles[self::ROLE_DEPARTMENT_CHIEF], $roles[self::ROLE_PROJECT_MANAGER]);
+		$this->addRole($roles[self::ROLE_GROUP_MANAGER], $roles[self::ROLE_LOGGED_USER]);
+		$this->addRole($roles[self::ROLE_PROJECT_MANAGER], $roles[self::ROLE_LOGGED_USER]);
+		$this->addRole($roles[self::ROLE_DEPARTMENT_CHIEF], $roles[self::ROLE_LOGGED_USER]);
 		$this->addRole($roles[self::ROLE_HR], $roles[self::ROLE_LOGGED_USER]);
 		$this->addRole($roles[self::ROLE_ACCOUNTANT], $roles[self::ROLE_LOGGED_USER]);
 		$this->addRole($roles[self::ROLE_CEO], $roles[self::ROLE_LOGGED_USER]);

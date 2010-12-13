@@ -21,7 +21,7 @@ class Application_Form_Permission_AddCeo extends Zend_Form
 
 		$dateStart = $this->createElement('text', 'dateStart', array(
 			'label'		=> 'Ważne od:',
-			'class'		=> 'date',
+			'class'		=> 'datepicker',
 			'title' => 'rrrr-mm-dd',
 			'required'	=> true,
 			'maxLength' => 11,
@@ -32,7 +32,7 @@ class Application_Form_Permission_AddCeo extends Zend_Form
 
 		$dateEnd = $this->createElement('text', 'dateEnd', array(
 			'label'		=> 'Ważne od:',
-			'class'		=> 'date',
+			'class'		=> 'datepicker',
 			'title' => 'rrrr-mm-dd',
 			'required'	=> true,
 			'maxLength' => 11,

@@ -13,10 +13,31 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$cfg = $this->getOption('resources');
 
 		$layout = $this->getResource('layout');
-		$layout->basePath = $cfg['layout']['basePath'];
+		$view->basePath = $layout->basePath = $cfg['layout']['basePath'];
 
 		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
 		$viewRenderer->setView($view);
+
+		//dołączamy globalnie jquery
+		$view->headScript()->appendFile(
+    		$cfg['layout']['basePath'] . '/js/jquery.js',
+    		'text/javascript'
+		);
+
+		$view->headScript()->appendFile(
+    		$cfg['layout']['basePath'] . '/js/jquery-ui.min.js',
+    		'text/javascript'
+		);
+
+		$view->headScript()->appendFile(
+    		$cfg['layout']['basePath'] . '/js/main.js',
+    		'text/javascript'
+		);
+
+		$view->headLink()
+			->appendStylesheet($cfg['layout']['basePath'] . '/styles/basic.css')
+			->appendStylesheet('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css')
+		;
 
 		$view->messages = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages();
 

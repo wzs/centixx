@@ -11,17 +11,23 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 
 	const ACTION_ADD_CEO = 'add_ceo';
 
-
 	/**
 	 * @var Centixx_Model_Group|int
 	 */
 	protected $_group;
 
 	/**
+	 * @var Centixx_Model_Project|int
+	 */
+
+	protected $_project;
+
+
+	/**
 	 * Stawka godzinowa
 	 * @var float
 	 */
-	protected $_hour_rate;
+	protected $_hourRate;
 
 	/**
 	 * Numer konta
@@ -102,6 +108,22 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		return $this->_mapper->getRoleName($this);
 	}
 
+	public function setProject($project)
+	{
+		$this->_project = $project;
+		return $this;
+	}
+
+	/**
+	 * Zwraca projekt w ktorym pracuje uzytkownik
+	 * @return Centixx_Model_Project
+	 * @param bool $raw - czy ma byc pominiete ładowanie zewnetrznego obiektu
+	 */
+	public function getProject($raw = false)
+	{
+		return $raw ? $this->_project : $this->_mapper->getRelated($this, 'project', 'Project');
+	}
+
 	public function setGroup($group)
 	{
 		$this->_group = $group;
@@ -131,17 +153,17 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		$this->_account = $account;
 		return $this;
 	}
-	
+
 	public function setHourRate($hourRate)
 	{
-		$this->_hour_rate = $hourRate;
+		$this->_hourRate = $hourRate;
 		return $this;
 	}
-	
+
 
 	public function getHourRate()
 	{
-		return $this->_hour_rate;
+		return $this->_hourRate;
 	}
 
 	public function __toString()
@@ -168,6 +190,10 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		return count($p) > 0;
 	}
 
+	/**
+	 * Zmienijsza liczbe / usuwa zezwolenie
+	 * @param string $permissionType
+	 */
 	public function removePermission($permissionType)
 	{
 		Centixx_Model_Mapper_Permission::factory()->removePermissions($this, $permissionType);
@@ -197,20 +223,20 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 			}
 
 			//kierownik grupy moze ogladac profil podwladnego
-			if ($privilage == self::ACTION_SHOW && $role->getRole() == Centixx_Acl::ROLE_GROUP_MANAGER
+			if ($privilage == self::ACTION_READ && $role->getRole() == Centixx_Acl::ROLE_GROUP_MANAGER
 				&& $this->group->manager->id == $role->id) {
 				return self::ASSERTION_SUCCESS;
 			}
 
-			//kierownik projektu moze ogladac profil podwladnego
-			if ($privilage == self::ACTION_SHOW && $role->getRole() == Centixx_Acl::ROLE_PROJECT_MANAGER
+ 			//kierownik projektu moze ogladac profil podwladnego
+			if ($privilage == self::ACTION_READ && $role->getRole() == Centixx_Acl::ROLE_PROJECT_MANAGER
 				&& $this->group->project->manager->id == $role->id) {
 				return self::ASSERTION_SUCCESS;
 			}
 
 			//TODO sprawdzic czy dziala prawidlowo po dodaniu modelu department
 			//kierownik dzialu moze ogladac wszystkich swoich podwladnych
-			if ($privilage == self::ACTION_SHOW && $role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF
+			if ($privilage == self::ACTION_READ && $role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF
 				&& in_array($this->role, array(Centixx_Acl::ROLE_USER, Centixx_Acl::ROLE_GROUP_MANAGER, Centixx_Acl::ROLE_PROJECT_MANAGER))) {
 				return self::ASSERTION_SUCCESS;
 			}

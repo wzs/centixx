@@ -9,10 +9,10 @@ class ProjectsController extends Centixx_Controller_Action
 
 	public function deleteAction()
 	{
-		$projectId = $this->getRequest()->getParam('project_id');
+		$projectId = $this->getRequest()->getParam('id');
 		$project = Centixx_Model_Mapper_Project::factory()->find($projectId);
 
-		if (!$project->isAllowed($this->_currentUser, 'edit')) {
+		if (!$project->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_DELETE)) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
 		$project->delete();
@@ -27,15 +27,17 @@ class ProjectsController extends Centixx_Controller_Action
 		$projectId = $this->getRequest()->getParam('id');
 		$project = Centixx_Model_Mapper_Project::factory()->find($projectId);
 
-		if (!$project->isAllowed($this->_currentUser, 'view')) {
+		if (!$project->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_READ)) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
 		$this->view->headTitle()->prepend('Projekt ' . $project . ' - ');
 		$this->view->project = $project;
 	}
 
-
-
+	/**
+	 * @throws Centixx_Acl_AuthenticationException
+	 * @deprecated
+	 */
 	public function addGroupAction()
 	{
 		$request = $this->getRequest();
@@ -47,7 +49,7 @@ class ProjectsController extends Centixx_Controller_Action
 			$group = Centixx_Model_Mapper_Group::factory()->find($groupId);
 			$project = Centixx_Model_Mapper_Project::factory()->find($projectId);
 
-			if (!$project->isAllowed($this->_currentUser, 'edit')) {
+			if (!$project->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
 				throw new Centixx_Acl_AuthenticationException();
 			}
 
@@ -55,85 +57,82 @@ class ProjectsController extends Centixx_Controller_Action
 
 			$this->_logger->log(
 				"{$this->_currentUser} przypisał grupę {$group} do projektu {$project}",
-			Centixx_Log::CENTIXX
+				Centixx_Log::CENTIXX
 			);
 			$this->_redirect($project->getUrl('edit'));
-			//			$this->_forward('edit', null, null, $request->getParams());
 		} else {
 			$this->_forward('show', null, null, $request->getParams());
 		}
 	}
 
-	public function newAction()
+	protected function prepare($project, $mode)
 	{
 		//ustawiam, zeby renderowano ten sam widok co w przypadku editAction
 		$this->_helper->viewRenderer('edit');
 
-
-		$project = new Centixx_Model_Project();
-		$project->setMapper(new Centixx_Model_Mapper_Project());
+		$availableUsers = Centixx_Model_Mapper_User::factory()->fetchForProject($project);
 
 		$form = new Application_Form_Project_Edit();
-		$form->setValues(array('project' => $project, 'groups' => array()));
-
-		$addGroupForm = new Centixx_Form_AddItem();
-		$addGroupForm->submitLabel = 'Przypisz';
-		$addGroupForm->setValues(array('items' => array()));
+		$form->setValues(array('project' => $project, 'availableUsers' => $availableUsers));
 
 		if ($this->getRequest()->isPost()) {
 			try {
 				$data = $this->getRequest()->getPost();
 				if ($form->isValid($data)) {
 					$project->setOptions($data)->save();
-					$this->_flashMessenger->addMessage('Projekt został utworzony');
+
+					if ($mode == 'edit') {
+						$this->_flashMessenger->addMessage('Dane zostały zaktualizowane');
+					} else {
+						$this->_flashMessenger->addMessage('Projekt został utworzony');
+					}
 					$this->_redirect($project->getUrl('edit'));
 				}
 			} catch (Exception $e) {
 				echo $e->getMessage();
 			}
 		} else {
-			$array = $project->toArray();
-			$form->setDefaults($array);
+			$form->setDefaults($project->toArray());
+
+			//potrzebne ze wzgledu na "dziwne" zachowanie multicheckboksa
+			$form->setDefaults(array(
+				'users' => array_keys($project->users),
+				'manager' => $project->manager->id,
+			));
+
+
 		}
 
 		$this->view->form = $form;
-		$this->view->formAction = 'new';
 		$this->view->project = $project;
-		$this->view->addGroupForm = $addGroupForm;
+		$this->view->formAction = $mode;
+	}
 
+	public function newAction()
+	{
+		$project = new Centixx_Model_Project();
+
+		//ustawiam odpowiedni dział dla nowotworzonego projektu
+		$department = Centixx_Model_Mapper_Department::factory()->findByManager($this->_currentUser);
+		$project->department = $department;
+
+		if (!$project->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_CREATE)) {
+			throw new Centixx_Acl_AuthenticationException();
+		}
+
+		$this->prepare($project, 'new');
 	}
 
 	public function editAction()
 	{
 		$projectId = $this->getRequest()->getParam('id');
 		$project = Centixx_Model_Mapper_Project::factory()->find($projectId);
-		$groups = Centixx_Model_Mapper_Group::factory()->fetchFreeGroups($project);
 
-		if (!$project->isAllowed($this->_currentUser, 'edit')) {
+		if (!$project->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
-		
-		$form = new Application_Form_Project_Edit();
-		$form->setValues(array('project' => $project, 'groups' => $groups));
 
-		$addGroupForm = new Centixx_Form_AddItem();
-		$addGroupForm->submitLabel = 'Przypisz';
-		$addGroupForm->setValues(array('items' => $groups));
 
-		if ($this->getRequest()->isPost()) {
-				$data = $this->getRequest()->getPost();
-				if ($form->isValid($data)) {
-					$project->setOptions($data)->save();
-					$this->view->messages[] = 'Dane zostały zaktualizowane';
-				}
-		} else {
-//			debug($project->toArray());
-			$form->setDefaults($project->toArray());
-		}
-		$this->view->form = $form;
-		$this->view->formAction = 'edit';
-		$this->view->project = $project;
-		$this->view->addGroupForm = $addGroupForm;
-
+		$this->prepare($project, 'edit');
 	}
 }

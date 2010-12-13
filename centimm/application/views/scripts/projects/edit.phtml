@@ -1,3 +1,12 @@
+<?php
+$this->headScript()->appendFile($this->basePath . '/js/jquery.shiftcheckbox.js', 'text/javascript');
+?>
+<script type="text/javascript">
+$(document).ready (function () {
+	$('input[type=checkbox]').shiftcheckbox();
+});
+</script>
+
 <h2>Edycja projektu <?php echo $this->project ?></h2>
 <?php
 	if ($this->project->isAllowed($this->currentUser, 'edit')):
@@ -5,27 +14,18 @@
 ?>
 
 <?php
-		if ($this->addGroupForm->hasItems()):
-?>
-		<hr />
-		<h4>Przypisz grupę do projektu</h4>
-		<?php echo $this->addGroupForm->setAction($this->url(array('controller' => 'projects', 'action' => 'add-group'))); ?>
-<?php 	
-		endif;
-?>
-<?php	
 		if ($this->project->id != null):
 			$deleteForm = new Zend_Form();
 			$deleteForm->addElement('submit', 'submit', array(
 				'label' => 'Usuń projekt',
 			));
-	
+
 			$deleteForm->addElement('hidden', 'project_id', array(
 				'value' => $this->project->id
 			));
 			echo '<hr />';
 			echo $deleteForm->setAction($this->url(array('controller' => 'projects', 'action' => 'delete', 'id' => $this->project->id)));
 		endif;
-		
+
 	endif;
 ?>

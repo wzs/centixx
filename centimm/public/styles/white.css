@@ -1,9 +1,5 @@
 /* globals */
 
-html, body, h1, h2, p, ul, ol, li, pre {
-	margin: 0;
-	padding: 0;
-}
 
 ul {
 	list-style-type: none;
@@ -14,14 +10,6 @@ code {
 	color: #666;
 }
 
-/* layout */
-
-body {
-	background: url(bg.gif) 50% 0 repeat-y #F5F5F5;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: small;
-	color: #333;
-}
 
 #km-wrapper {
 	width: 768px;

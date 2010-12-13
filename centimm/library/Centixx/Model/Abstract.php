@@ -22,12 +22,10 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	 */
 	const ASSERTION_SUCCESS = 1;
 
-	const ACTION_EDIT = 'edit';
-	const ACTION_SHOW = 'show';
-	const ACTION_NEW  = 'edit';
-	const ACTION_DELETE = 'delete';
-
-
+	const ACTION_CREATE 	= 'create';
+	const ACTION_READ 		= 'read';
+	const ACTION_UPDATE  	= 'update';
+	const ACTION_DELETE 	= 'delete';
 
 	/**
 	 * @var Centixx_Model_Mapper_Abstract
@@ -36,12 +34,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 
 	protected $_resourceType = null;
 
-	public function setMapper(Centixx_Model_Mapper_Abstract $mapper)
-	{
-		$this->_mapper = $mapper;
-	}
-
-	public function __construct(array $options = null)
+	public function __construct($options = null)
 	{
 		if (is_array($options)) {
 			$this->setOptions($options);
@@ -232,10 +225,10 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	 * @param string $action akcja do wykonania - domyślnie wyświetlenie obiektu: 'show'
 	 * @return string URL
 	 */
-	public function getUrl($action = self::ACTION_SHOW)
+	public function getUrl($actionName = 'show')
 	{
 		//odwoluje się do metody mappera, bo zwykłe get_class() nie zadziała w PHP < 5.3 (brak LSB)
 		$controllerName = strtolower($this->_mapper->getModelName() . 's');
-		return Zend_View_Helper_Url::url(array('controller' => $controllerName, 'action' => $action, 'id' => $this->id));
+		return Zend_View_Helper_Url::url(array('controller' => $controllerName, 'action' => $actionName, 'id' => $this->id));
 	}
 }

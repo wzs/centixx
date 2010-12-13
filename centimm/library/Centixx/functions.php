@@ -29,10 +29,10 @@ function array_get($array, $n) {
  * Zmienia podaną nazwę na format CamelCase: usuwane są znaki podkreślenia
  * i każda ze składowych cześci rozpoczyna się wielkją literą
  * @example hello_world -> helloWorld
- * 
+ *
  * @param string $text
  * @param bool $uppercaseFirst czy pierwsza litera ma być wielką literą
- * @return striong 
+ * @return striong
  */
 function camelCase($text, $uppercaseFirst = false)
 {
@@ -40,10 +40,11 @@ function camelCase($text, $uppercaseFirst = false)
 	foreach ($t as &$part) {
 		$part = ucfirst($part);
 	}
-	
-	if ($uppercaseFirst) {
-		$t[0] = ucfirst($t[0]);
+
+	if (!$uppercaseFirst) {
+		$t[0] = strtolower($t[0]);
 	}
+
 	return implode('', $t);
-	
+
 }

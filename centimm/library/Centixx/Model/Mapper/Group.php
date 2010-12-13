@@ -9,6 +9,19 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 	 */
 	protected $_saveUsers = false;
 
+
+	public function getGroupUsers(Centixx_Model_Group $model)
+	{
+		$adapter = $this->getDbTable()->getAdapter();
+		$q = $adapter
+			->select()
+			->from(array('u' => 'users'))
+			->where('u.user_group = ?', $model->id)
+		;
+		$userMapper = Centixx_Model_Mapper_User::factory();
+		return $userMapper->_fetchAll($q, null, $adapter);
+	}
+
 	/**
 	 * Zwraca listę grup nieprzypisanych do danego projektu
 	 * @param Centixx_Model_Project $excludedProject
@@ -23,10 +36,10 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 
 		$adapter = $this->getDbTable()->getAdapter();
 		$query = $adapter
-			->select()
-			->from(array('g' => 'groups'))
-			->where('group_project != ? OR group_project IS NULL', $excludedProject->id)
-			->order('group_name')
+		->select()
+		->from(array('g' => 'groups'))
+		->where('group_project != ? OR group_project IS NULL', $excludedProject->id)
+		->order('group_name')
 		;
 		return $this->_fetchAll($query, null, $adapter);
 	}
@@ -71,22 +84,42 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 		if ($model->id) {
 			$pk = $this->_getPrimaryKey();
 			$where = $table->getAdapter()->quoteInto($pk . ' = ?', $model->id);
-			$table->update($data, $where);
+			try {
+				$table->update($data, $where);
+			} catch (Exception $e) {
+				debug($e);
+			}
 		} else {
 			$model->id = $table->insert($data);
 		}
 
-		//zapisanie użytkowników przypisanych do grupy
-		if ($this->_saveUsers) {
-			foreach ($model->users as $user) {
-				$user->setGroup($model);
-				$user->save();
-			}
-		}
-
+		$this->_updateUsers($model);
 		$this->_updateManager($model);
 
 		return $this;
+	}
+
+	/**
+	 * Aktualizuje pole projektu w uzyt
+	 * @param Centixx_Model_Group $model
+	 */
+	protected function _updateUsers(Centixx_Model_Group $model)
+	{
+		if (!count($model->users)) {
+			return;
+		}
+
+		$a = array();
+		foreach ($model->users as $user ) {
+			$a[$user->id] = $user->id;
+		}
+
+		$adapter = $this->getDbTable()->getAdapter()->query("UPDATE `users` SET `user_group` = NULL WHERE `user_group` = ?",
+		array($model->id));
+
+		$in = join(',', $a);
+		$adapter = $this->getDbTable()->getAdapter()->query("UPDATE `users` SET `user_group` = ? WHERE `user_id` IN ($in)",
+		array($model->id));
 	}
 
 	/**
@@ -99,12 +132,23 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 
 		//usuwam poprzedniego managera
 		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_group` = ? AND `user_role` = ?",
-			array(Centixx_Acl::ROLE_USER, $model->id, Centixx_Acl::ROLE_GROUP_MANAGER));
+		array(Centixx_Acl::ROLE_USER, $model->id, Centixx_Acl::ROLE_GROUP_MANAGER));
 
 		//ustawiam nowego manadzera
-		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_id` = ?",
-			array(Centixx_Acl::ROLE_GROUP_MANAGER, $this->_findId($model->manager)));
+		$adapter->query("UPDATE `users` SET `user_role` = ?, user_group = ? WHERE `user_id` = ?",
+		array(Centixx_Acl::ROLE_GROUP_MANAGER, $model->id, $this->_findId($model->manager)));
+	}
 
+	public function delete(Centixx_Model_Abstract $model)
+	{
+		//usuwam managera
+		$this->getDbTable()->getAdapter()->query("
+			UPDATE users
+			SET user_role = DEFAULT
+			WHERE user_group = ?",
+			array($model->id));
+
+		return $this->getDbTable()->delete($this->_getPrimaryKey() . ' = ' . $model->id);
 	}
 
 	/**

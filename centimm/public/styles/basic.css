@@ -1,4 +1,8 @@
 @CHARSET "UTF-8";
+html, body, h1, h2, p, ul, ol, li, pre {
+	margin: 0;
+	padding: 0;
+}
 
 @font-face {
 	font-family: 'Essays 1743';
@@ -106,6 +110,7 @@ a:hover {
 	border: 1px solid #E8E8E8;
 	font-family: verdana, arial, sans-serif;
 	font-size: 90%;
+	margin-bottom: 1em;
 }
 
 .navi-menu li {
@@ -219,4 +224,54 @@ form #submit-element {
 
 #loginForm dt {
 	width: 60px;
+}
+
+input.datepicker {
+	width: 6em;
+}
+
+table.staffing {
+	width: 100%;
+	margin: 1em auto;
+}
+
+table {
+	border-collapse: collapse;
+	font-family: verdana, aria, sans-serif;
+	font-size: 80%;
+}
+
+table thead td {
+	background-color: #DFDFC3;
+	text-align: center;
+	font-weight: bold;
+}
+
+table td {
+	border: 1px solid lightgray;
+	padding: 2px 5px;
+}
+
+table tbody tr:hover  {
+	background-color: #FEFF8F;
+}
+
+a.button {
+	background-position: center; 
+	width: 16px; 
+	height: 16px; 
+	display: inline-block; 
+	text-indent: -5000px; 
+	position: relative; 
+	text-align: left; 
+}
+
+a.button.delete {
+	background: url(../img/action_delete.png) no-repeat; 
+}
+a.button.edit {
+	background: url(../img/edit.png) no-repeat; 
+}
+a.button.add {
+	background: url(../img/link.png) no-repeat; 
 }

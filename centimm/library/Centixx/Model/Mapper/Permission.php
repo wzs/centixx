@@ -6,7 +6,7 @@ class Centixx_Model_Mapper_Permission extends Centixx_Model_Mapper_Abstract
 	 * Zwraca aktywne, nadane danemu użytkownikowi uprawnienie danego typu (jeśli takie istnieje)
 	 * @param Centixx_Model_User $user
 	 * @param string $permissionType
-	 *
+	 * @return array<Centixx_Model_Permission>
 	 */
 	public function getPermissions(Centixx_Model_User $user, $permissionType)
 	{
@@ -22,18 +22,25 @@ class Centixx_Model_Mapper_Permission extends Centixx_Model_Mapper_Abstract
 		return $this->_fetchAll($query, null, $adapter);
 	}
 
+	/**
+	 * W zaleznosci od wartosci count w permission - zmniejsza ja, badz usuwa rekord z bazy
+	 * w zwiazku ze "zużyciem" danego uprawnienia
+	 * @param Centixx_Model_User $user
+	 * @param string $permissionType
+	 */
 	public function removePermissions(Centixx_Model_User $user, $permissionType)
 	{
-		$adapter = $this->getDbTable()->getAdapter();
-		return $adapter->query("DELETE FROM permissions
-			WHERE permission_to = ?
-			AND permission_type = ?
-			AND permission_count > 0
-			AND NOW() BETWEEN permission_starts AND permission_ends
-			ORDER BY permission_ends ASC
-			LIMIT 1",
-			array($user->id, $permissionType)
-		);
+		$permission = array_pop($this->getPermissions($user, $permissionType));
+		if ($permission->count == 1) {
+			$this->getDbTable()->delete('permission_id = ' . $permission->id);
+		} else {
+			$adapter = $this->getDbTable()->getAdapter();
+			return $adapter->query("UPDATE permissions
+				SET permission_count = permission_count - 1
+				WHERE permission_id = ?",
+				$permission->id
+			);
+		}
 	}
 
 	protected function fillModel(Centixx_Model_Abstract $model, $row)
@@ -45,6 +52,7 @@ class Centixx_Model_Mapper_Permission extends Centixx_Model_Mapper_Abstract
 			->setType($row->permission_type)
 			->setDateStart($row->permission_starts)
 			->setDateEnd($row->permission_ends)
+			->setCount($row->permission_count)
 		;
 	}
 
@@ -57,7 +65,7 @@ class Centixx_Model_Mapper_Permission extends Centixx_Model_Mapper_Abstract
 			'permission_type'		=> $model->type,
 			'permission_ends'		=> $model->dateEnd,
 			'permission_starts'		=> $model->dateStart,
-
+			'permission_count'		=> $model->count,
 		);
 
 
