@@ -21,12 +21,20 @@ class ReportsController extends Centixx_Controller_Action {
 		$this->view->headLink()->appendStylesheet($this->baseUrl() . 'styles/white.css');
 		$this->view->headLink()->appendStylesheet($this->baseUrl() . 'styles/custom.css');
 		
-		$this->chartOverallTime();
-		$this->chartOverallCash();
+		$reports = new Centixx_Model_Reports();
 		
-		$this->chartOverallTime_end();
-		$this->chartOverallCash_end();
+		$this->view->chartProjectsCashData = $reports->chartProjectsCashData();
+		$this->view->chartProjectsTimeData = $reports->chartProjectsTimeData();
+		$this->view->chartOverallTime = $reports->chartOverallTime();
+		$this->view->chartOverallCash = $reports->chartOverallCash();
+		$this->view->chartOverallTime_end = $reports->chartOverallTime_end();
+		$this->view->chartOverallCash_end = $reports->chartOverallCash_end();
 		
+		if($this->_currentUser->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {
+			$this->view->deny = '1';
+		} else {
+			$this->view->deny = '0';
+		}
 	}
 	
 	protected function baseUrl() {
@@ -36,73 +44,5 @@ class ReportsController extends Centixx_Controller_Action {
         $path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';             
         return "$protocol://$server$port$path";
     }
-	
-	
-	
-	protected function chartOverallTime() {
-		$db = $this->_db;
-		
-		$result = $db->query(
-            'SELECT project_name, (SELECT SUM(timesheet_hours) FROM timesheets WHERE timesheet_project = project_id) as hours '.
-			'FROM `projects` WHERE project_stop < NOW()'
-        );
-        
-		$data = array();
-		while ($row = $result->fetch()) {
-    		$data[$row->project_name] = (int)$row->hours;
-		}
-		
-		$this->view->chartOverallTime = $data;
-	}
-	
-	protected function chartOverallCash() {
-		$db = $this->_db;
-		
-		$result = $db->query(
-            'SELECT project_name, (SELECT SUM(timesheet_hours*user_hour_rate) '.
-			'FROM timesheets, users WHERE timesheet_project = project_id AND timesheet_user = user_id) as cash '.
-			'FROM `projects` WHERE project_stop < NOW()'
-        );
-        
-		$data = array();
-		while ($row = $result->fetch()) {
-    		$data[$row->project_name] = (int)$row->cash;
-		}
-		
-		$this->view->chartOverallCash = $data;
-	}
-	
-	protected function chartOverallTime_end() {
-		$db = $this->_db;
-		
-		$result = $db->query(
-            'SELECT project_name, (SELECT SUM(timesheet_hours) FROM timesheets WHERE timesheet_project = project_id) as hours '.
-			'FROM `projects` WHERE project_stop > NOW()'
-        );
-        
-		$data = array();
-		while ($row = $result->fetch()) {
-    		$data[$row->project_name] = (int)$row->hours;
-		}
-		
-		$this->view->chartOverallTime_end = $data;
-	}
-	
-	protected function chartOverallCash_end() {
-		$db = $this->_db;
-		
-		$result = $db->query(
-            'SELECT project_name, (SELECT SUM(timesheet_hours*user_hour_rate) '.
-			'FROM timesheets, users WHERE timesheet_project = project_id AND timesheet_user = user_id) as cash '.
-			'FROM `projects` WHERE project_stop > NOW()'
-        );
-        
-		$data = array();
-		while ($row = $result->fetch()) {
-    		$data[$row->project_name] = (int)$row->cash;
-		}
-		
-		$this->view->chartOverallCash_end = $data;
-	}
-	
+
 }

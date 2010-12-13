@@ -105,8 +105,8 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 
 		$this->allow(self::ROLE_CEO, 'page-permissions');
 
-		$this->allow(self::ROLE_ACCOUNTANT, 'page-reports');
-		$this->allow(self::ROLE_GROUP_MANAGER, 'page-reports');
+		$this->allow(self::ROLE_CEO, 'page-reports');
+		$this->allow(self::ROLE_DEPARTMENT_CHIEF, 'page-reports');
 
 	}
 }
