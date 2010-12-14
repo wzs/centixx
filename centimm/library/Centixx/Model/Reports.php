@@ -98,7 +98,7 @@ class Centixx_Model_Reports extends Centixx_Model_Abstract {
 
 		$result = $db->query(
             'SELECT project_name, (SELECT SUM(timesheet_hours) FROM timesheets WHERE timesheet_project = project_id) as hours '.
-			'FROM `projects` WHERE project_stop < NOW()'
+			'FROM `projects` WHERE project_stop > NOW()'
         );
 
 		$data = array();
@@ -115,7 +115,7 @@ class Centixx_Model_Reports extends Centixx_Model_Abstract {
 		$result = $db->query(
             'SELECT project_name, (SELECT SUM(timesheet_hours*user_hour_rate) '.
 			'FROM timesheets, users WHERE timesheet_project = project_id AND timesheet_user = user_id) as cash '.
-			'FROM `projects` WHERE project_stop < NOW()'
+			'FROM `projects` WHERE project_stop > NOW()'
         );
 
 		$data = array();
@@ -131,7 +131,7 @@ class Centixx_Model_Reports extends Centixx_Model_Abstract {
 
 		$result = $db->query(
             'SELECT project_name, (SELECT SUM(timesheet_hours) FROM timesheets WHERE timesheet_project = project_id) as hours '.
-			'FROM `projects` WHERE project_stop > NOW()'
+			'FROM `projects` WHERE project_stop < NOW()'
         );
 
 		$data = array();
@@ -148,7 +148,7 @@ class Centixx_Model_Reports extends Centixx_Model_Abstract {
 		$result = $db->query(
             'SELECT project_name, (SELECT SUM(timesheet_hours*user_hour_rate) '.
 			'FROM timesheets, users WHERE timesheet_project = project_id AND timesheet_user = user_id) as cash '.
-			'FROM `projects` WHERE project_stop > NOW()'
+			'FROM `projects` WHERE project_stop < NOW()'
         );
 
 		$data = array();
