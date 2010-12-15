@@ -53,7 +53,7 @@ class Application_Form_User_Add extends Zend_Form
 
 		if ($this->_roles) {
 			$this->addElement('select', 'role', array(
-				'label' => 'Stanowisko (! bez sprawdzania narazie)',
+				'label' => 'Stanowisko',
 				'multiOptions' => $this->_roles,
 			));
 		}

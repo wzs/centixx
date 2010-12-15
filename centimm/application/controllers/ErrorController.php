@@ -9,9 +9,9 @@ class ErrorController extends Centixx_Controller_Action
 			$this->_response->clearBody(); //layout generował się dwa razy
 			$this->getResponse()->setHttpResponseCode(403);
 			$this->view->message = 'Dostęp zabroniony';
-			
+
 			$uri = $errors->request->getRequestUri();
-			$this->_logger->log("Próba nieautoryzowanego dostępu do {$uri} przez {$this->_currentUser}", Centixx_Log::CENTIXX);
+			$this->log(Centixx_Log::UNAUTHORISED_ACCESS, $uri);
 
 		} else {
 			switch ($errors->type) {
@@ -37,6 +37,11 @@ class ErrorController extends Centixx_Controller_Action
 		}
 
 		$this->view->request   = $errors->request;
+
+		if ($this->_isAjaxRequest) {
+			$this->getResponse()->setHttpResponseCode(200);
+			echo json_encode(false);
+		}
 	}
 
 

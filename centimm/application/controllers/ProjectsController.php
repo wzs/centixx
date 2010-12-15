@@ -55,10 +55,6 @@ class ProjectsController extends Centixx_Controller_Action
 
 			$project->addGroup($group);
 
-			$this->_logger->log(
-				"{$this->_currentUser} przypisał grupę {$group} do projektu {$project}",
-				Centixx_Log::CENTIXX
-			);
 			$this->_redirect($project->getUrl('edit'));
 		} else {
 			$this->_forward('show', null, null, $request->getParams());

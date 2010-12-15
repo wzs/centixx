@@ -182,12 +182,15 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 
 	/**
 	 * Sprawdza, czy użytkownik ma aktywne, nadane uprawnienia na wykonanie danego typu akcji
+	 * Jeśli tak, to zwraca ich listę
+	 *
 	 * @param string $permissionType
+	 * @return array<Centixx_Model_Permission>
 	 */
-	public function hasPermission($permissionType)
+	public function hasPermission($permissionType = null)
 	{
 		$p = Centixx_Model_Mapper_Permission::factory()->getPermissions($this, $permissionType);
-		return count($p) > 0;
+		return $p;
 	}
 
 	/**

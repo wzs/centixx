@@ -52,6 +52,7 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 * Uwaga! Metoda natychmiast zapisuje stan uzytkownika!
 	 * @param Centixx_Model_User $user
 	 * @return Centixx_Model_Group fluent interface
+	 * @deprecated
 	 */
 	public function addUser(Centixx_Model_User $user)
 	{

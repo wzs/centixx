@@ -21,9 +21,11 @@ class PermissionsController extends Centixx_Controller_Action
 
 			try {
 				$permission = new Centixx_Model_Permission($data);
-				$permission->save();
+				$id = $permission->save();
 
 				$this->view->messages[] = 'Uprawnienie zostało nadane';
+				$this->log(Centixx_Log::PERMISSION_GRANTED, "id = " . $id);
+
 			} catch (Zend_Db_Statement_Exception $e) {
 				//zapewniona unikalnosc odpowiednich kluczy  =na poziomie bazy danych
 				$this->view->messages[] = 'Uprawnienie zostało nadane już wcześniej';

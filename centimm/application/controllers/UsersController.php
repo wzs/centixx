@@ -5,6 +5,7 @@ class UsersController extends Centixx_Controller_Action
 	public function indexAction()
 	{
 		$this->view->users = Centixx_Model_Mapper_User::factory()->fetchAll();
+		$this->view->permissions = Centixx_Model_Mapper_Permission::factory()->getPermissions($this->_currentUser);
 	}
 
 	public function showAction()
@@ -21,9 +22,30 @@ class UsersController extends Centixx_Controller_Action
 		$this->view->user = $user;
 	}
 
+	public function deleteAction()
+	{
+
+		$userId = $this->getRequest()->getParam('id');
+		$user = Centixx_Model_Mapper_User::factory()->find($userId);
+
+		if (!$user->isAllowed($this->_currentUser, 'delete')) {
+			throw new Centixx_Acl_AuthenticationException();
+		}
+
+		$user->delete();
+		$this->log(Centixx_Log::USER_DELETED, $user);
+		$this->view->messages[] = 'Użytkownik został usunięty';
+
+		$this->_forward('index');
+
+		if ($this->_isAjaxRequest) {
+			echo json_encode(true);
+		}
+	}
+
 	public function addAction()
 	{
- 		$this->_helper->viewRenderer('edit');
+		$this->_helper->viewRenderer('edit');
 
 		$form = new Application_Form_User_Edit();
 
@@ -47,7 +69,6 @@ class UsersController extends Centixx_Controller_Action
 					throw new Centixx_Acl_AuthenticationException('Nie masz uprawnień do tworzenia nowych użytkowników');
 				}
 
-
 				//jezeli obecny uzytkownik nie ma nadanych uprawnien,
 				//nie powinien miec mozliwosci zmiany uprawnien CEO
 				if ($data['role'] == Centixx_Acl::ROLE_CEO) {
@@ -58,7 +79,9 @@ class UsersController extends Centixx_Controller_Action
 				}
 
 				$user->setOptions($data)->save();
+				$this->log(Centixx_Log::USER_CREATED, $user);
 				$this->view->messages[] = 'Użytkownik został dodany';
+				$this->_forward('index');
 			}
 		}
 
@@ -97,7 +120,7 @@ class UsersController extends Centixx_Controller_Action
 				//aby zmienić uprawnienia użytkownika na CEO / zmniejszyć uprawnienia CEO
 				//obecnie zalogowany user MUSI mieć nadane pozwolenie
 				if ($data['role'] !== $user->getRole()
-					&& ($data['role'] == Centixx_Acl::ROLE_CEO || $user->role == Centixx_Acl::ROLE_CEO)
+				&& ($data['role'] == Centixx_Acl::ROLE_CEO || $user->role == Centixx_Acl::ROLE_CEO)
 				) {
 					if (!$user->isAllowed($this->_currentUser, Centixx_Model_User::ACTION_ADD_CEO)) {
 						throw new Centixx_Acl_AuthenticationException("Nie masz uprawnień do edycji członka zarządu");
@@ -108,6 +131,7 @@ class UsersController extends Centixx_Controller_Action
 				$user->setOptions($data)->save();
 				$form->setDefaults($user->toArray());
 				$this->view->messages[] = 'Dane zostały zaktualizowane';
+				$this->log(Centixx_Log::USER_UPDATED, $user);
 			}
 		} else {
 			$form->setDefaults($user->toArray());
@@ -123,9 +147,9 @@ class UsersController extends Centixx_Controller_Action
 	public function selfeditAction()
 	{
 		$user = $this->_currentUser;
-//		if (!$user->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
-//			throw new Centixx_Acl_AuthenticationException();
-//		}
+		//		if (!$user->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
+		//			throw new Centixx_Acl_AuthenticationException();
+		//		}
 
 		$form = new Application_Form_User_SelfEdit();
 

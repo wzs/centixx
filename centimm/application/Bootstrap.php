@@ -126,13 +126,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$this->bootstrap('config');
 		$config = Zend_Registry::getInstance()->get('config');
-		$log = Zend_Log::factory(array($config['resources']['log']));
 
-		//ustawiam logowanie tylko zdarzen specyficznych dla aplikacji
-		$log->addPriority('Centixx', Centixx_Log::CENTIXX);
-		$log->addFilter(new Zend_Log_Filter_Priority(Centixx_Log::CENTIXX, '='));
 
-		Zend_Registry::set('log', $log);
+		$writer = Zend_Log_Writer_Stream::factory($config['resources']['log']['writerParams']);
+		$writer->setFormatter(new Zend_Log_Formatter_Simple("%timestamp%\t%priority%\t%message%" . PHP_EOL));
+
+		$log = new Centixx_Log();
+		$log->addWriter($writer);
+
+		Zend_Registry::set('centixx_logger', $log);
 
 		//dodatkowo do debugowania przez FirePHP
 		$firePhpLog = new Zend_Log(new Zend_Log_Writer_Firebug());

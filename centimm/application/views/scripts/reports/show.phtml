@@ -1,0 +1,24 @@
+
+		<div id="chart-container-time" />
+		<div id="chart-container-cash" />
+
+		<script type="text/javascript">
+			function timeFormatter() {
+				return '<b>'+ this.point.name +'</b>: '+ this.y +' godzin';
+			}
+			function cashFormatter() {
+				return '<b>'+ this.point.name +'</b>: '+ this.y +' zł';
+			}
+
+			$(document).ready(function() {
+
+				//TODO nie wiem czemu, ale dwa jednoczenie nie chce sie wyswietlic :/
+//				var options = <?php echo $this->report->renderTime('Zestawienie czasu projektu', 'chart-container-time') ?>;
+//				options.plotOptions.pie.dataLabels.formatter = options.tooltip.formatter = timeFormatter;
+//				var chart1 = new Highcharts.Chart(options);
+
+				var options2 = <?php echo $this->report->renderCash('Zestawienie kosztu projektu', 'chart-container-cash') ?>;
+				options2.plotOptions.pie.dataLabels.formatter = options2.tooltip.formatter = cashFormatter;
+				var chart2 = new Highcharts.Chart(options2);
+			});
+		</script>

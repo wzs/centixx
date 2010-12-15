@@ -33,12 +33,6 @@ class Centixx_Navigation extends Zend_Navigation
 		    ),
 
 		    array(
-		        'label' => 'Pracownicy',
-		        'controller' => 'users',
-    	        'resource' => 'page-users',
-		    ),
-
-		    array(
 		        'label' => 'Grupy',
 		        'controller' => 'groups',
 		        'resource' => 'page-groups',
@@ -70,16 +64,16 @@ class Centixx_Navigation extends Zend_Navigation
 
 		    array(
 		        'label' => 'Moduł kadrowy',
-		        'controller' => 'staffing',
-		        'resource' => 'page-staffing',
+		        'controller' => 'users',
+		        'resource' => 'page-users',
 		    ),
-		    
+
 		    array(
 		        'label' => 'Moduł księgowy',
 		        'controller' => 'accounting',
 		        'resource' => 'page-accounting',
 		    ),
-		    
+
 		    array(
 		        'label' => 'Logowanie',
 		        'controller' => 'auth',

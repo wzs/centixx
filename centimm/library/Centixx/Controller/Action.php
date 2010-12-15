@@ -24,22 +24,33 @@ abstract class Centixx_Controller_Action extends Zend_Controller_Action
 	protected $_currentUser = null;
 
 	/**
-	 * @var Zend_Log
+	 * @var Centixx_Log
 	 */
 	protected $_logger = null;
+
+	/**
+	 * @var bool czy request jest AJAXowy
+	 */
+	protected $_isAjaxRequest;
 
 	public function __construct(Zend_Controller_Request_Abstract $request, Zend_Controller_Response_Abstract $response, array $invokeArgs = array())
 	{
 		$registry = Zend_Registry::getInstance();
 		parent::__construct($request, $response, $invokeArgs);
 		$this->_db = $registry->get('db');
-		$this->_logger = $registry->get('log');
+		$this->_logger = $registry->get('centixx_logger');
 		$this->_currentUser = $registry->get('currentUser');
 		$this->_flashMessenger = $this->getHelper('FlashMessenger');
 		$this->_config = Zend_Registry::get('config');
 
 		$this->view->currentUser = $this->_currentUser;
 		$this->view->messages += $this->_flashMessenger->getMessages();
+
+		$this->_isAjaxRequest = $this->getRequest()->isXmlHttpRequest();
+		if ($this->_isAjaxRequest) {
+			$this->_helper->layout()->disableLayout();
+	        $this->_helper->viewRenderer->setNoRender();
+		}
 	}
 
 	/**
@@ -77,5 +88,20 @@ abstract class Centixx_Controller_Action extends Zend_Controller_Action
 			);
 		}
 
+	}
+
+
+	/**
+	 * Loguje specyficzne dla aplikacji wydarzenia
+	 * @param string $message treść wiadomości kontekst użytkownika wykonujacego akcje zostanie automatycznie dodany
+	 * @param int $type typ logowanej wiadomości (patrz zdefiniowane stałe w Centixx_Log)
+	 */
+	protected function log($type, $message = null)
+	{
+		if (!$this->_logger) {
+			return;
+		}
+
+		$this->_logger->log($type, $message, $this->_currentUser);
 	}
 }

@@ -17,14 +17,14 @@ class AuthController extends Centixx_Controller_Action
 				$auth = $this->_authenticate($loginForm);
 				if ($auth->isValid()) {
 					$this->_setCurrentUser($auth->getIdentity());
-					$this->_logger->log($this->_currentUser . " zalogował się", Centixx_Log::CENTIXX);
+					$this->log(Centixx_Log::LOGIN_SUCCESS);
 					$this->_redirect('/');
 				} else {
 					$this->_flashMessenger->addMessage('Niepoprawne dane logowania ');
-					$this->_logger->log("Nieudana próba logowania na konto {$loginForm->getValue('email')}", Centixx_Log::CENTIXX);
+					$this->log(Centixx_Log::LOGIN_FAILURE, "do konta " . $request->getParam('email'));
 				}
 			} else {
-				$this->_flashMessenger->addMessage('Popraw formularz');
+				$this->_flashMessenger->addMessage('Nie podano wszystkich wymaganych danych');
 			}
 		}
 
@@ -41,7 +41,7 @@ class AuthController extends Centixx_Controller_Action
 		} else if ($this->_getParam('action') == 'logout') {
 			Zend_Auth::getInstance()->clearIdentity();
 			$this->_flashMessenger->addMessage("Wylogowałeś się!");
-			$this->_logger->log($this->_currentUser . " wylogował się", Centixx_Log::CENTIXX);
+			$this->log(Centixx_Log::LOGIN_LOGOUT);
 			$this->_redirect('/');
 		}
 	}

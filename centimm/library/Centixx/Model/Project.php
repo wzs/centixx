@@ -151,9 +151,12 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
 	 * @return Zend_Date|string
 	 */
-	public function getDateStart($raw = false)
+	public function getDateStart($format = false)
 	{
-		return $raw ? $this->_dateStart : $this->_dateStart ? $this->_dateStart->toString($this->_dateFormat) : null;
+		if (!$format) {
+			$format = $this->_dateFormat;
+		}
+		return $this->_dateStart->toString($format);
 	}
 
 	public function setDateEnd($dateEnd)

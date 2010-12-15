@@ -51,11 +51,6 @@ class GroupsController extends Centixx_Controller_Action
 			}
 
 			$group->addUser($user);
-
-			$this->_logger->log(
-				"{$this->_currentUser} przypisał użytkownika {$user} do grupy {$group}",
-			Centixx_Log::CENTIXX
-			);
 			$this->_forward('edit', null, null, $request->getParams());
 			$this->_redirect($group->getUrl('edit'));
 		} else {

@@ -12,7 +12,11 @@ function debug($msg, $level = null) {
 	if ($level == null) {
 		$level = Zend_Log::DEBUG;
 	}
-	Zend_Registry::get('firephplog')->log($msg, $level);
+
+	$logger = Zend_Registry::get('firephplog');
+	if ($logger) {
+		$logger->log($msg, $level);
+	}
 }
 
 /**

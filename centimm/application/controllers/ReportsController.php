@@ -25,4 +25,18 @@ class ReportsController extends Centixx_Controller_Action {
 			$this->view->deny = '0';
 		}
 	}
+
+	public function showAction()
+	{
+		$this->appendScript(array('js/highcharts.js', 'js/yetii.js'));
+		$this->appendStyles(array(
+			'styles/white.css',
+			'styles/custom.css',
+		));
+
+    	$report = new Centixx_Model_ProjectReport();
+    	$report->setProject(Centixx_Model_Mapper_Project::factory()->find($this->getRequest()->getParam('id')));
+
+    	$this->view->report = $report;
+	}
 }

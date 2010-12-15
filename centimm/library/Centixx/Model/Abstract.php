@@ -107,7 +107,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	}
 
 	/**
-	 * Usuwa obiekt z bazy danych przy pomocy mappera
+	 * Usuwa na stałe obiekt z bazy danych
 	 * @return Centixx_Model_Abstract fluent interface
 	 */
 	public function delete()

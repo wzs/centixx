@@ -11,7 +11,7 @@ class Application_Form_Permission_AddCeo extends Zend_Form
 		$this->setMethod(self::METHOD_POST);
 
 		if (count($this->_users)) {
-			$this->addElement('radio', 'to', array(
+			$this->addElement('select', 'to', array(
 				'label'	=> 'Pracownik kadr',
 				'multiOptions' => $this->_users,
 				'required' => true,

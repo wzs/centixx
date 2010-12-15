@@ -131,10 +131,14 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
 	 * @return Zend_Date|string
 	 */
-	public function getDateStart($raw = false)
+	public function getDateStart($format = false)
 	{
-		return $raw ? $this->_dateStart : $this->_dateStart ? $this->_dateStart->toString($this->_dateFormat) : null;
+		if (!$format) {
+			$format = $this->_dateFormat;
+		}
+		return $this->_dateStart->toString($format);
 	}
+
 
 	public function setDateEnd($dateEnd)
 	{
@@ -160,5 +164,18 @@ class Centixx_Model_Permission extends Centixx_Model_Abstract
 	public function __toString()
 	{
 		return (string)$this->id;
+	}
+
+	/**
+	 * Zwraca tekstowy, długi opis uprawnienia
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		$countDesc = $this->count == 1 ? 'jednokrotne' : $this->count . '-krotne';
+		$typeDesc = $this->type == self::TYPE_ADD_CEO ? 'do edycji członka zarządu' : '';
+		$dateDesc = ($this->_dateStart != null &&  $this->_dateEnd != null) ? " ograniczone czasowo: {$this->dateStart} - {$this->dateEnd} " : '';
+
+		return $countDesc . ' uprawnienie ' . $typeDesc . $dateDesc;
 	}
 }

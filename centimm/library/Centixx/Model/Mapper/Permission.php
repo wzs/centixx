@@ -8,17 +8,21 @@ class Centixx_Model_Mapper_Permission extends Centixx_Model_Mapper_Abstract
 	 * @param string $permissionType
 	 * @return array<Centixx_Model_Permission>
 	 */
-	public function getPermissions(Centixx_Model_User $user, $permissionType)
+	public function getPermissions(Centixx_Model_User $user, $permissionType = null)
 	{
 		$adapter = $this->getDbTable()->getAdapter();
 		$query = $adapter
 			->select()
 			->from(array('p' => 'permissions'))
 			->where('permission_to = ?', $user->id)
-			->where('permission_type = ?', $permissionType)
 			->where('permission_count > 0')
 			->where('NOW() BETWEEN permission_starts AND permission_ends')
 		;
+
+		if ($permissionType) {
+			$query = $query->where('permission_type = ?', $permissionType);
+		}
+
 		return $this->_fetchAll($query, null, $adapter);
 	}
 

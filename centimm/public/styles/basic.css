@@ -33,7 +33,7 @@ body {
 }
 
 p {
-	font-size: large;
+	font-size: medium;
 	margin: 1.556em 0;
 	overflow: hidden;
 }
@@ -274,4 +274,13 @@ a.button.edit {
 }
 a.button.add {
 	background: url(../img/link.png) no-repeat; 
+}
+
+span.info {
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	background-color: lightblue;
+	font-family: verdana, arial, serif;
+	font-size: 80%;
+	padding: 3px 10px;
 }
