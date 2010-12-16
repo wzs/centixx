@@ -23,14 +23,14 @@ class PermissionsController extends Centixx_Controller_Action
 				$permission = new Centixx_Model_Permission($data);
 				$id = $permission->save();
 
-				$this->view->messages[] = 'Uprawnienie zostało nadane';
+				$this->addFlashMessage('Uprawnienie zostało nadane');
 				$this->log(Centixx_Log::PERMISSION_GRANTED, "id = " . $id);
 
 			} catch (Zend_Db_Statement_Exception $e) {
-				//zapewniona unikalnosc odpowiednich kluczy  =na poziomie bazy danych
-				$this->view->messages[] = 'Uprawnienie zostało nadane już wcześniej';
+				//zapewniona unikalnosc odpowiednich kluczy = na poziomie bazy danych
+				$this->addFlashMessage('Uprawnienie zostało nadane już wcześniej', true);
 			} catch (Exception $e) {
-				$this->view->messages[] = 'Wystąpił błąd - uprawnienie nie zostało nadane';
+				$this->addFlashMessage('Wystąpił błąd - uprawnienie nie zostało nadane', true);
 			}
 		}
 	}

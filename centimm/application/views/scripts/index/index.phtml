@@ -1,10 +1,15 @@
-<div id="welcome">
-<p>Witamy w naszym wypaśnym projekcie!</p>
+<h2>Centixx</h2>
+<div style="width: 600px;">
+	<p>Centixx jest aplikacją, która umożliwia zarządzanie projektami, oraz
+	nadzorowanie czasu pracy</p>
+	<p>
+		Aplikacja została przygotowana przez zespół:
+	</p>
+	<ul class="list">
+		<li>Kamil Ostaszewski</li>
+		<li>Sebastian Suchanowsk</li>
+		<li>Krzysztof Wódkiewicz</li>
+		<li>Paweł Wrzosek</li>
+		<li>Kamil Zień</li>
+	</ul>
 </div>
-
-<?php if (isset($this->user)): ?>
-<p>
-	Zalogowany jako <?php echo $this->user ?>
-	(<?php echo $this->user->getroleName() ?>)
-</p>
-<?php endif ?>

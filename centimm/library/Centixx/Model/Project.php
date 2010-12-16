@@ -151,8 +151,12 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
 	 * @return Zend_Date|string
 	 */
-	public function getDateStart($format = false)
+	public function getDateStart($format = null)
 	{
+		if (!$this->_dateStart) {
+			return null;
+		}
+
 		if (!$format) {
 			$format = $this->_dateFormat;
 		}
@@ -175,9 +179,16 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
 	 * @return Zend_Date|string
 	 */
-	public function getDateEnd($raw = false)
+	public function getDateEnd($format = null)
 	{
-		return $raw ? $this->_dateEnd : $this->_dateEnd ? $this->_dateEnd->toString($this->_dateFormat) : null;
+		if (!$this->_dateEnd) {
+			return null;
+		}
+
+		if (!$format) {
+			$format = $this->_dateFormat;
+		}
+		return $this->_dateEnd->toString($format);
 	}
 
 	/**

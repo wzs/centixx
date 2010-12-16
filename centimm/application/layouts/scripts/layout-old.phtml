@@ -1,0 +1,28 @@
+<?php echo $this->doctype() . PHP_EOL ?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<?php echo $this->headTitle() . PHP_EOL ?>
+	<?php echo $this->headLink(). PHP_EOL ; ?>
+	<?php echo $this->headScript(). PHP_EOL  ?>
+	<script type="text/javascript">
+		var rootUrl = '<?php echo $this->basePath ?>';
+	</script>
+</head>
+<body>
+
+<?php echo $this->navigation()->menu()->renderMenu(null, array('ulClass' => 'navi-menu')) ?>
+
+<?php if ($this->messages): ?>
+<ul id="flashMessages">
+	<?php foreach ($this->messages as $message): ?>
+	<li><?php echo $message ?></li>
+	<?php endforeach; ?>
+</ul>
+<?php endif ?>
+
+<div class="mainWrapper">
+	<?php echo $this->layout()->content ?>
+</div>
+</body>
+</html>

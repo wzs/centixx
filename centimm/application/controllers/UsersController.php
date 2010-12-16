@@ -34,7 +34,7 @@ class UsersController extends Centixx_Controller_Action
 
 		$user->delete();
 		$this->log(Centixx_Log::USER_DELETED, $user);
-		$this->view->messages[] = 'Użytkownik został usunięty';
+		$this->addFlashMessage('Użytkownik został usunięty', false, true);
 
 		$this->_forward('index');
 
@@ -80,7 +80,7 @@ class UsersController extends Centixx_Controller_Action
 
 				$user->setOptions($data)->save();
 				$this->log(Centixx_Log::USER_CREATED, $user);
-				$this->view->messages[] = 'Użytkownik został dodany';
+				$this->addFlashMessage('Użytkownik został dodany', false, true);
 				$this->_forward('index');
 			}
 		}
@@ -103,7 +103,7 @@ class UsersController extends Centixx_Controller_Action
 		$roles = Centixx_Model_Mapper_Role::factory()->fetchAll();
 
 		$form->setValues(array(
-			'user' => $user,
+			'user' 	=> $user,
 			'roles' => $roles,
 		));
 
@@ -116,7 +116,6 @@ class UsersController extends Centixx_Controller_Action
 
 			$data = $this->getRequest()->getPost();
 			if ($form->isValid($data)) {
-
 				//aby zmienić uprawnienia użytkownika na CEO / zmniejszyć uprawnienia CEO
 				//obecnie zalogowany user MUSI mieć nadane pozwolenie
 				if ($data['role'] !== $user->getRole()
@@ -130,7 +129,7 @@ class UsersController extends Centixx_Controller_Action
 
 				$user->setOptions($data)->save();
 				$form->setDefaults($user->toArray());
-				$this->view->messages[] = 'Dane zostały zaktualizowane';
+				$this->addFlashMessage('Dane zostały zaktualizowane', false, true);
 				$this->log(Centixx_Log::USER_UPDATED, $user);
 			}
 		} else {
@@ -167,7 +166,7 @@ class UsersController extends Centixx_Controller_Action
 			if ($form->isValid($data)) {
 				try {
 					$user->setOptions($data)->save();
-					$this->view->messages[] = 'Dane zostały zaktualizowane';
+					$this->addFlashMessage('Dane zostały zaktualizowane', false, true);
 				} catch (Zend_Db_Statement_Exception $e) {
 					$form->getElement('email')->setErrors(array('' => 'Podany adres email jest już w użyciu'));
 				}

@@ -4,9 +4,6 @@ class AuthController extends Centixx_Controller_Action
 {
 	public function indexAction()
 	{
-		if (Zend_Auth::getInstance()->getIdentity()) {
-			$this->_forward('logout');
-		}
 
 		$db = $this->_getParam('db');
 		$request = $this->getRequest();
@@ -17,14 +14,16 @@ class AuthController extends Centixx_Controller_Action
 				$auth = $this->_authenticate($loginForm);
 				if ($auth->isValid()) {
 					$this->_setCurrentUser($auth->getIdentity());
+
+					$this->addFlashMessage('Zalogowałeś się', false, true);
 					$this->log(Centixx_Log::LOGIN_SUCCESS);
 					$this->_redirect('/');
 				} else {
-					$this->_flashMessenger->addMessage('Niepoprawne dane logowania ');
+					$this->addFlashMessage('Niepoprawne dane logowania ', true, true);
 					$this->log(Centixx_Log::LOGIN_FAILURE, "do konta " . $request->getParam('email'));
 				}
 			} else {
-				$this->_flashMessenger->addMessage('Nie podano wszystkich wymaganych danych');
+				$this->addFlashMessage('Nie podano wszystkich wymaganych danych', true, true);
 			}
 		}
 
@@ -34,15 +33,20 @@ class AuthController extends Centixx_Controller_Action
 		$this->view->loginForm = $loginForm;
 	}
 
+	public function loginAction()
+	{
+		$this->_forward('index');
+	}
+
 	public function logoutAction()
 	{
 		if (!Zend_Auth::getInstance()->hasIdentity()) {
 			$this->_forward('index');
 		} else if ($this->_getParam('action') == 'logout') {
 			Zend_Auth::getInstance()->clearIdentity();
-			$this->_flashMessenger->addMessage("Wylogowałeś się!");
+			$this->addFlashMessage("Wylogowałeś się!", false, true);
 			$this->log(Centixx_Log::LOGIN_LOGOUT);
-			$this->_redirect('/');
+			$this->redirect('auth');
 		}
 	}
 

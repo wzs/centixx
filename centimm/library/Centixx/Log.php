@@ -11,6 +11,7 @@ class Centixx_Log  extends Zend_Log
 	const USER_CREATED			= 15;
 	const USER_UPDATED 			= 16;
 	const USER_DELETED 			= 17;
+	const LOG_CLEARED			= 18;
 
 	protected static $actionTypeNames = array(
 		9 => 'Logowanie',
@@ -22,6 +23,7 @@ class Centixx_Log  extends Zend_Log
 		'Utworzenie użytkownika',
 		'Edycja danych użytkownika',
 		'Usunięcie użytkownika',
+		'Wyczyszczenie logów systemowych',
 	);
 
 	/**
@@ -57,7 +59,7 @@ class Centixx_Log  extends Zend_Log
 	{
 		$t = explode(self::$logLineSeparator, trim($line));
 		return array(
-			'date' 			=> new Zend_Date($t[0]), //TODO przeformatować
+			'date' 			=> new Zend_Date($t[0]),
 			'actionNo' 		=> $t[1],
 			'actionName' 	=> self::getActionName($t[1]),
 			'user' 			=> $t[2],

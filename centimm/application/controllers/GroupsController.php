@@ -17,7 +17,7 @@ class GroupsController extends Centixx_Controller_Action
 		}
 		$group->delete();
 
-		$this->_flashMessenger->addMessage('Grupa została usunięta');
+		$this->addFlashMessage('Grupa została usunięta');
 		$this->_redirect('groups');
 
 	}
@@ -80,9 +80,9 @@ class GroupsController extends Centixx_Controller_Action
 					$group->setOptions($data)->save();
 
 					if ($mode == 'edit') {
-						$this->_flashMessenger->addMessage('Dane zostały zaktualizowane');
+						$this->addFlashMessage('Dane grupy zostały zaktualizowane');
 					} else {
-						$this->_flashMessenger->addMessage('Grupa została utworzona');
+						$this->addFlashMessage('Grupa została utworzona');
 					}
 					$this->_redirect($group->getUrl('edit'));
 				}

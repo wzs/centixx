@@ -10,19 +10,82 @@
 	</script>
 </head>
 <body>
+	<div class="wrapper <?php echo $this->pageId ?>">
+	<!-- Header -->
+	<div id="header">
+		<div class="shell">
+			<p id="user-menu">
+				<?php
+				if ($this->currentUser) {
+					echo 'Zalogowany jako ' . $this->currentUser . ' <a href="'.$this->url(array('controller' => 'auth', 'action' => 'logout')).'">wyloguj</a>';
+				} else {
+					echo '<a href="'.$this->url(array('controller' => 'auth', 'action' => 'index')).'">Zaloguj się</a>';
+				}
+				?>
+			</p>
+			<!-- Logo -->
+			<h1 id="logo" >
+				<a href="<?php echo $this->url(array('controller' => 'index', 'action' => 'index')) ?>" title="Strona główna">
+					<span>Centixx</span>
+					zarządzanie projektem &bull; kontrola czasu pracy
+				</a>
+			</h1>
+			<!-- End Logo -->
+			<div id="navigation">
+			<?php echo $this->navigation()->myMenu()->renderMenu() ?>
+			</div>
+			<!-- End Navigation -->
+		</div>
+	</div>
+	<!-- END Header -->
 
-<?php echo $this->navigation()->menu()->renderMenu(null, array('ulClass' => 'navi-menu')) ?>
+	<!-- Heading -->
+	<div id="heading">
+		<div class="shell">
+			<!-- flashMessages -->
+			<div id="flashMessages">
+			<?php if ($this->messages): ?>
+				<?php foreach ($this->messages as $msg): ?>
+					<div class="<?php echo $msg['status'] . ($msg['fading'] ? ' fading' : '') ?>"><?php echo $msg['text'] ?></div>
+				<?php endforeach; ?>
+			<?php endif ?>
+			</div>
+			<!-- END flashMessages -->
 
-<?php if ($this->messages): ?>
-<ul id="flashMessages">
-	<?php foreach ($this->messages as $message): ?>
-	<li><?php echo $message ?></li>
-	<?php endforeach; ?>
-</ul>
-<?php endif ?>
+			<div class="heading-cnt">
+				<?php echo $this->layout()->content ?>
+			</div>
 
-<div class="mainWrapper">
-	<?php echo $this->layout()->content ?>
-</div>
+			<div class="cl">&nbsp;</div>
+		</div>
+	</div>
+	<!-- End Heading -->
+
+
+	<!-- Features -->
+	<div id="features">
+		<div class="shell">
+
+		</div>
+	</div>
+	<!-- End Features -->
+
+
+	<!-- Footer -->
+	<div id="footer">
+		<div class="shell">
+			<div class="cl">&nbsp;</div>
+			<!--
+			<ul>
+			    <li><a href="#">Terms of Use</a></li>
+			    <li><a href="#">Privacy Policy</a></li>
+			</ul>
+			 -->
+			<p class="copy">&copy; 2010 Centixx. Design by <a href="http://chocotemplates.com">ChocoTemplates.com</a></p>
+			<div class="cl">&nbsp;</div>
+		</div>
+	</div>
+	<!-- End Footer -->
+	</div>
 </body>
 </html>

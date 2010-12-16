@@ -14,25 +14,32 @@ class Centixx_Navigation extends Zend_Navigation
     	$this->addPages($this->_getPages());
     }
 
+    public function getActive()
+    {
+    	foreach ($this->_pages as $p) {
+    		if ($p->isActive()) {
+    			return $p;
+    		}
+    	}
+    }
+
     protected function _getPages()
     {
     	//TODO wczytać z configu
 		return array(
-		    array(
-		        'label' => 'Centixx',
-		    	'title' => 'Strona główna',
+			array(
 		        'controller' => 'index',
-		    	'order'	=> -1,
-		    ),
-		    array(
-		        'label' => 'wyloguj',
-		    	'class' => 'logout',
-		        'controller' => 'auth',
-		    	'action'	=> 'logout',
-		        'resource' => 'page-logout',
+		        'resource' => 'page-index',
+				'visible' => false,
 		    ),
 
 		    array(
+		        'controller' => 'auth',
+		        'resource' => 'page-auth',
+				'visible' => false,
+		    ),
+
+			array(
 		        'label' => 'Grupy',
 		        'controller' => 'groups',
 		        'resource' => 'page-groups',
@@ -73,13 +80,6 @@ class Centixx_Navigation extends Zend_Navigation
 		        'controller' => 'accounting',
 		        'resource' => 'page-accounting',
 		    ),
-
-		    array(
-		        'label' => 'Logowanie',
-		        'controller' => 'auth',
-		        'resource' => 'page-login',
-		    ),
-
 
 		    array(
 		        'label' => 'Raporty',

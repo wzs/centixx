@@ -4,15 +4,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
 	protected function _initView()
 	{
+		$this->bootstrap('layout');
+		$cfg = $this->getOption('resources');
 
 		$view = new Zend_View();
 		$view->doctype(Zend_View_Helper_Doctype::HTML4_STRICT);
 		$view->headTitle('Centixx');
 
-		$this->bootstrap('layout');
-		$cfg = $this->getOption('resources');
-
 		$layout = $this->getResource('layout');
+
 		$view->basePath = $layout->basePath = $cfg['layout']['basePath'];
 
 		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
@@ -35,13 +35,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		);
 
 		$view->headLink()
-			->appendStylesheet($cfg['layout']['basePath'] . '/styles/basic.css')
-			->appendStylesheet('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css')
+			->appendStylesheet($cfg['layout']['basePath'] . '/styles/template.css')
+//			->appendStylesheet('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css')
+			->appendStylesheet($cfg['layout']['basePath'] . '/styles/jquery-ui.css')
 		;
 
 		$view->messages = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages();
-
-//		$view->addHelperPath("ZendX/JQuery/View/Helper", "ZendX_JQuery_View_Helper");
 
 		return $view;
 	}
@@ -85,11 +84,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$modelResourceAcl = new Centixx_Acl_ModelResource();
 		Zend_Registry::set('Zend_Acl', $modelResourceAcl);
 
-		//rejestrowanie pluginu, w którym automatycznie sprawdzane są uprawnienia
-		//do wykonania akcji w kontrolerze
-
-//		$actionResourceAcl = new Centixx_Acl_ActionResource();
-//		Zend_Registry::set('actionAcl', $actionResourceAcl);
 		$frontController = Zend_Controller_Front::getInstance();
 		$frontController->registerPlugin(new Centixx_Controller_Plugin_Acl($currentUser, $modelResourceAcl));
 
@@ -112,7 +106,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$currentUser = $this->getResource('currentUser');
 
 		$navi = new Centixx_Navigation();
-		Zend_Registry::set('Zend_Navigation', $navi);
+
+		$this->bootstrap('view');
+		$view = $this->getResource('view');
+
+		$view->navigation($navi);
 
 		//ustawiam ACL'a używanego przez menu
 		Zend_View_Helper_Navigation_Menu::setDefaultAcl($acl);
@@ -126,7 +124,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$this->bootstrap('config');
 		$config = Zend_Registry::getInstance()->get('config');
-
 
 		$writer = Zend_Log_Writer_Stream::factory($config['resources']['log']['writerParams']);
 		$writer->setFormatter(new Zend_Log_Formatter_Simple("%timestamp%\t%priority%\t%message%" . PHP_EOL));
@@ -145,7 +142,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initCache()
 	{
-
 		$frontendOptions = array('automatic_serialization' => true);
 		$backendOptions  = array('cache_dir' => APPLICATION_PATH . '/../data/cache');
 
@@ -165,6 +161,19 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$locale = new Zend_Locale($config['locale']['locale']);
 
 		Zend_Registry::set('Zend_Locale', $locale);
+
+		//spolszczenie komunikatów walidatorów - działa dla Zend_Framework > 1.11.0
+		if (Zend_Version::compareVersion('1.11.0') != 1) {
+			$translator = new Zend_Translate(
+			    array(
+			        'adapter' => 'array',
+			        'content' => APPLICATION_PATH . '/../resources/languages',
+			        'locale'  => $config['locale']['locale'],
+			        'scan' => Zend_Translate::LOCALE_DIRECTORY
+			    )
+			);
+			Zend_Validate_Abstract::setDefaultTranslator($translator);
+		}
 		return $locale;
 	}
 }

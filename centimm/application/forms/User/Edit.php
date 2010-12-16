@@ -30,13 +30,24 @@ class Application_Form_User_Edit extends Zend_Form
 			'errorMessages'  => array('Nazwisko jest wymagane'),
 		));
 
+		$dbValidatorOptions = array(
+			'table' => 'users',
+			'field' => 'user_email',
+		);
+		if ($this->_user) {
+			$dbValidatorOptions['exclude'] = array(
+				'field' => 'user_id',
+				'value' => $this->_user->id
+			);
+		}
+
 		$this->addElement('text', 'email', array(
 			'label'		=> 'E-mail',
 			'required'	=> true,
 			'validators'=> array(
-				new Zend_Validate_EmailAddress()
+				new Zend_Validate_EmailAddress(),
+				new Zend_Validate_Db_NoRecordExists($dbValidatorOptions),
 			),
-			'errorMessages'  => array('Wprowadź prawidłowy email'),
 		));
 
 		$this->addElement('text', 'hourRate', array(
@@ -56,7 +67,7 @@ class Application_Form_User_Edit extends Zend_Form
 
 		if ($this->_roles) {
 			$this->addElement('select', 'role', array(
-				'label' => 'Stanowisko (! bez sprawdzania narazie)',
+				'label' => 'Stanowisko',
 				'multiOptions' => $this->_roles,
 			));
 		}
@@ -76,8 +87,9 @@ class Application_Form_User_Edit extends Zend_Form
 		//nadpisałem, bo nie mogelm zmusic Zend_Validate_Identical do dzialania
 //		$this->getElement('password_retype')
 //			->addValidator(new Zend_Validate_Identical($data['password']));
-//		return parent::isValid($data);
-		return true;
+
+
+		return parent::isValid($data);
 	}
 
 	/**

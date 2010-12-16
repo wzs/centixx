@@ -6,12 +6,12 @@ class AccountingController extends Centixx_Controller_Action
 	{
 		$this->view->users = Centixx_Model_Mapper_User::factory()->fetchAll();
 //		$grid = Bvb_Grid::factory('table',array(),'');
-//		
+//
 //		$grid->setImagesUrl($this->_config['resources']['layout']['basePath'] . 'Bvb/extras/images/');
-//		
+//
 //		$select = $this->_db->select()
 //			->from(
-//				array('u' => 'users'), 
+//				array('u' => 'users'),
 //				array(
 //					'Nr kadrowy' => 'u.user_id',
 //					'Nazwisko' => 'user_surname',
@@ -19,7 +19,7 @@ class AccountingController extends Centixx_Controller_Action
 //					'E-mail' => 'user_email',
 //					'Nr konta' => 'user_account'))
 //			->join(
-//				array('r' => 'roles'), 
+//				array('r' => 'roles'),
 //				'u.user_role = r.role_id',
 //				array('Stanowisko' => 'role_name')
 //			)
@@ -28,19 +28,19 @@ class AccountingController extends Centixx_Controller_Action
 //				'u.user_group = g.group_id',
 //				array('Grupa' => 'group_name')
 //			);
-//										
+//
 //		$grid->setSource(new Bvb_Grid_Source_Zend_Select($select));
 //		//do czego export
 //		$grid->setExport(array('xml','odt','pdf'));
-//		
+//
 //		$form = new Bvb_Grid_Form('Application_Form_User_Edit', array());
 //		$form->setAdd(true);
 //    	$form->setEdit(true);
 //    	$form->setDelete(true);
 //    	$form->setAddButton(true);
-//    	
+//
 //    	$grid->setForm($form);
-		
+
 //		$this->view->grid = $grid->deploy();
 	}
 
@@ -96,7 +96,7 @@ public function showAction()
 				}
 
 				$user->setOptions($data)->save();
-				$this->view->messages[] = 'Użytkownik został dodany';
+				$this->addFlashMessage('Użytkownik został dodany');
 			}
 		}
 
@@ -142,7 +142,7 @@ public function showAction()
 				}
 
 				$user->setOptions($data)->save();
-				$this->view->messages[] = 'Dane zostały zaktualizowane';
+				$this->addFlashMessage('Dane zostały zaktualizowane');
 			}
 
 		} else {
@@ -151,12 +151,12 @@ public function showAction()
 
 		$this->view->editForm = $form;
 	}
-	
+
 	public function deleteAction(){
 		$userId = $this->getRequest()->getParam('id');
-		
+
 		$user = Centixx_Model_Mapper_User::factory()->find($userId);
-		
+
 		if (!$user->isAllowed($this->_currentUser, 'delete')) {
 			throw new Centixx_Acl_AuthenticationException();
 		}
