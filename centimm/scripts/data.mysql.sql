@@ -27,7 +27,32 @@ INSERT INTO `users` (`user_id`, `user_name`, `user_surname`, `user_hour_rate`, `
 (2, 'Kamil', 'Zień', '30', '12346', 1, 2, 'kamilz@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c'),
 (3, 'Sebastian', 'Suchanowski', '30', '12347', 1, 2, 'sebastians@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c'),
 (4, 'Krzysztóf', 'Wódkiewicz', '30', '12348', 1, 2, 'krzysztofw@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c'),
-(5, 'Kamil', 'Ostaszewski', '30', '12349', 6, 1, 'kamilo@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c');
+(5, 'Kamil', 'Ostaszewski', '30', '12349', 1, 1, 'kamilo@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c');
+
+INSERT INTO daysofweek (day) VALUES
+('2010-12-13'),
+('2010-12-14'),
+('2010-12-15'),
+('2010-12-16'),
+('2010-12-17'),
+('2010-12-18'),
+('2010-12-19');
+
+INSERT INTO timesheets (timesheet_user, timesheet_project, timesheet_hours, timesheet_date, timesheet_descr) VALUES
+(5, 1, 4, '2010-12-09', 'opierdalanie sie'),
+(5, 1, 4, '2010-12-10', 'bumelowanie'),
+(5, 1, 4, '2010-12-11', 'leniuchowanie'),
+(5, 1, 4, '2010-12-12', 'praca'),
+(5, 1, 4, '2010-12-13', 'pierdzenie w stolek'),
+(5, 1, 4, '2010-12-14', 'zbijanie bakow'),
+(5, 1, 4, '2010-12-15', 'obijanie sie'),
+(5, 1, 4, '2010-12-16', 'opierdalanie sie'),
+(5, 1, 4, '2010-12-17', 'bumelowanie'),
+(5, 1, 4, '2010-12-18', 'leniuchowanie'),
+(5, 1, 4, '2010-12-19', 'praca'),
+(5, 1, 4, '2010-12-20', 'pierdzenie w stolek'),
+(5, 1, 4, '2010-12-21', 'zbijanie bakow'),
+(5, 1, 4, '2010-12-22', 'obijanie sie');
 
 SET FOREIGN_KEY_CHECKS=1;
 

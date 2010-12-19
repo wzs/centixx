@@ -6,7 +6,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
-
+DROP TABLE IF EXISTS `departments`;
 CREATE TABLE IF NOT EXISTS `departments` (
   `department_id` int(11) NOT NULL AUTO_INCREMENT,
   `department_name` varchar(45) COLLATE utf8_polish_ci NOT NULL,
@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `departments` (
   KEY `department_manager` (`department_manager`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS `groups`;
 CREATE TABLE IF NOT EXISTS `groups` (
   `group_id` int(11) NOT NULL AUTO_INCREMENT,
   `group_name` varchar(45) COLLATE utf8_polish_ci NOT NULL,
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
   KEY `group_project_2` (`group_project`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE IF NOT EXISTS `permissions` (
   `permission_id` int(11) NOT NULL AUTO_INCREMENT,
   `permission_from` int(11) NOT NULL,
@@ -40,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   KEY `permission_to` (`permission_to`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS `projects`;
 CREATE TABLE IF NOT EXISTS `projects` (
   `project_id` int(11) NOT NULL AUTO_INCREMENT,
   `project_name` varchar(45) COLLATE utf8_polish_ci NOT NULL,
@@ -52,21 +55,28 @@ CREATE TABLE IF NOT EXISTS `projects` (
   KEY `project_department` (`project_department`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `role_id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(45) COLLATE utf8_polish_ci NOT NULL,
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS `timesheets`;
 CREATE TABLE IF NOT EXISTS `timesheets` (
+  `timesheet_id` int(11) NOT NULL AUTO_INCREMENT,
   `timesheet_user` int(11) NOT NULL,
   `timesheet_project` int(11) NOT NULL,
   `timesheet_hours` decimal(10,0) NOT NULL,
   `timesheet_date` date NOT NULL,
-  PRIMARY KEY (`timesheet_user`,`timesheet_project`,`timesheet_date`),
+  `timesheet_descr` text NOT NULL,
+  `timesheet_accepted` bool NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (`timesheet_id`),
+  UNIQUE unique_user_date (`timesheet_user`, `timesheet_date`),
   KEY `timesheet_project` (`timesheet_project`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS `transactions`;
 CREATE TABLE IF NOT EXISTS `transactions` (
   `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
   `transaction_account` decimal(10,0) NOT NULL,
@@ -76,6 +86,7 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   PRIMARY KEY (`transaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(45) COLLATE utf8_polish_ci NOT NULL,
@@ -95,6 +106,10 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `user_role_2` (`user_role`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
+DROP TABLE IF EXISTS daysofweek;
+CREATE TABLE IF NOT EXISTS daysofweek (
+  day date NOT NULL
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
 ALTER TABLE `departments`
   ADD CONSTRAINT `departments_ibfk_1` FOREIGN KEY (`department_manager`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
@@ -120,3 +135,4 @@ ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`user_project`) REFERENCES `projects` (`project_id`) ON DELETE SET NULL,
   ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`user_group`) REFERENCES `groups` (`group_id`) ON DELETE SET NULL;
 SET FOREIGN_KEY_CHECKS=1;
+
