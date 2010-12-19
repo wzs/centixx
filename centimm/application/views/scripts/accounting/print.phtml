@@ -1,0 +1,22 @@
+<h2>Przelew nr <?php echo $this->transaction->id?> dla użytkownika <?php echo $this->user->getName().' '.$this->user->getSurname()?></h2>
+
+<div>
+	<img id="trans" src="http://localhost/centixx/centimm/public/img/tmp.jpg"/>
+</div>
+
+<div>
+	<button>Drukuj</button>
+	<button onclick="closeWindow()">Zamknij</button>
+</div>
+
+<script type="text/javascript">
+
+function closeWindow(){
+	window.close();
+}
+
+function print(){
+	window.print();
+}
+
+</script>

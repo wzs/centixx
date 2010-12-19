@@ -1,104 +1,49 @@
-<h2>Pracownicy</h2>
-<?php if ($this->users): ?>
+<h2>Transakcje</h2>
+
+<?php if($this->transactions): ?>
 <?php $index = 1 ?>
-<table>
+<table class="staffing">
 <thead>
 <tr>
-	<td>
-		Id	
-	</td>
-	<td>
-		Nazwisko 
-	</td>
-	<td>
-		Imie	
-	</td>
-	<td>
-		Email
-	</td>
-	<td>
-		Stanowisko
-	</td>
-	<td>
-		Grupa
-	</td>
-	<td>
-		Stawka
-	</td>
-	<td>
-		Nr konta
-	</td>
+	<td>Id</td>
+	<td>Pracownik</td>
+	<td>Nr konta</td>
+	<td>Kwota</td>
+	<td>Tytuł</td>
+	<td>Data</td>
+	<td></td>
 </tr>
 </thead>
 <tbody>
-<?php foreach ($this->users as $user): ?>
-<?php if ($user->isAllowed($this->currentUser, 'show')): ?>
+<?php foreach ($this->transactions as $transaction): ?>
 <tr>
-	<td>
-		<?php echo $index++;?>	
-	</td>
-	<td>
-		<?php echo $user->getSurname() ?>
-	</td>
-	<td>
-		<?php echo $user->getName() ?>
-	</td>
-	<td>
-		<?php echo $user->getEmail()?>
-	</td>
-	<td>
-		<?php echo $user->getRoleName() ?>
-	</td>
-	<td>
-		<?php if ($user->getGroup() == null): ?>
-			--------------
-		<?php else: ?>
-			<?php echo $user->getGroup() ?>
-		<?php endif?>
-	</td>
-	<td>
-		<?php if($user->getRole()==8):?>
-			<?php if($this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
-				<?php echo $user->getHourRate() . "zł"?>
-				<?php else: ?>
-				-----
-			<?php endif?>
-		<?php else: ?>
-			<?php echo $user->getHourRate() . "zł"?>
-		<?php endif?>
-	</td>
-	<td>
-		<?php echo $user->getAccount()?>
-	</td>
-	<td>
-		<a href = <?php echo $user->getUrl('edit')?>>
-			<img src="../public/img/edit.png" alt="E" ></img>
-		</a>
-	</td>
-	<td>
-		<a href = <?php echo $user->getUrl('delete')?>>
-			<img src="../public/img/action_delete.png" alt="X"></img>
-		</a>
-	</td>
+	<td id = "id"><?php echo $index++;?></td>
+	<td id = "user"><?php echo $transaction->getUser()?> </td>
+	<td id = "account"><?php echo $transaction->getAccount() ?></td>
+	<td id = "value"><?php echo $transaction->getValue()?></td>
+	<td id = "title"><?php echo $transaction->getTitle() ?></td>
+	<td id = "date"><?php echo $transaction->getDate() ?></td>
+	<td><img alt="Generuj przelew" src="../public/img/edit.png" onclick="popup()"/></td>
 </tr>
-<?php endif ?>
 <?php endforeach; ?>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td>
-<!--		<img src="../public/img/link.gif" alt="D" onclick="createUser('<?php echo $user->getUrl('add')?>')"></img>-->
-		<a href = <?php echo $user->getUrl('add')?>>
-			<img src="../public/img/link.gif" alt="D"></img>
-		</a>
-	</td>
-</tr>
 </tbody>
 </table>
+
 <?php endif ?>
+
+<script type="text/javascript">
+
+function popup(){
+	var controller = "accounting";
+	var account = document.getElementById("account").firstChild.nodeValue;
+	var value = document.getElementById("value").firstChild.nodeValue;
+	var tId = document.getElementById("id").firstChild.nodeValue;
+	alert(account);
+	window.open(controller + "/print/id/" + tId);
+}
+
+</script>
+<!--
+
+//-->
+</script>
