@@ -16,6 +16,23 @@ INSERT INTO `daysofweek` (`day`) VALUES
 ('2010-12-18'),
 ('2010-12-19');
 
+INSERT INTO timesheets (timesheet_user, timesheet_project, timesheet_hours, timesheet_date, timesheet_descr) VALUES
+(5, 1, 4, '2010-12-09', 'opierdalanie sie'),
+(5, 1, 4, '2010-12-10', 'bumelowanie'),
+(5, 1, 4, '2010-12-11', 'leniuchowanie'),
+(5, 1, 4, '2010-12-12', 'praca'),
+(5, 1, 4, '2010-12-13', 'pierdzenie w stolek'),
+(5, 1, 4, '2010-12-14', 'zbijanie bakow'),
+#(5, 1, 4, '2010-12-15', 'obijanie sie'),
+(5, 1, 4, '2010-12-16', 'opierdalanie sie'),
+(5, 1, 4, '2010-12-17', 'bumelowanie'),
+(5, 1, 4, '2010-12-18', 'leniuchowanie'),
+(5, 1, 4, '2010-12-19', 'praca'),
+(5, 1, 4, '2010-12-20', 'pierdzenie w stolek'),
+(5, 1, 4, '2010-12-21', 'zbijanie bakow'),
+(5, 1, 4, '2010-12-22', 'obijanie sie');
+
+
 INSERT INTO `departments` (`department_id`, `department_name`, `department_manager`) VALUES
 (1, 'Dział IT', 1);
 
