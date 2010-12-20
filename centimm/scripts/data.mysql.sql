@@ -48,7 +48,7 @@ INSERT INTO `users` (`user_id`, `user_name`, `user_surname`, `user_hour_rate`, `
 (2, 'Kamil', 'Zień', '10.00', 'ZK0135', NULL, NULL, 'kamilz@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c', 10, 'Warszawa, warszawska'),
 (3, 'Sebastian', 'Suchanowski', '19.00', 'SS45563', NULL, 1, 'sebastians@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c', 1, ''),
 (4, 'Krzysztof', 'Wódkiewicz', '25.00', 'WK1245', NULL, 1, 'krzysztofw@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c', 1, ''),
-(5, 'Kamil', 'Ostaszewski', '42.00', 'OK235', NULL, 1, 'kamilo@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c', 1, 'Kotowo');
+(5, 'Kamil', 'Ostaszewski', '42.00', 'OK235', NULL, 1, 'kamilo@a.pl', '1faf0c1ab4dbcdd9543c0615f04c9b2c', 1, 'Warszawa');
 
 INSERT INTO `users_roles` (`user_id`, `role_id`) VALUES
 (1, 1),
