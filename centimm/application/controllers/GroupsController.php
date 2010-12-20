@@ -119,8 +119,6 @@ class GroupsController extends Centixx_Controller_Action
 
 		$this->prepare($group, 'edit');
 
-//		$usersFromOtherGroups = Centixx_Model_Mapper_User::factory()->fetchAvailableUsers($group);
-//
 //		$addUserForm = new Centixx_Form_AddItem();
 //		$addUserForm->submitLabel = 'Przypisz';
 //		$addUserForm->setValues(array('items' => $usersFromOtherGroups));

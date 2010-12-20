@@ -110,10 +110,6 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 			return $this;
 		}
 
-		if (!$manager instanceof Centixx_Model_User) {
-			$manager = new Centixx_Model_User(array('id' => $manager));
-		}
-
 		if ($this->manager) {
 			$this->oldManager = $this->manager;
 		}

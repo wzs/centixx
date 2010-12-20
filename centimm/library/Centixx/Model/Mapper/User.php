@@ -82,10 +82,8 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 		$query = $adapter
 			->select()
 			->from(array('u' => 'users'))
-			->where("user_role = ".Centixx_Acl::ROLE_USER." OR (user_role = ".Centixx_Acl::ROLE_GROUP_MANAGER." AND user_group = ".$group->id.") ")
 			->where("user_project = ?", array($group->project->id))
 			->where('user_group IS NULL OR user_group = ?', array($group->id));
-
 		return $this->_fetchAll($query, null, $adapter);
 	}
 
