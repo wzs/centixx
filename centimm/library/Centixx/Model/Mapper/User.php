@@ -7,13 +7,13 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 	 * @param Centixx_Model_User $model
 	 * @return string
 	 */
-	public function getRoleName(Centixx_Model_User $model)
+	public function getRoleName($model)
 	{
 		//nie powinno mieć miejsca
-		if ($model->role == null) {
+		if ($model == null) {
 			return 'Gość';
 		}
-		return Centixx_Model_Mapper_Role::factory()->find($model->role)->name;
+		return Centixx_Model_Mapper_Role::factory()->find($model->id)->name;
 	}
 
 	/**
@@ -33,13 +33,14 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 	 */
 	public function fetchUsersByRole($roleId)
 	{
-		$adapter = $this->getDbTable()->getAdapter();
-		$query = $adapter
+		$query = $this->getDbTable()
 			->select()
-			->from(array('u' => 'users'))
-			->where("user_role  = ?", $roleId)
+			->from(array('r' => 'roles'), null)
+			->joinLeft(array('ur' => 'users_roles'), 'ur.role_id = r.role_id', null)
+			->join(array('u' => 'users'), 'u.user_id = ur.user_id')
+			->where('r.role_id = ?', $roleId)
 		;
-		return $this->_fetchAll($query, null, $adapter);
+		return $this->_fetchAll($query);
 	}
 
 	/**
@@ -53,13 +54,14 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 		$adapter = $this->getDbTable()->getAdapter();
 		$query = $adapter
 			->select()
-			->from(array('u' => 'users'))
-			->where("user_role = ?", array(Centixx_Acl::ROLE_USER))
-			->where("user_project IS NULL")
+			->from(array('ur' => 'users_roles'))
+			->join(array('u' => 'users'), 'u.user_id = ur.user_id')
+			->where("ur.role_id = ?", array(Centixx_Acl::ROLE_USER))
+			->where("u.user_project IS NULL")
 		;
 
 		if ($project instanceof Centixx_Model_Project) {
-			$query = $query->orWhere('user_project = ?', array($project->id));
+			$query = $query->orWhere('u.user_project = ?', array($project->id));
 		}
 
 		return $this->_fetchAll($query, null, $adapter);
@@ -132,11 +134,12 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 			->setEmail($row->user_email)
 			->setName($row->user_name)
 			->setSurname($row->user_surname)
-			->setRole($row->user_role)
+			->setHashedPassword($row->user_password)
 			->setGroup($row->user_group)
 			->setProject($row->user_project)
 			->setHourRate($row->user_hour_rate)
 			->setAccount($row->user_account)
+			->setAddress($row->user_address)
 		;
 	}
 
@@ -150,10 +153,11 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 			'user_email'		=> $model->email,
 			'user_name'			=> $model->name,
 			'user_surname'		=> $model->surname,
-			'user_role'			=> $model->role,
 			'user_hour_rate'	=> $model->hourRate,
 			'user_group'		=> $this->_findId($model->group),
 			'user_project'		=> $this->_findId($model->project),
+			'user_account'		=> $model->account,
+			'user_address'		=> $model->address,
 		);
 
 		if ($model->password != null) {
@@ -169,7 +173,29 @@ class Centixx_Model_Mapper_User extends Centixx_Model_Mapper_Abstract
 		} else {
 			$model->id = $table->insert($data);
 		}
+		$this->_updateRoles($model);
+
 		return $this;
+	}
+
+	protected function _updateRoles(Centixx_Model_User $model)
+	{
+		if (!count($model->getRoles())) {
+			return;
+		}
+
+		$a = array();
+		$insertValues = array();
+		foreach ($model->getRoles() as $role) {
+			$a[$role->id] = $role->id;
+			$insertValues[] = "({$model->id}, {$role->id})";
+		}
+
+		$in = join(',', $a);
+		$adapter = $this->getDbTable()->getAdapter()->query("DELETE FROM `users_roles` WHERE `user_id` = ?",
+			array($model->id));
+
+		$adapter = $this->getDbTable()->getAdapter()->query("INSERT INTO users_roles (user_id, role_id) VALUES " . join(', ', $insertValues));
 	}
 
 	/**

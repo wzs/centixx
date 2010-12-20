@@ -35,11 +35,22 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	protected $_manager;
 
 	/**
+	 * @var Centixx_Model_User
+	 */
+	protected $_oldManager;
+
+	/**
 	 * @var Centixx_Model_Department
 	 */
 	protected $_department;
 
 	protected $_groups;
+
+	/**
+	 * @var Centixx_Model_ProjectReport
+	 */
+	protected $_report;
+
 
 	/**
 	 * @param string $name
@@ -92,13 +103,23 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	}
 
 	/**
+	 * Ustawia nowego managera,
+	 * uwaga - efekt jest natychmiastowy, bez metody save()
+	 *
 	 * @param Centixx_Model_User|int $manager
 	 * @return Centixx_Model_Project provides fluent interface
 	 */
 	public function setManager($manager)
 	{
-		if ($manager != '')
-			$this->_manager = $manager;
+		if ($manager == '') {
+			return $this;
+		}
+
+		if ($this->manager) {
+			$this->oldManager = $this->manager;
+		}
+
+		$this->_manager = $manager;
 		return $this;
 	}
 
@@ -111,6 +132,20 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 			? $this->_manager
 			: $this->_mapper->getRelated($this, 'manager', 'User');
 		return $ret;
+	}
+
+	public function setOldManager($manager)
+	{
+		$this->_oldManager = $manager;
+		return $this;
+	}
+
+	/**
+	 * @return Centixx_Model_User
+	 */
+	public function getOldManager()
+	{
+		return $this->_oldManager;
 	}
 
 	/**
@@ -151,16 +186,17 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
 	 * @return Zend_Date|string
 	 */
-	public function getDateStart($format = null)
+	public function getDateStart($raw = false)
 	{
 		if (!$this->_dateStart) {
 			return null;
 		}
 
-		if (!$format) {
-			$format = $this->_dateFormat;
+		if ($raw == true) {
+			return $this->_dateStart;
 		}
-		return $this->_dateStart->toString($format);
+
+		return $this->_dateStart->toString($this->_dateFormat);
 	}
 
 	public function setDateEnd($dateEnd)
@@ -179,16 +215,16 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 	 * @param bool $raw czy ma być zwrócone jako Zend_Date
 	 * @return Zend_Date|string
 	 */
-	public function getDateEnd($format = null)
+	public function getDateEnd($raw = false)
 	{
 		if (!$this->_dateEnd) {
 			return null;
 		}
 
-		if (!$format) {
-			$format = $this->_dateFormat;
+		if ($raw == true) {
+			return $this->_dateEnd;
 		}
-		return $this->_dateEnd->toString($format);
+		return $this->_dateEnd->toString($this->_dateFormat);
 	}
 
 	/**
@@ -219,7 +255,7 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 			if (!$user instanceof Centixx_Model_User) {
 				$user = new Centixx_Model_User(array('id' => $user));
 			}
-			$this->_users[] = $user;
+			$this->_users[$user->id] = $user;
 		}
 		return $this;
 	}
@@ -241,11 +277,23 @@ class Centixx_Model_Project extends Centixx_Model_Abstract
 		return (string)$this->name;
 	}
 
+	/**
+	 * @return Centixx_Model_ProjectReport
+	 */
+	public function getReport()
+	{
+		if (!$this->_report) {
+			$this->_report = new Centixx_Model_ProjectReport();
+			$this->_report->setProject($this);
+		}
+		return $this->_report;
+	}
+
     protected function _customAclAssertion($role, $privilage = null)
     {
     	if ($role instanceof Centixx_Model_User) {
 
-    		if ($role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {
+    		if ($role->hasRole(Centixx_Acl::ROLE_DEPARTMENT_CHIEF)) {
 
     			//kierownik działu ma dostep do wszelkich działan na projekcie nalezacym do jego dzialu
     			if ($this->department->manager->id == $role->id) {

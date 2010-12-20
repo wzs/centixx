@@ -1,17 +1,22 @@
 <h2>Projekt <?php echo $this->project ?></h2>
 
-<?php if ($this->project->isAllowed($this->currentUser, 'edit')): ?>
-	<a href="<?php echo $this->project->getUrl('edit') ?>">Edytuj</a>
-<?php endif ?>
-
 <p>Kierownik: <?php echo $this->project->getManager() ?></p>
 <p>Czas trwania: <span><?php echo $this->project->dateStart ?></span> - <span><?php echo $this->project->dateEnd ?></span></p>
 
+<?php if ($this->project->isAllowed($this->currentUser, 'edit')): ?>
+	<p>
+		<a href="<?php echo $this->project->getUrl('edit') ?>" class="button withtext edit">Edytuj</a></p>
+		<a href="<?php echo $this->url(array('controller' => 'reports', 'action' => 'show', 'id' => $this->project->id)) ?>"  class="button withtext chartcurve">Zobacz zestawienie dziennego czasu pracy</a>
+	</p>
+<?php endif ?>
+
 <?php if ($this->project->groups): ?>
+<!--
 <h3>Grupy w projekcie:</h3>
 <ul class="project-groups">
 <?php foreach ($this->project->groups as $group): ?>
 	<li><a href="<?php echo $this->url(array('controller' => 'groups', 'action' => 'show', 'id' => $group->id)) ?>"><?php echo $group ?></a></li>
 <?php endforeach ?>
 </ul>
+ -->
 <?php endif ?>

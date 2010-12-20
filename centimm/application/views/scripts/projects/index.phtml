@@ -1,6 +1,6 @@
 <h2>Lista projektów</h2>
 <?php if ($this->projects): ?>
-<ul>
+<ul class="list">
 <?php foreach ($this->projects as $project): ?>
 <?php if ($project->isAllowed($this->currentUser)): ?>
 <li>
@@ -11,4 +11,4 @@
 </ul>
 <?php endif ?>
 
-<a href="<?php echo $this->url(array('action' => 'new')); ?>">Dodaj nowy</a>
+<a href="<?php echo $this->url(array('action' => 'new')); ?>" class="button withtext add">Dodaj nowy</a>

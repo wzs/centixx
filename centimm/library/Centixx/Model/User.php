@@ -1,15 +1,25 @@
 <?php
 class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role_Interface
 {
+	const ACTION_ADD_CEO = 'add_ceo';
+
 	protected $_resourceType = 'user';
 	protected $_id;
 	protected $_name;
 	protected $_surname;
 	protected $_password;
 	protected $_email;
-	protected $_role = 1;
+	protected $_address;
 
-	const ACTION_ADD_CEO = 'add_ceo';
+	/**
+	 * @var string zahashowana postać hasła
+	 */
+	protected $_hashedPassword;
+
+	/**
+	 * @var array<Centixx_Model_Roles>
+	 */
+	protected $_roles;
 
 	/**
 	 * @var Centixx_Model_Group|int
@@ -34,31 +44,21 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	 * @var int
 	 */
 	protected $_account;
-	
+
 	public function getId()
 	{
 		return $this->_id;
 	}
 
 	protected $_db;
-	
+
 	public function __construct($options = null)
 	{
-		if (is_array($options)) {
-			$this->setOptions($options);
-		}
-
+		parent::__construct($options);
 		$this->_db = Zend_Registry::get('db');
 	}
 
-	public function save()
-	{
-	}
 
-	public function delete()
-	{
-	}
-	
 	public function setName($name)
 	{
 		if (is_string($name)) {
@@ -76,7 +76,32 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 
 	public function setPassword($password)
 	{
+		$config = Zend_Registry::get('config');
+		$salt = $config['security']['passwordSalt'];
+
 		$this->_password = $password;
+		$this->hashedPassword = md5($salt . $password);
+
+		return $this;
+	}
+
+	/**
+	 * Zwraca zahaszowaną postać hasła
+	 * @return string
+	 */
+	public function getHashedPassword()
+	{
+		return $this->_hashedPassword;
+	}
+
+	/**
+	 * Ustawia zahashowaną postać hasla
+	 * @param string $password
+	 */
+	public function setHashedPassword($password)
+	{
+		$this->_hashedPassword = $password;
+		return $this;
 	}
 
 	public function getName()
@@ -93,6 +118,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		}
 		return $this;
 	}
+
 	public function getSurname()
 	{
 		return $this->_surname;
@@ -114,22 +140,85 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		return $this->_email;
 	}
 
-	public function setRole($roleId)
+	public function setAddress($address)
 	{
-		if ($roleId != '') {
-			$this->_role = $roleId;
+		$this->_address = trim(strip_tags($address));
+		return $this;
+	}
+
+	public function getAddress()
+	{
+		return $this->_address;
+	}
+
+	/**
+	 * Zwraca numeryczną reprezentację roli,
+	 * którą przyjął użytkownik w aktywnej sesji
+	 *
+	 * @return int
+	 * @deprecated użytkownik może mieć kilka ról, zamiast tej metody należy użyć getRoles.
+	 * Obecnie nie należy się na niej opierać, zwraca tylko jedną, "najwyższą" rolę
+	 */
+	public function getRole()
+	{
+//		trigger_error('Należy użyć getRoles()!');
+		return array_pop($this->roles);
+	}
+
+	/**
+	 * Zwraca tekstowy opis roli użytkownika
+	 * return string
+	 * @deprecated nie należy tego używać, jako że user może mieć przypisanych kilka roli
+	 */
+	public function getRoleName()
+	{
+//		trigger_error('Należy użyć getRoles()!');
+		return $this->_mapper->getRoleName($this->getRole());
+	}
+
+	/**
+	 * Zwraca listę roli które są przypisane użytkownikowi
+	 */
+	public function getRoles()
+	{
+		if ($this->_roles == null) {
+			$this->_roles = Centixx_Model_Mapper_Role::factory()->fetchByUser($this);
+		}
+		return $this->_roles;
+	}
+
+	/**
+	 * Ustawia dostępne dla użytkownika role
+	 * @param array<Centixx_Model_Role> $roles
+	 * @throws Centixx_Model_Exception
+	 */
+	public function setRoles($roles)
+	{
+		if (!is_array($roles)) {
+			throw new Centixx_Model_Exception('Roles must be an array');
+		}
+
+		$this->_roles = array();
+		foreach ($roles as $role) {
+			if (!$role instanceof Centixx_Model_Role) {
+				$role = new Centixx_Model_Role(array('id' => $role));
+			}
+			$this->_roles[$role->id] = $role;
 		}
 		return $this;
 	}
 
-	public function getRole()
+	/**
+	 * Sprawdza, czy użytkownik ma możliwość użycia roli
+	 * @param int|Centixx_Model_Role $role
+	 */
+	public function hasRole($role)
 	{
-		return $this->_role;
-	}
+		if ($role instanceof Centixx_Model_Role) {
+			$role = $role->id;
+		}
 
-	public function getRoleName()
-	{
-		return $this->_mapper->getRoleName($this);
+		return array_key_exists($role, $this->getRoles());
 	}
 
 	public function setProject($project)
@@ -201,7 +290,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	 */
 	public function getRoleId()
 	{
-		return $this->_role;
+		return $this->role->id;
 	}
 
 	/**
@@ -227,19 +316,46 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	}
 
 	/**
+	 * Sprawdza, czy użytkownik jest podwładnym wobec $superior
+	 * @param Centixx_Model_User $superior
+	 * @return bool
+	 */
+	public function isInferiorTo(Centixx_Model_User $user) {
+		//CEO jest zwierzchnikiem wszystkich pracowników, poza innymi CEO
+		if ($user->hasRole(Centixx_Acl::ROLE_CEO) && !$this->hasRole(Centixx_Acl::ROLE_CEO)) {
+			return true;
+		}
+
+		//szef działu jest zwierzchnikiem ludzi pracujących w jego dziale
+		if ($user->hasRole(Centixx_Acl::ROLE_DEPARTMENT_CHIEF) && $this->getProject() != null
+			&& $this->getProject()->getDepartment()->getManager()->getId() == $user->id) {
+			return true;
+		}
+
+		//szef projektu jest zwierzchnikiem ludzi pracujących w jego projekcie
+		if ($user->hasRole(Centixx_Acl::ROLE_PROJECT_MANAGER) && $this->getProject() != null
+			&& $this->getProject()->getManager()->getId() == $user->id) {
+			return true;
+		}
+
+		//szef grupy jest zwierzchnikiem ludzi pracujących w jego grupie
+		if ($user->hasRole(Centixx_Acl::ROLE_GROUP_MANAGER) && $this->getGroup() != null
+			&& $this->getGroup()->getManager()->getId() == $user->id) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * (non-PHPdoc)
 	 * @see library/Centixx/Model/Centixx_Model_Abstract::_customAclAssertion()
 	 */
     protected function _customAclAssertion($role, $privilage = null)
     {
 		if ($role instanceof Centixx_Model_User) {
-//			 //swój profil można edytować
-//			if ($role->id == $this->_id) {
-//				return self::ASSERTION_SUCCESS;
-//			}
-
 			//HR może edytować/dodawac profil użytkownika
-			if ($role->getRole() == Centixx_Acl::ROLE_HR) {
+			if ($role->hasRole(Centixx_Acl::ROLE_HR)) {
 
 				//dla ustawienia CEO potrzebna jest cesja
 				if ($privilage == self::ACTION_ADD_CEO) {
@@ -250,30 +366,16 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 			}
 
 			//kierownik grupy moze ogladac profil podwladnego
-			if ($privilage == self::ACTION_READ && $role->getRole() == Centixx_Acl::ROLE_GROUP_MANAGER
-				&& $this->group->manager->id == $role->id) {
-				return self::ASSERTION_SUCCESS;
+			if ($privilage == self::ACTION_READ && $this->isInferiorTo($role)) {
+					return self::ASSERTION_SUCCESS;
 			}
-
- 			//kierownik projektu moze ogladac profil podwladnego
-			if ($privilage == self::ACTION_READ && $role->getRole() == Centixx_Acl::ROLE_PROJECT_MANAGER
-				&& $this->group->project->manager->id == $role->id) {
-				return self::ASSERTION_SUCCESS;
-			}
-
-			//TODO sprawdzic czy dziala prawidlowo po dodaniu modelu department
-			//kierownik dzialu moze ogladac wszystkich swoich podwladnych
-			if ($privilage == self::ACTION_READ && $role->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF
-				&& in_array($this->role, array(Centixx_Acl::ROLE_USER, Centixx_Acl::ROLE_GROUP_MANAGER, Centixx_Acl::ROLE_PROJECT_MANAGER))) {
-				return self::ASSERTION_SUCCESS;
-			}
-
 		}
 		return parent::_customAclAssertion($role, $privilage);
     }
-    
+
+    //TODO: model to nie miejsce na takie rzeczy
 	public function generateTransaction($user, $date) {
-		
+
 		$datearray = split('-',$date);
 		$month = $datearray[1];
 		if ($month == 1) {
@@ -282,7 +384,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		else{
 			$month = $month - 1;
 		}
-		
+
 		$result = $this->_db->query(
             "SELECT users.user_hour_rate AS hour_rate, SUM( timesheets.timesheet_hours ) AS time ".
 				"FROM users, timesheets ".
@@ -292,10 +394,10 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 			array($user->getId(), $month)
         	);
 
-        
+
 
         if($row = $result->fetch()){
-        	
+
         $transactionAccount = $user->getAccount();
         $transactionValue = ($row->hour_rate) * ($row->time);
         $transactionTitle = 'Wynagrodzenie za miesiąc '.getMonthName($month);
@@ -303,7 +405,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
         $transactionDate = $transactionDate.$month;
         $transactionDate = $transactionDate."-";
         $transactionDate = $transactionDate."01";
-        
+
         $result2 = $this->_db->query(
             "SELECT t.transaction_id ".
 				"FROM transactions t ".
@@ -311,11 +413,11 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 				"AND t.transaction_date = ? ",
 			array($user->getId(), $transactionDate)
         	);
-        	
+
         if(!$row1 = $result2->fetch()){
-        	
+
 	        if($transactionValue > 0){
-	        	
+
 			$result1 = $this->_db->query(
 	            "INSERT INTO transactions (transaction_user, transaction_account , transaction_value, ".
 				"transaction_title, transaction_date) VALUES (?, ?, ?, ?, ? )",
@@ -324,7 +426,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	        }
 
         }
-        
+
         }
 	}
 }

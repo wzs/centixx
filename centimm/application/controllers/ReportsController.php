@@ -19,11 +19,22 @@ class ReportsController extends Centixx_Controller_Action {
 		$this->view->chartOverallCash_end = $reports->chartOverallCash_end();
 
 		//raport zbiorczy tylko dla CEO
-		if($this->_currentUser->getRole() == Centixx_Acl::ROLE_DEPARTMENT_CHIEF) {
-			$this->view->deny = '1';
-		} else {
+		if($this->_currentUser->hasRole(Centixx_Acl::ROLE_CEO)) {
 			$this->view->deny = '0';
+		} else {
+			$this->view->deny = '1';
 		}
+	}
+
+	/**
+	 * Moja wersja wyświetlania raportów
+	 * @throws Centixx_Acl_AuthenticationException
+	 * @author Paweł Wrzosek
+	 */
+	public function index2Action()
+	{
+		//TODO ograniczyć
+    	$this->view->projects = Centixx_Model_Mapper_Abstract::factory('project')->fetchAll();
 	}
 
 	public function showAction()
@@ -35,7 +46,18 @@ class ReportsController extends Centixx_Controller_Action {
 		));
 
     	$report = new Centixx_Model_ProjectReport();
-    	$report->setProject(Centixx_Model_Mapper_Project::factory()->find($this->getRequest()->getParam('id')));
+
+    	$projectId = $this->getRequest()->getParam('id');
+    	$reportType = $this->getRequest()->getParam('type', Centixx_Model_ProjectReport::TYPE_DAILYTIME);
+
+
+    	$project = Centixx_Model_Mapper_Abstract::factory('project')->find($projectId);
+    	$report->setProject($project);
+    	$report->setType($reportType);
+
+    	if (!$report->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_READ)) {
+    		throw new Centixx_Acl_AuthenticationException('Nieuprawniony dostęp');
+    	}
 
     	$this->view->report = $report;
 	}

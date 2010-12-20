@@ -15,10 +15,6 @@ class Application_Form_Project_Edit extends Zend_Form
 	{
 		$this->setMethod(self::METHOD_POST);
 
-		$this->addElement('hidden', 'department', array(
-			'value' => $this->_project->getDepartment()->getId(),
-		));
-
 		$this->addElement('text', 'name', array(
 			'label'		=> 'Nazwa',
 			'required'	=> true,
@@ -85,6 +81,7 @@ class Application_Form_Project_Edit extends Zend_Form
 		}
 
 		$this->rebuild();
+
 		return $this;
 	}
 }

@@ -133,7 +133,6 @@ abstract class Centixx_Controller_Action extends Zend_Controller_Action
     }
 
     /**
-     *
      * Wykonuje przekierowanie na wskazaną strone mvc
      * @param string $controller
      * @param string $action
@@ -150,4 +149,49 @@ abstract class Centixx_Controller_Action extends Zend_Controller_Action
 
     	$this->_redirect($url);
     }
+
+
+	/**
+	 * Przeładowuje obecnie zalogowanego użytkownika
+	 * @param string $identify adres email na podstawie którego identyfikwoany jest user
+	 */
+	protected function _setCurrentUser($identify)
+	{
+		$this->_currentUser = Centixx_Model_Mapper_User::factory()->findByEmail($identify);
+	}
+
+	/**
+	 * Autentykacja użytkownika
+	 * @param Centixx_Model_User $model
+	 * @return Zend_Auth_Result
+	 */
+	protected function _authenticate(Centixx_Model_User $model)
+	{
+		$auth = Zend_Auth::getInstance();
+
+		$adapter = new Zend_Auth_Adapter_DbTable($this->_db, 'users', 'user_email', 'user_password', "?");
+		$adapter->setIdentity($model->getEmail());
+		$adapter->setCredential($model->getHashedPassword());
+
+		return $auth->authenticate($adapter);
+	}
+
+	/**
+	 * Przygotowuje model, oraz sprawdza dostep do niego
+	 *
+	 * @param string $className krótka nazwa klasy rozpatrywanego boiektu
+	 * @param int $action typ akcji CRUD, domylsnie READ
+	 * @return Centixx_Model_Abstract utworzony model
+	 * @throws Centixx_Acl_AuthenticationException
+	 */
+	protected function _show($className, $action = Centixx_Model_Abstract::ACTION_READ)
+	{
+		$modelId = $this->getRequest()->getParam('id');
+		$model = Centixx_Model_Mapper_Abstract::factory($className)->find($modelId);
+
+		if (!$model || !$model->isAllowed($this->_currentUser, $action)) {
+			throw new Centixx_Acl_AuthenticationException();
+		}
+		return $model;
+	}
 }

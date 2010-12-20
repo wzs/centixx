@@ -1,5 +1,5 @@
 <?php
-//opakowuje linki w menu w dodatkowy span
+//opakowuje linki w menu w dodatkowy span, zmienia sposób sprawdzania ACL'a
 class Zend_View_Helper_MyMenu extends Zend_View_Helper_Navigation_Menu
 {
 
@@ -7,6 +7,37 @@ class Zend_View_Helper_MyMenu extends Zend_View_Helper_Navigation_Menu
 	{
 		return parent::menu($container);
 	}
+
+    protected function _acceptAcl(Zend_Navigation_Page $page)
+    {
+        if (!$acl = $this->getAcl()) {
+            // no acl registered means don't use acl
+            return true;
+        }
+
+        $role = $this->getRole();
+        $resource = $page->getResource();
+        $privilege = $page->getPrivilege();
+
+        if ($resource || $privilege) {
+
+        	//niezalogowany
+        	if (!$role) {
+				return $acl->isAllowed($role, $resource, $privilege);
+        	}
+
+        	//sprawdzam czy którakolwiek z roli użytkownika umożliwia wyświetlenie menu
+        	foreach ($role->getRoles() as $r) {
+				if ($acl->isAllowed($r->id, $resource, $privilege)) {
+					return true;
+				}
+            }
+            return false;
+        }
+
+        return true;
+    }
+
 
 	/**
 	 * (non-PHPdoc)

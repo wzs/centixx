@@ -1,7 +1,9 @@
 <h2>Lista grup</h2>
 
+<p><a href="<?php echo $this->url(array('action' => 'new')) ?>" class="button withtext add">Dodaj nową</a></p>
+
 <?php if ($this->groups): ?>
-<ul>
+<ul class="list">
 <?php foreach ($this->groups as $group): ?>
 <?php if ($group->isAllowed($this->currentUser, 'show')): ?>
 <li>
@@ -11,5 +13,3 @@
 <?php endforeach; ?>
 </ul>
 <?php endif ?>
-
-<a href="<?php echo $this->url(array('action' => 'new')) ?>">Dodaj nową</a>

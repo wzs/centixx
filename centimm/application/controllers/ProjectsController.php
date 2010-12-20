@@ -24,12 +24,8 @@ class ProjectsController extends Centixx_Controller_Action
 
 	public function showAction()
 	{
-		$projectId = $this->getRequest()->getParam('id');
-		$project = Centixx_Model_Mapper_Project::factory()->find($projectId);
+		$project = $this->_show('Project');
 
-		if (!$project->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_READ)) {
-			throw new Centixx_Acl_AuthenticationException();
-		}
 		$this->view->headTitle()->prepend('Projekt ' . $project . ' - ');
 		$this->view->project = $project;
 	}
@@ -69,12 +65,16 @@ class ProjectsController extends Centixx_Controller_Action
 		$availableUsers = Centixx_Model_Mapper_User::factory()->fetchForProject($project);
 
 		$form = new Application_Form_Project_Edit();
-		$form->setValues(array('project' => $project, 'availableUsers' => $availableUsers));
+		$form->setValues(array(
+			'project' => $project,
+			'availableUsers' => $availableUsers
+		));
 
 		if ($this->getRequest()->isPost()) {
 			try {
 				$data = $this->getRequest()->getPost();
 				if ($form->isValid($data)) {
+
 					$project->setOptions($data)->save();
 
 					if ($mode == 'edit') {

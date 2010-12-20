@@ -126,17 +126,21 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 	 * Dokonuje wszelkich zmian zwiazanych ze zmiana kierownika grupy
 	 * @param Centixx_Model_Group $model
 	 */
-	protected function _updateManager(Centixx_Model_Group $model)
+	public function _updateManager(Centixx_Model_Project $model)
 	{
 		$adapter = $this->getDbTable()->getAdapter();
 
-		//usuwam poprzedniego managera
-		$adapter->query("UPDATE `users` SET `user_role` = ? WHERE `user_group` = ? AND `user_role` = ?",
-		array(Centixx_Acl::ROLE_USER, $model->id, Centixx_Acl::ROLE_GROUP_MANAGER));
+		if ($model->getOldManager()) {
+			//usuwam poprzedniego managera
+			$adapter->query("DELETE FROM users_roles WHERE user_id = ? AND role_id = ?",
+			array($model->getOldManager()->getId(), Centixx_Acl::ROLE_GROUP_MANAGER));
+		}
 
-		//ustawiam nowego manadzera
-		$adapter->query("UPDATE `users` SET `user_role` = ?, user_group = ? WHERE `user_id` = ?",
-		array(Centixx_Acl::ROLE_GROUP_MANAGER, $model->id, $this->_findId($model->manager)));
+		if ($model->getManager()) {
+			//ustawiam nowego
+			$adapter->query("INSERT INTO users_roles SET user_id = ?, role_id = ? ON DUPLICATE KEY UPDATE role_id = role_id",
+			array($model->getManager()->getId(), Centixx_Acl::ROLE_GROUP_MANAGER));
+		}
 	}
 
 	public function delete(Centixx_Model_Abstract $model)

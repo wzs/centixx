@@ -26,7 +26,7 @@ class Application_Form_Group_Edit extends Zend_Form
 			'errorMessages'  => array('Nazwa jest wymagana'),
 		));
 
-		if ($this->_group->id) {
+		if ($this->_group->id && count($this->_group->users)) {
 			$this->addElement('select', 'manager', array(
 				'label'	=> 'Kierownik:',
 				'multiOptions' => array('' => ' - ') + $this->_group->users,

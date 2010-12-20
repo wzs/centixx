@@ -67,9 +67,10 @@ class Centixx_Model_Department extends Centixx_Model_Abstract
 	}
 
 
+	//TODO sprawdzic czy to gdzies nei powoduje błedu
 	public function __toString()
 	{
-		return (string)$this->id;
+		return (string)$this->name;
 	}
 
 }

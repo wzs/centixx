@@ -12,7 +12,6 @@ class Centixx_Model_Mapper_Department extends Centixx_Model_Mapper_Abstract
 		return $this->findByField($manager->id, 'department_manager');
 	}
 
-
 	protected function fillModel(Centixx_Model_Abstract $model, $row)
 	{
 		$model
@@ -41,7 +40,6 @@ class Centixx_Model_Mapper_Department extends Centixx_Model_Mapper_Abstract
 
 		return $this;
 	}
-
 
 	/**
 	 * Statyczna metoda fabrykująca

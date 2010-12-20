@@ -48,6 +48,7 @@ class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
 
 	public function save(Centixx_Model_Abstract $model)
 	{
+
 		$data = array(
 			'project_name'			=> $model->name,
 			'project_manager'		=> $this->_findId($model->manager),
@@ -61,8 +62,10 @@ class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
 		if ($model->id) {
 			$pk = $this->_getPrimaryKey();
 			$where = $table->getAdapter()->quoteInto($pk . ' = ?', $model->id);
-			$this->_updateManager($model); //wazne aby wykonac to przed updatem
+
 			$table->update($data, $where);
+
+			$this->_updateManager($model); //wazne aby wykonac to przed updatem
 		} else {
 			$model->id = $table->insert($data);
 		}
@@ -100,26 +103,30 @@ class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
 	 */
 	protected function _updateManager(Centixx_Model_Project $model)
 	{
-		//TODO trzeba napisac jakas funkcje w sql'u ktora automatycznie poustawia odpowiednie prawa dostepu przy zmianach
-		//tzn. dla wszystkich projektow znajdzie kierownikow i ustawi im user_role = 4 i analogicznie dla kierownikow grup
 
 		$adapter = $this->getDbTable()->getAdapter();
 
-		//usuwam poprzedniego managera
-		$adapter->query("
-UPDATE projects p
-JOIN users u ON u.user_id = p.project_manager
-SET u.user_role = ?
-WHERE p.project_id = ?",
-			array(Centixx_Acl::ROLE_USER, $model->id));
+		$oldManager = $model->getOldManager();
+		if ($oldManager instanceof Centixx_Model_User) {
+			$oldManager = $oldManager->id;
+		}
 
-		//ustawiam nowego manadzera
-		$adapter->query("
-UPDATE users u
-SET u.user_role = ?
-WHERE u.user_id = ?",
-			array(Centixx_Acl::ROLE_PROJECT_MANAGER, $this->_findId($model->manager)));
+		$newManager = $model->getManager();
+		if ($newManager instanceof Centixx_Model_User) {
+			$newManager = $newManager->id;
+		}
 
+		if ($oldManager) {
+			//usuwam poprzedniego managera
+			$adapter->query("DELETE FROM users_roles WHERE user_id = ? AND role_id = ?",
+			array($oldManager, Centixx_Acl::ROLE_PROJECT_MANAGER));
+		}
+
+		if ($newManager) {
+			//ustawiam nowego
+			$adapter->query("INSERT INTO users_roles SET user_id = ?, role_id = ? ON DUPLICATE KEY UPDATE role_id = role_id",
+			array($newManager, Centixx_Acl::ROLE_PROJECT_MANAGER));
+		}
 	}
 
 	public function delete(Centixx_Model_Abstract $model)

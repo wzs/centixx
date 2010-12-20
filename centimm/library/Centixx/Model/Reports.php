@@ -31,7 +31,7 @@ class Centixx_Model_Reports extends Centixx_Model_Abstract {
 		if ($role instanceof Centixx_Model_User) {
 
 			//CEO ma dostep do wszystkich raportów w firmie
-			if ($role->getRole() == Centixx_Acl::ROLE_CEO) {
+			if ($role->hasRole(Centixx_Acl::ROLE_CEO)) {
 				return self::ASSERTION_SUCCESS;
 			}
 

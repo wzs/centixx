@@ -6,6 +6,12 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
+
+DROP TABLE IF EXISTS `daysofweek`;
+CREATE TABLE IF NOT EXISTS `daysofweek` (
+  `day` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
+
 DROP TABLE IF EXISTS `departments`;
 CREATE TABLE IF NOT EXISTS `departments` (
   `department_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -25,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
   KEY `group_manager` (`group_manager`),
   KEY `group_project` (`group_project`),
   KEY `group_project_2` (`group_project`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
 DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE IF NOT EXISTS `permissions` (
@@ -69,35 +75,38 @@ CREATE TABLE IF NOT EXISTS `timesheets` (
   `timesheet_project` int(11) NOT NULL,
   `timesheet_hours` decimal(10,0) NOT NULL,
   `timesheet_date` date NOT NULL,
-  `timesheet_descr` text NOT NULL,
-  `timesheet_accepted` bool NOT NULL DEFAULT FALSE,
+  `timesheet_descr` text COLLATE utf8_polish_ci NOT NULL,
+  `timesheet_accepted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`timesheet_id`),
-  UNIQUE unique_user_date (`timesheet_user`, `timesheet_date`),
+  UNIQUE KEY `unique_user_date` (`timesheet_user`,`timesheet_date`),
   KEY `timesheet_project` (`timesheet_project`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
 DROP TABLE IF EXISTS `transactions`;
 CREATE TABLE IF NOT EXISTS `transactions` (
   `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
-  `transaction_account` decimal(10,0) NOT NULL,
-  `transaction_value` decimal(10,0) NOT NULL,
+  `transaction_value` decimal(7,2) NOT NULL,
   `transaction_title` varchar(45) COLLATE utf8_polish_ci NOT NULL,
   `transaction_date` datetime NOT NULL,
-  PRIMARY KEY (`transaction_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
+  `transaction_user` int(11) DEFAULT NULL,
+  `transaction_account` varchar(255) COLLATE utf8_polish_ci DEFAULT NULL,
+  PRIMARY KEY (`transaction_id`),
+  KEY `transaction_user` (`transaction_user`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(45) COLLATE utf8_polish_ci NOT NULL,
   `user_surname` varchar(45) COLLATE utf8_polish_ci NOT NULL,
-  `user_hour_rate` decimal(10,0) NOT NULL,
-  `user_account` decimal(10,0) NOT NULL,
-  `user_role` int(11) NOT NULL DEFAULT '1',
+  `user_hour_rate` decimal(4,2) NOT NULL,
+  `user_account` varchar(32) COLLATE utf8_polish_ci NOT NULL,
+  `user_role` int(11) DEFAULT NULL,
   `user_group` int(11) DEFAULT NULL,
   `user_email` varchar(100) COLLATE utf8_polish_ci NOT NULL,
-  `user_password` char(32) COLLATE utf8_polish_ci NOT NULL,
+  `user_password` varchar(255) COLLATE utf8_polish_ci NOT NULL,
   `user_project` int(11) DEFAULT NULL,
+  `user_address` text COLLATE utf8_polish_ci,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_email` (`user_email`),
   KEY `user_project` (`user_project`),
@@ -106,10 +115,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `user_role_2` (`user_role`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
 
-DROP TABLE IF EXISTS daysofweek;
-CREATE TABLE IF NOT EXISTS daysofweek (
-  day date NOT NULL
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
+DROP TABLE IF EXISTS `users_roles`;
+CREATE TABLE IF NOT EXISTS `users_roles` (
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  UNIQUE KEY `user_id` (`user_id`,`role_id`),
+  KEY `role_id` (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_polish_ci;
+
 
 ALTER TABLE `departments`
   ADD CONSTRAINT `departments_ibfk_1` FOREIGN KEY (`department_manager`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
@@ -119,8 +132,8 @@ ALTER TABLE `groups`
   ADD CONSTRAINT `groups_ibfk_2` FOREIGN KEY (`group_manager`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 
 ALTER TABLE `permissions`
-  ADD CONSTRAINT `permissions_ibfk_2` FOREIGN KEY (`permission_to`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `permissions_ibfk_1` FOREIGN KEY (`permission_from`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `permissions_ibfk_1` FOREIGN KEY (`permission_from`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `permissions_ibfk_2` FOREIGN KEY (`permission_to`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 ALTER TABLE `projects`
   ADD CONSTRAINT `projects_ibfk_1` FOREIGN KEY (`project_manager`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
@@ -130,9 +143,15 @@ ALTER TABLE `timesheets`
   ADD CONSTRAINT `timesheets_ibfk_1` FOREIGN KEY (`timesheet_user`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `timesheets_ibfk_2` FOREIGN KEY (`timesheet_project`) REFERENCES `projects` (`project_id`) ON DELETE CASCADE;
 
-ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_3` FOREIGN KEY (`user_role`) REFERENCES `roles` (`role_id`),
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`user_project`) REFERENCES `projects` (`project_id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`user_group`) REFERENCES `groups` (`group_id`) ON DELETE SET NULL;
-SET FOREIGN_KEY_CHECKS=1;
+ALTER TABLE `transactions`
+  ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`transaction_user`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`user_project`) REFERENCES `projects` (`project_id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`user_group`) REFERENCES `groups` (`group_id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `users_ibfk_3` FOREIGN KEY (`user_role`) REFERENCES `roles` (`role_id`);
+
+ALTER TABLE `users_roles`
+  ADD CONSTRAINT `users_roles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `users_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE;
+SET FOREIGN_KEY_CHECKS=1;

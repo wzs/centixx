@@ -11,6 +11,11 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	protected $_manager;
 
 	/**
+	 * @var Centixx_Model_User
+	 */
+	protected $_oldManager;
+
+	/**
 	 * @var Centixx_Model_Project
 	 */
 	protected $_project;
@@ -42,7 +47,7 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 			if (!$user instanceof Centixx_Model_User) {
 				$user = new Centixx_Model_User(array('id' => $user));
 			}
-			$this->_users[] = $user;
+			$this->_users[$user->id] = $user;
 		}
 		return $this;
 	}
@@ -101,8 +106,19 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 	 */
 	public function setManager($manager)
 	{
-		if ($manager != '')
-			$this->_manager = $manager;
+		if ($manager == '') {
+			return $this;
+		}
+
+		if (!$manager instanceof Centixx_Model_User) {
+			$manager = new Centixx_Model_User(array('id' => $manager));
+		}
+
+		if ($this->manager) {
+			$this->oldManager = $this->manager;
+		}
+
+		$this->_manager = $manager;
 		return $this;
 	}
 
@@ -115,6 +131,20 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 			? $this->_manager
 			: $this->_mapper->getRelated($this, 'manager', 'User');
 		return $ret;
+	}
+
+	public function setOldManager($manager)
+	{
+		$this->_oldManager = $manager;
+		return $this;
+	}
+
+	/**
+	 * @return Centixx_Model_User
+	 */
+	public function getOldManager()
+	{
+		return $this->_oldManager;
 	}
 
 	/**
@@ -159,7 +189,7 @@ class Centixx_Model_Group extends Centixx_Model_Abstract
 		if ($role instanceof Centixx_Model_User) {
 
 			//kierownik projektu moze dowolnie zmieniac grupy nalezace do jego projektu
-			if ($role->role == Centixx_Acl::ROLE_PROJECT_MANAGER && $this->project->manager->id == $role->id) {
+			if ($role->hasRole(Centixx_Acl::ROLE_PROJECT_MANAGER) && $this->project->manager->id == $role->id) {
 				return self::ASSERTION_SUCCESS;
 			}
 		}

@@ -51,7 +51,7 @@ class AuthController extends Centixx_Controller_Action
 	}
 
 	/**
-	 * Authenticate user
+	 * Autentykacja użytkownika na podstawie danych z formularza
 	 * @param Zend_Form $loginForm
 	 * @return Zend_Auth_Result
 	 */
@@ -60,7 +60,6 @@ class AuthController extends Centixx_Controller_Action
 		$auth = Zend_Auth::getInstance();
 
 		$salt = $this->_config['security']['passwordSalt'];
-
 		$adapter = new Zend_Auth_Adapter_DbTable($this->_db, 'users', 'user_email', 'user_password', "MD5(CONCAT('{$salt}', ?))");
 		$adapter->setIdentity($loginForm->getValue('email'));
 		$adapter->setCredential($loginForm->getValue('password'));

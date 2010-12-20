@@ -118,6 +118,15 @@ abstract class Centixx_Model_Mapper_Abstract
 		}
 
 		$resultSet = $dbTable->fetchAll($query, $order);
+		return $this->_fillResultSet($resultSet);
+	}
+
+	/**
+	 * Przetwarza wyniki zwrócone w $resultSet na obiekty
+	 * @param $resultSet
+	 */
+	protected function _fillResultSet($resultSet)
+	{
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entries[] = $this->_getNewModelInstance($row);
@@ -312,7 +321,7 @@ abstract class Centixx_Model_Mapper_Abstract
 	 * @return Centixx_Model_Mapper_Abstract
 	 */
 	public static function factory($shortName) {
-		$className = 'Centixx_Model_Mapper_' . $shortName;
+		$className = 'Centixx_Model_Mapper_' . ucfirst($shortName);
 		if (class_exists($className)) {
 			return new $className;
 		}

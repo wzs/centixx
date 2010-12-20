@@ -9,7 +9,9 @@ if (count($this->permissions) > 0) {
 	echo '</p>';
 }
 ?>
-
+<p style="text-align: right;">
+	<a href="<?php echo $this->url(array('controller' => 'users', 'action' => 'add')) ?>" class="button withtext add">Dodaj nowego użytkownika</a>
+</p>
 <?php if ($this->users): ?>
 <table class="staffing">
 <thead>
@@ -33,7 +35,7 @@ if (count($this->permissions) > 0) {
 	<td><?php echo $user->getSurname() ?></td>
 	<td><?php echo $user->getName() ?></td>
 	<td><?php echo $user->getEmail()?></td>
-	<td><?php echo $user->getRoleName() ?></td>
+	<td><?php echo join(', ', $user->getRoles()) ?></td>
 	<td>
 		<?php if ($user->getGroup() == null): ?>
 			---
@@ -42,14 +44,14 @@ if (count($this->permissions) > 0) {
 		<?php endif?>
 	</td>
 	<td>
-		<?php if($user->getRole() == Centixx_Acl::ROLE_CEO && !$this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
+		<?php if ($user->hasRole(Centixx_Acl::ROLE_CEO) && !$this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
 			---
 		<?php else: ?>
 		<?php echo $user->getHourRate() . " zł"?>
 		<?php endif?>
 	</td>
 	<td>
-		<?php if($user->getRole() == Centixx_Acl::ROLE_CEO && !$this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
+		<?php if ($user->hasRole(Centixx_Acl::ROLE_CEO) && !$this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
 			---
 		<?php else: ?>
 			<?php echo $user->getAccount()?>
@@ -57,7 +59,7 @@ if (count($this->permissions) > 0) {
 
 	</td>
 	<td>
-		<?php if ($user->getRole() == Centixx_Acl::ROLE_CEO && !$this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
+		<?php if ($user->hasRole(Centixx_Acl::ROLE_CEO) && !$this->currentUser->hasPermission(Centixx_Model_Permission::TYPE_ADD_CEO)):?>
 				---
 		<?php else: ?>
 			<a href="<?php echo $user->getUrl('edit')?>" class="button edit" title="Edycja">Edycja</a>
@@ -70,7 +72,4 @@ if (count($this->permissions) > 0) {
 <?php endforeach; ?>
 </tbody>
 </table>
-<p style="text-align: right;">
-	<a href="<?php echo $user->getUrl('add')?>" class="">Dodaj nowego użytkownika</a>
-</p>
 <?php endif ?>

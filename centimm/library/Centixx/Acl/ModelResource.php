@@ -64,6 +64,8 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->addResource('page-accounting');
 		$this->addResource('page-permissions');
 		$this->addResource('page-reports');
+		$this->addResource('page-profile');
+
 	}
 
 	/**
@@ -83,8 +85,8 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->deny(null, 'page-logout');
 		$this->allow(self::ROLE_LOGGED_USER, 'page-logout');
 
-		//widocznosc swoich pracownikow dla menadzera grupy
-		$this->allow(self::ROLE_GROUP_MANAGER, 'page-users');
+		$this->allow(self::ROLE_LOGGED_USER, 'page-profile');
+
 
 		//widocznosc swoich grup dla menadzera projektu
 		$this->allow(self::ROLE_PROJECT_MANAGER, 'page-groups');

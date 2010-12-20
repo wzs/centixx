@@ -17,7 +17,7 @@
 			<p id="user-menu">
 				<?php
 				if ($this->currentUser) {
-					echo 'Zalogowany jako ' . $this->currentUser . ' <a href="'.$this->url(array('controller' => 'auth', 'action' => 'logout')).'">wyloguj</a>';
+					echo 'Zalogowany jako <a href="'.$this->url(array('controller' => 'profile', 'action' => null, 'id' => null)).'" class="userProfile">' . $this->currentUser . '</a> <a href="'.$this->url(array('controller' => 'auth', 'action' => 'logout')).'">wyloguj</a>';
 				} else {
 					echo '<a href="'.$this->url(array('controller' => 'auth', 'action' => 'index')).'">Zaloguj się</a>';
 				}
@@ -25,10 +25,10 @@
 			</p>
 			<!-- Logo -->
 			<h1 id="logo" >
-				<a href="<?php echo $this->url(array('controller' => 'index', 'action' => 'index')) ?>" title="Strona główna">
-					<span>Centixx</span>
-					zarządzanie projektem &bull; kontrola czasu pracy
+				<a href="<?php echo $this->url(array('controller' => 'index', 'action' => null, 'id' => null)) ?>" title="Strona główna">
+					Centixx
 				</a>
+				<span>zarządzanie projektem &bull; kontrola czasu pracy</span>
 			</h1>
 			<!-- End Logo -->
 			<div id="navigation">
@@ -65,27 +65,10 @@
 	<!-- Features -->
 	<div id="features">
 		<div class="shell">
-
+			<p class="copy">&copy; 2010 Centixx. Design by <a href="http://chocotemplates.com">ChocoTemplates.com</a></p>
 		</div>
 	</div>
 	<!-- End Features -->
-
-
-	<!-- Footer -->
-	<div id="footer">
-		<div class="shell">
-			<div class="cl">&nbsp;</div>
-			<!--
-			<ul>
-			    <li><a href="#">Terms of Use</a></li>
-			    <li><a href="#">Privacy Policy</a></li>
-			</ul>
-			 -->
-			<p class="copy">&copy; 2010 Centixx. Design by <a href="http://chocotemplates.com">ChocoTemplates.com</a></p>
-			<div class="cl">&nbsp;</div>
-		</div>
-	</div>
-	<!-- End Footer -->
 	</div>
 </body>
 </html>

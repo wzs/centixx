@@ -3,9 +3,9 @@
 body {
     font-size: 15px;
     line-height: 16px;
-    font-family: Verdana, Arial, sans;
+    font-family: verdana, arial, sans-serif;
     color: #656565;
-	background: #fff;
+	background: #8B9716;
     text-align: left;
 }
 
@@ -21,39 +21,50 @@ a img { border: 0; }
 
 .shell {margin: 0 auto; width: 946px;}
 
-#header {background: url(../img/template/header.gif) repeat-x 0 0; height: 103px; }
+#header {background: #1F1F1F url(../img/template/header.gif) repeat-x 0 0; height: 110px; }
 
-#header .shell {overflow: hidden;}
+#header .shell {overflow: hidden; position: relative; height: 110px;}
 
-h1#logo {float: left; padding-top: 26px;}
+h1#logo {
+	float: left; 
+	padding-top: 15px;
+	width: 500px;
+	overflow: hidden;
+}
+
 h1#logo a {
 	background: url(../img/template/logo.gif) no-repeat 0 0; display: block; width: 278px; height: 55px;
-	font-size: 12px;
+	font-family: verdana, arial, sans-serif;
+	font-size: 30px;
+	text-transform: uppercase;
+	color: white;
 	display: block;
 	padding-left: 70px;
 	padding-top: 10px;
 	color: #e1ff35;
-}
-h1#logo a span {
-	font-family: Arial, verdana, serif;
-	text-transform: uppercase;
-	color: white;
-	display: block;
-	font-size: 30px;
 	margin-bottom: 5px;
 }
+
 h1#logo a:hover {
 	text-decoration: none;
+}
+
+h1#logo span {
+	font-size: 12px;
+	margin-top: -40px;
+	margin-left: 70px;
+	float: left;
+	color: white;
 }
 
 h2 {font-family: "Myriad Pro", "Trebuchet MS", sans-serif; font-size: 23px; line-height: 23px;}
 h3 {font-family: "Myriad Pro", "Trebuchet MS", sans-serif; font-size: 18px; color: #262626;}
 
-#navigation {float: right; padding-top: 41px;}
+#navigation {position: absolute; bottom: 8px; right: 0; }
 #navigation ul {list-style-type: none;}
 #navigation ul li {display: inline; float:left; padding-left: 5px;}
-#navigation ul li a {border-radius: 5px; -moz-border-radius: 5px; background: #454545 no-repeat 0 0; padding-left: 37px; height: 27px; display: block; float: left; color: #fff; font-family: tahoma, sans-serif; color: #fff; font-size: 14px;}
-#navigation ul li a span {padding-right: 37px; height: 21px; display: block; float: left; padding-top: 6px; line-height: 14px;}
+#navigation ul li a {border-radius: 5px; -moz-border-radius: 5px; background: #454545 no-repeat 0 0; height: 27px; display: block; float: left; color: #fff; font-family: tahoma, sans-serif; color: #fff; font-size: 14px;}
+#navigation ul li a span {height: 21px; display: block; float: left; padding: 6px 15px; line-height: 14px;}
 #navigation ul li a:hover, #navigation ul li.active a {text-decoration: none; background-color: white; color: #343434;}
 #navigation ul li a:hover span, #navigation ul li.active a span {}
 
@@ -62,16 +73,13 @@ h3 {font-family: "Myriad Pro", "Trebuchet MS", sans-serif; font-size: 18px; colo
 .heading-cnt { padding-top: 10px; padding-left: 8px; }
 #heading h2 {color: #262626; padding-bottom: 15px;}
 
-#features {background: url(../img/template/features.gif) repeat-x 0 0; height: 122px; padding-top: 5px;}
-.features-cnt {background: url(../img/template/features-cnt.gif) no-repeat 0 0; height: 118px; padding-left: 20px;}
-.feature {width: 290px; float: left; padding-top: 6px; padding-right: 30px;}
+#features {background: url(../img/template/features.gif) repeat-x 0 0; height: 112px; padding-top: 5px; position: relative;}
 .less-padding {padding-right: 14px;}
 .no-padding {padding-right: 0 !important;}
-.feature h2 {color: #fff; padding-bottom: 5px; font-size: 15px; }
-.feature img {padding-right: 6px;}
-.feature p {float: left; width: 198px; font-size: 12px; line-height: 15px; color: #fff; height: 71px;}
-.feature p span {padding-bottom: 4px; display: block;}
-.feature a.more {background: url(../img/template/more.gif) no-repeat 0 0; display: block; float: left; width: 24px; height: 11px;}
+#features p.copy {float: right; font-size: 10px; color: #000; padding-right: 10px;
+position: absolute; bottom: 0; right: 20px; color: darkgreen}
+#features p.copy a {color: darkgreen; font-weight: bold;}
+
 
 #main {background: #e9e9e9; padding-top: 15px;padding-left: 28px; padding-bottom: 37px;}
 #main h3 {padding-bottom: 7px;}
@@ -83,21 +91,6 @@ h3 {font-family: "Myriad Pro", "Trebuchet MS", sans-serif; font-size: 18px; colo
 .middle-column {width: 312px; float: left; padding-right: 9px;}
 .last-column {width: 270px; float: left; padding-left: 8px;}
 
-ul.news {list-style-type: none; padding-bottom: 8px;}
-ul.news li {background: url(../img/template/newsitem-bg.gif) repeat-x 0 bottom; padding-top: 6px; padding-bottom: 7px;}
-ul.news li small {color: #606d0f; font-size: 11px;}
-ul.news li small.grey {color: #656565;}
-
-.contacts {font-size: 12px; }
-strong.usa {background: url(../img/template/flag-usa.gif) no-repeat 0 11px; padding-left: 20px; display: block; padding-top: 8px;}
-strong.swe {background: url(../img/template/flag-swe.gif) no-repeat 0 11px; padding-left: 20px; display: block; padding-top: 8px;}
-
-#footer {padding-top: 5px; padding-bottom: 5px;}
-#footer ul {list-style-type: none; float: left; padding-left: 19px; background: transparent;}
-#footer ul li {display: inline; float: left; padding-right: 9px;}
-#footer ul li a {text-decoration: underline; color: #6e6e6e; font-size: 10px;}
-#footer ul li a:hover {text-decoration: none;}
-#footer p.copy {float: right; font-size: 10px; color: #6e6e6e; padding-right: 10px;}
 
 .wrapper #heading .shell {
 	min-height: 290px;
@@ -118,9 +111,10 @@ ul {
 }
 
 ul.list {
-	list-style-type: circle;
+	list-style-type: inherit;
+	margin-bottom: 1em;
 }
-ul.list li{
+ul.list li {
 	margin-left: 20px;
 	margin-bottom: 2px;
 }
@@ -132,7 +126,12 @@ ul.list li{
 	text-align: right;
 }
 
+input[type=submit] {
+	padding: 2px 5px;
+}
+
 #user-menu a {color: lightgray;}
+#user-menu a.userProfile {color: gray; font-weight: bold;}
 #user-menu a:hover {color: white;}
 
 
@@ -219,6 +218,12 @@ input.datepicker {
 	width: 6em;
 }
 
+/*
+input.datepicker:after {
+	content: url('../img/calendar_view_month.png'); 
+}
+*/
+
 form ul.errors {
 	list-style-type: none;
 	position: relative;
@@ -233,17 +238,23 @@ form {
 	padding: 15px 0px;
 }
 
-form dl {
+form dl, dl.table {
 	overflow: hidden;
 }
 
-form dt {
+form dt, dl.table dt {
 	float: left;
 	width: 160px;
 	clear: left;
 }
 
-form dd {
+dl.table dt {
+	font-weight: bold;
+}
+
+
+
+form dd, dl.table dd {
 	float: left;
 	margin-bottom: 5px;
 }
@@ -285,6 +296,7 @@ table tbody tr:hover  {
 
 a.button {
 	background-position: center; 
+	background-repeat: no-repeat;
 	width: 16px; 
 	height: 16px; 
 	display: inline-block; 
@@ -293,15 +305,23 @@ a.button {
 	text-align: left; 
 }
 
-a.button.delete {
-	background: url(../img/action_delete.png) no-repeat; 
+a.button.withtext {
+	background-position: left; 
+	
+	padding-left: 20px;
+	display: inline; 
+	text-indent: 0px; 
+	position: relative; 
+	text-align: left; 
 }
-a.button.edit {
-	background: url(../img/edit.png) no-repeat; 
-}
-a.button.add {
-	background: url(../img/link.png) no-repeat; 
-}
+
+a.button.delete 		{background-image: url('../img/action_delete.png'); }
+a.button.edit 			{background-image: url('../img/edit.png'); }
+a.button.add 			{background-image: url('../img/add.png'); }
+a.button.chartcurve 	{background-image: url('../img/chart_curve.png');}
+a.button.chartbar 		{background-image: url('../img/chart_bar.png');}
+a.button.chartpie 		{background-image: url('../img/chart_pie.png');}
+
 
 span.info {
 	border-radius: 5px;
@@ -311,3 +331,23 @@ span.info {
 	font-size: 80%;
 	padding: 3px 10px;
 }
+
+#profile-view  {
+	padding: 15px 0;
+	margin-top: 20px;
+}
+
+#timesheet_grid table {
+	width: 80%;
+	margin: 0 auto;
+}
+#timesheet_grid th {
+	text-align: center;
+	background-color: #DFDFC3;
+	border: 1px solid lightgray;
+}
+
+.paginationNumbers {
+	display: none;		
+}
+

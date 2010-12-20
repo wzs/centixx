@@ -11,7 +11,8 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	const ASSERTION_FAILURE = -1;
 
 	/**
-	 * Nie rozstrzygnięto, czy udzielić dostępu do zasobu
+	 * Nie rozstrzygnięto, czy udzielić dostępu do zasobu,
+	 * należy użyć reguł ogólnych zdefiniowanych w Centixx_Acl
 	 * @var int
 	 */
 	const ASSERTION_INCONCLUSIVE = 0;
@@ -51,7 +52,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	{
 		$method = 'set' . $name;
 		if (!method_exists($this, $method)) {
-			throw new Centixx_Model_Exception('Invalid property');
+			throw new Centixx_Model_Exception("Invalid property for set $name");
 		}
 		$this->$method($value);
 	}
@@ -60,19 +61,19 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 	{
 		$method = 'get' . $name;
 		if (!method_exists($this, $method)) {
-			throw new Centixx_Model_Exception('Invalid property');
+			throw new Centixx_Model_Exception("Invalid property for get $name");
 		}
 		return $this->$method();
 	}
 
-	public function setOptions(array $options)
+	public function setOptions($options)
 	{
 		$methods = get_class_methods($this);
 		foreach ($options as $key => $value) {
 			$method = 'set' . ucfirst($key);
 			if (in_array($method, $methods)) {
 				$this->$method($value);
-			}	
+			}
 		}
 		return $this;
 	}
@@ -103,7 +104,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 			throw new Exception('Mapper nie został ustawiony dla ' . get_class());
 		}
 		$this->_mapper->save($this);
-		
+
 		return $this;
 	}
 
