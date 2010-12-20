@@ -126,7 +126,7 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 	 * Dokonuje wszelkich zmian zwiazanych ze zmiana kierownika grupy
 	 * @param Centixx_Model_Group $model
 	 */
-	public function _updateManager(Centixx_Model_Project $model)
+	public function _updateManager(Centixx_Model_Group $model)
 	{
 		$adapter = $this->getDbTable()->getAdapter();
 
