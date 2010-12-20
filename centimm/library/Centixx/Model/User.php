@@ -304,15 +304,27 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
         $transactionDate = $transactionDate."-";
         $transactionDate = $transactionDate."01";
         
-        if($transactionValue > 0){
-        	
-		$result1 = $this->_db->query(
-            "INSERT INTO transactions (transaction_user, transaction_account , transaction_value, ".
-			"transaction_title, transaction_date) VALUES (?, ?, ?, ?, ? )",
-			array($user->getId(), $transactionAccount, $transactionValue, $transactionTitle, $transactionDate)
+        $result2 = $this->_db->query(
+            "SELECT t.transaction_id ".
+				"FROM transactions t ".
+				"WHERE t.transaction_user = ? ".
+				"AND t.transaction_date = ? ",
+			array($user->getId(), $transactionDate)
         	);
-        }
+        	
+        if(!$row1 = $result2->fetch()){
+        	
+	        if($transactionValue > 0){
+	        	
+			$result1 = $this->_db->query(
+	            "INSERT INTO transactions (transaction_user, transaction_account , transaction_value, ".
+				"transaction_title, transaction_date) VALUES (?, ?, ?, ?, ? )",
+				array($user->getId(), $transactionAccount, $transactionValue, $transactionTitle, $transactionDate)
+	        	);
+	        }
 
+        }
+        
         }
 	}
 }
