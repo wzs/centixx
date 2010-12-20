@@ -1,0 +1,42 @@
+<h2><?php echo $this->header ?></h2>
+<div id="profile-tabs" class="demolayout">
+	<ul id="profile-tabs-nav" class="demolayout">
+		<li><a href="#tab-view">Podgląd</a></li>
+		<li><a href="#tab-edit">Edycja</a></li>
+	</ul>
+	<div class="tabs-container">
+		<div class="tab" id="tab-view">
+			<dl class="table" id="profile-view">
+				<dt>Imię</dt>
+				<dd><?php echo $this->user->name ?></dd>
+
+				<dt>Nazwisko</dt>
+				<dd><?php echo $this->user->surname ?></dd>
+
+				<dt>Email</dt>
+				<dd><?php echo $this->user->email ?></dd>
+
+				<dt>Stawka godzinowa</dt>
+				<dd><?php echo $this->user->hourRate ?> zł</dd>
+
+				<dt>Nr konta</dt>
+				<dd><?php echo $this->user->account ?></dd>
+
+				<dt>Role</dt>
+				<dd>
+					<ul class="list">
+					<?php echo join('<br />', $this->user->roles) ?>
+					</ul>
+				</dd>
+			</dl>
+		</div>
+		<div class="tab" id="tab-edit">
+			<?php echo $this->editForm ?>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	var tabber1 = new Yetii({
+		id: 'profile-tabs',
+	});
+</script>
