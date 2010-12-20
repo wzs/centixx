@@ -1,0 +1,6 @@
+<h2>Raporty</h2>
+
+<?php foreach ($this->projects as $project): ?>
+	<div id="placeholder" ></div>
+	<?php echo $project->getReport()->render('placeholder') ?>
+<?php endforeach; ?>
