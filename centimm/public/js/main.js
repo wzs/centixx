@@ -1,3 +1,14 @@
+var ROLE_DEPARTMENT_CHIEF = 5; //wyciagnac dynamicznie z PHP
+
+//funkcje uzywane do formatowania etykiet na wykresach highcharts
+function timeFormatter() {
+	return '<b>'+ this.point.name +'</b>: '+ this.y +' godzin';
+}
+function cashFormatter() {
+	return '<b>'+ this.point.name +'</b>: '+ this.y +' zł';
+}
+
+
 function addFlashMessage(msg, success)
 {
 	var infobox = $('<div>').addClass(success ? 'success' : 'error').text(msg);
@@ -108,4 +119,29 @@ $(document).ready (function () {
 		}, 1000);
 	}
 	
+	//zapewnienie, że user będzie miał rolę
+	$('form#user-edit').submit(function() {
+		if ($(this).find('input[type=checkbox]:checked').size() == 0) {
+			alert('Musisz zaznaczyć conajmniej jedną rolę');
+			return false;
+		}
+	});
+	
+	//ukrywam role, których nie powinno się zmieniać w module kadrowym
+	$('#roles-element').find('br:eq(2), br:eq(3), label:eq(2), label:eq(3)').css('display', 'none');
+
+	
+	//pokazuje listę działów, gdy wybrano kierownika dzialu
+	var departmentEl = $('#department-label, #department-element');
+	departmentEl.hide();
+	$('#roles-element input').click(function() {
+		if ($(this).val() != ROLE_DEPARTMENT_CHIEF) return;
+
+		if (this.checked) {
+			departmentEl.slideDown('slow');
+		} else {
+			$('#department').val(0);
+			departmentEl.slideUp('slow');
+		}
+	});
 });
