@@ -62,6 +62,12 @@ class Centixx_Navigation extends Zend_Navigation
 		        'controller' => 'timesheet',
 		        'resource' => 'page-timesheet',
 		    ),
+		    
+		    array(
+		    	'label' => 'Zatwierdź czas pracy',
+		    	'controller' => 'timesheetacc',
+		    	'resource' => 'page-timesheetacc',
+		    ),
 
 		    array(
 		        'label' => 'Uprawnienia',

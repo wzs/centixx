@@ -68,6 +68,25 @@ class Centixx_Model_Mapper_Timesheet extends Centixx_Model_Mapper_Abstract
 		}
 		return $this;
 	}
+	
+	/*
+	public function saveAccepted(Centixx_Model_Abstract $model)
+	{
+		$data = array(
+			'timesheet_accepted'	=> $model->accepted,
+		);
+
+		$table = $this->getDbTable();
+		if ($model->id) {
+			$pk = $this->_getPrimaryKey();
+			$where = $table->getAdapter()->quoteInto($pk . ' = ?', $model->id);
+			$table->update($data, $where);
+		} else {
+			$model->id = $table->insert($data);
+		}
+		return $this;
+	}
+	*/
 
 	/**
 	 * @return Centixx_Model_Mapper_User

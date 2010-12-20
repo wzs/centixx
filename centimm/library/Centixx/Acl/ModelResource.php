@@ -60,6 +60,7 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->addResource('page-logout');
 		$this->addResource('page-index');
 		$this->addResource('page-timesheet');
+		$this->addResource('page-timesheetacc');
 		$this->addResource('page-accounting');
 		$this->addResource('page-permissions');
 		$this->addResource('page-reports');
@@ -100,6 +101,8 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->allow(self::ROLE_ADMIN, 'page-admin');
 
 		$this->allow(self::ROLE_USER, 'page-timesheet');
+		
+		$this->allow(self::ROLE_GROUP_MANAGER, 'page-timesheetacc');
 
 
 		$this->allow(self::ROLE_CEO, 'page-permissions');

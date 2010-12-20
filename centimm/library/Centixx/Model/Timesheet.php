@@ -105,18 +105,9 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract //implements Zend_A
 		return ($this->_accepted) ? true : false;
 	}
 	
-	/*
-	public function setData($data) {
-		$this->_data = $data;
-	}
-
-	public function getData($data) {
-		return $this->_data;
-	}
-	*/
-	
 	public static function isCorrectPeriod($date)
 	{
+		// FIXME: wyłączone na czas kodzenia
 		return true;
 		
 		$tmp = explode('-', $date);
@@ -164,7 +155,8 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract //implements Zend_A
 			elseif ($user->getRole() == Centixx_Acl::ROLE_GROUP_MANAGER)
 				if ($privilege == self::ACTION_READ || $privilege == self::ACTION_ACCEPT)
 					// czy użytkownik proszący o dostęp jest menadżerem grupy użytkownika tego wpisu
-					if ($user->getId() == $this->getUser()->getManager(true))
+					// FIXME: coś nie tak z _mapper w group
+					//if ($user->getId() == $this->getUser()->getGroup()->getManager(true))
 						return self::ASSERTION_SUCCESS;
     	}
     	return parent::_customAclAssertion($role, $privilage);
