@@ -54,6 +54,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$autoloader = Zend_Loader_Autoloader::getInstance();
 		$autoloader->registerNamespace('Centixx_');
+		$autoloader->registerNamespace('Bvb');
 	}
 
 	protected function _initDatabase()
@@ -163,6 +164,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		Zend_Registry::set('Zend_Locale', $locale);
 
 		//spolszczenie komunikatów walidatorów - działa dla Zend_Framework > 1.11.0
+		/*
 		if (Zend_Version::compareVersion('1.11.0') != 1) {
 			$translator = new Zend_Translate(
 			    array(
@@ -174,6 +176,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			);
 			Zend_Validate_Abstract::setDefaultTranslator($translator);
 		}
+		*/
 		return $locale;
 	}
 }

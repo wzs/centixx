@@ -26,6 +26,25 @@ class Centixx_Model_Mapper_Project extends Centixx_Model_Mapper_Abstract
 			->setDepartment($row->project_department)
 		;
 	}
+	
+	public function __toString()
+	{
+		return '';
+	}
+	
+	public function fetchForDate($date)
+	{
+		$adapter = $this->getDbTable()->getAdapter();
+		$query = $adapter
+			->select()
+			->from(array('p' => 'projects'))
+			->where("project_start <= ?", $date)
+			->where("? <= project_stop", $date)
+		;
+		//var_dump($query->__toString());
+
+		return $this->_fetchAll($query, null, $adapter);
+	}
 
 	public function save(Centixx_Model_Abstract $model)
 	{

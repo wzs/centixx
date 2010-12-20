@@ -72,7 +72,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 			$method = 'set' . ucfirst($key);
 			if (in_array($method, $methods)) {
 				$this->$method($value);
-			}
+			}	
 		}
 		return $this;
 	}
@@ -103,6 +103,7 @@ abstract class Centixx_Model_Abstract implements Zend_Acl_Resource_Interface, Ce
 			throw new Exception('Mapper nie został ustawiony dla ' . get_class());
 		}
 		$this->_mapper->save($this);
+		
 		return $this;
 	}
 

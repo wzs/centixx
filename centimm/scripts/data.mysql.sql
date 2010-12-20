@@ -10,7 +10,10 @@ INSERT INTO `groups` (`group_id`, `group_name`, `group_project`, `group_manager`
 (2, 'Ludzie od czarnej roboty', 1, 3);
 
 INSERT INTO `projects` (`project_id`, `project_name`, `project_start`, `project_stop`, `project_manager`, `project_department`) VALUES
-(1, 'Centimm', '2010-11-14', '2010-12-17', 5, 1);
+(1, 'Centimm', '2010-11-14', '2010-12-20', 5, 1),
+(2, 'Centixx', '2010-11-18', '2010-12-25', 5, 1),
+(3, 'Centixy', '2010-11-30', '2010-12-10', 5, 1),
+(4, 'Centizy', '2010-12-12', '2010-12-17', 5, 1);
 
 INSERT INTO `roles` (`role_id`, `role_name`) VALUES
 (1, 'Użytkownik'),
@@ -45,7 +48,7 @@ INSERT INTO timesheets (timesheet_user, timesheet_project, timesheet_hours, time
 (5, 1, 4, '2010-12-12', 'praca'),
 (5, 1, 4, '2010-12-13', 'pierdzenie w stolek'),
 (5, 1, 4, '2010-12-14', 'zbijanie bakow'),
-(5, 1, 4, '2010-12-15', 'obijanie sie'),
+#(5, 1, 4, '2010-12-15', 'obijanie sie'),
 (5, 1, 4, '2010-12-16', 'opierdalanie sie'),
 (5, 1, 4, '2010-12-17', 'bumelowanie'),
 (5, 1, 4, '2010-12-18', 'leniuchowanie'),

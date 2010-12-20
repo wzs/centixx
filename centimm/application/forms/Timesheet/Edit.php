@@ -1,46 +1,82 @@
 <?php
-class Application_Form_User_Edit extends Zend_Form
+class Application_Form_Timesheet_Edit extends Application_Form_Abstract //Zend_Form
 {
 	/**
 	 * @var Centixx_Model_User
 	 */
+	protected $_projects;
+	
+	protected $_date;
+	
 	protected $_user;
-
-	protected $_roles;
+	protected $_id;
 
 	public function rebuild()
 	{
 		$this->setMethod(self::METHOD_POST);
 
-		$this->addElement('hidden', 'user_id', array(
-			'value' => $this->_user->id,
+		$this->addElement('hidden', 'id', array(
+			//'value' => $this->_id,
 		));
+		
+		if ($this->_user)
+			$this->addElement('hidden', 'user', array(
+				'value' => $this->_user,
+				'required'	=> true,
+			));
+		
+		
+		if ($this->_date)
+			$this->addElement('hidden', 'date', array(
+				'value' => $this->_date,
+				'required'	=> true,
+			));
+		
+		//var_dump($this->_projects);
+		
+		if ($this->_projects)
+			$this->addElement('select', 'project', array(
+				'label' => 'Projekt',
+				'required'	=> true,
+				'multiOptions' => $this->_projects,
+			));
 
-		$this->addElement('text', 'name', array(
-			'label'		=> 'Imię',
+		$this->addElement('text', 'hours', array(
+			'label'		=> 'Czas pracy',
+			'validators' => array(
+				new Zend_Validate_Float(),
+			),
 			'required'	=> true,
-			'maxLength' => 64,
-			'errorMessages'  => array('Imię jest wymagane'),
+			'maxLength' => 3,
+			'errorMessages'  => array('Niepoprawna wartość'),
 		));
 
-		$this->addElement('text', 'surname', array(
-			'label'		=> 'Nazwisko',
+		$this->addElement('text', 'descr', array(
+			'label'		=> 'Opis zadań',
 			'required'	=> true,
-			'maxLength' => 64,
-			'errorMessages'  => array('Nazwisko jest wymagane'),
+			//'maxLength' => 64,
+			'errorMessages'  => array('Niepoprawna wartość'),
 		));
 
+		$this->addElement('submit', 'submit', array(
+			'label'		=> 'Zapisz',
+			'ignore'	=> true,
+		));
+		
+		/*
 		$dbValidatorOptions = array(
 			'table' => 'users',
 			'field' => 'user_email',
 		);
+		
 		if ($this->_user) {
 			$dbValidatorOptions['exclude'] = array(
 				'field' => 'user_id',
 				'value' => $this->_user->id
 			);
 		}
-
+		*/
+		/*
 		$this->addElement('text', 'email', array(
 			'label'		=> 'E-mail',
 			'required'	=> true,
@@ -71,12 +107,12 @@ class Application_Form_User_Edit extends Zend_Form
 				'multiOptions' => $this->_roles,
 			));
 		}
-		//var_dump($this->_roles);
 
 		$this->addElement('submit', 'submit', array(
 			'label'		=> 'Zapisz',
 			'ignore'	=> true,
 		));
+		*/
 	}
 
 	/**
@@ -99,13 +135,18 @@ class Application_Form_User_Edit extends Zend_Form
 	 * @return Application_Form_User_Edit fluent interface
 	 */
 	public function setValues($array) {
-		if (array_key_exists('user', $array)) {
+		//if (array_key_exists('id', $array))
+		//	$this->_user = $array['id'];
+		
+		if (array_key_exists('user', $array))
 			$this->_user = $array['user'];
-		}
-
-		if (array_key_exists('roles', $array)) {
-			$this->_roles = $array['roles'];
-		}
+		
+		if (array_key_exists('date', $array))
+			$this->_date = $array['date'];
+		
+		if (array_key_exists('projects', $array))
+			$this->_projects = $array['projects'];
+	
 
 		$this->rebuild();
 		return $this;

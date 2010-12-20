@@ -1,6 +1,6 @@
 <?php
 
-class Centixx_Model_Timesheet extends Centixx_Model_Abstract
+class Centixx_Model_Timesheet extends Centixx_Model_Abstract //implements Zend_Acl_Role_Interface
 {
 	protected $_resourceType = 'timesheet';
 	//protected $_data;
@@ -11,6 +11,7 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract
 	protected $_hours;
 	protected $_date;
 	protected $_descr;
+	protected $_accepted;
 
 	protected $_criteria = array();
 	
@@ -22,43 +23,50 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract
 
 	public function setId($id)
 	{
-		$this->_id = $_id;
+		$this->_id = $id;
+		//var_dump('id', $id);
 		return $this;
 	}
 	
 	public function setUser($user)
 	{
 		$this->_user = $user;
+		//var_dump('user', $user);
 		return $this;
 	}
 	
 	public function setProject($project)
 	{
 		$this->_project = $project;
+		//var_dump('project', $project);
 		return $this;
 	}
 	
 	public function setHours($hours)
 	{
 		$this->_hours = $hours;
+		//var_dump('hours', $hours);
 		return $this;
 	}
 	
 	public function setDate($date)
 	{
 		$this->_date = $date;
+		//var_dump('date', $date);
 		return $this;
 	}
 	
 	public function setDescr($descr)
 	{
 		$this->_descr = $descr;
+		//var_dump('descr', $descr);
 		return $this;
 	}
 	
 	public function setAccepted($accepted)
 	{
 		$this->_accepted = $accepted;
+		//var_dump('accepted', $accepted);
 		return $this;
 	}
 	
@@ -67,7 +75,7 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract
 		return $this->_id;
 	}
 	
-	public function getUser()
+	public function getUser($raw = false)
 	{
 		return $raw ? $this->_user : $this->_mapper->getRelated($this, 'user', 'User');
 	}
@@ -94,7 +102,7 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract
 	
 	public function getAccepted()
 	{
-		return $this->_accepted;
+		return ($this->_accepted) ? true : false;
 	}
 	
 	/*
@@ -107,8 +115,10 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract
 	}
 	*/
 	
-	private function isCorrectPeriod($date)
+	public static function isCorrectPeriod($date)
 	{
+		return true;
+		
 		$tmp = explode('-', $date);
 		if (count($tmp) < 3)
 			return;
@@ -117,46 +127,46 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract
 		return ($time < time() && date('W', $time) == date('W', time()));
 	}
 	
-	protected function _customAclAssertion($role, $privilege = null)
+	protected function _customAclAssertion($user, $privilege = null)
     {
     	if ($user instanceof Centixx_Model_User) 
     	{
     		if ($user->getRole() == Centixx_Acl::ROLE_USER) 
     		{
-    			if (! $user->getId() == $_user)
-    				return self::ASSERT_FAILURE;
+    			if ($privilege == self::ACTION_UPDATE)
+    			{
+    				// użytkownik nie jest właścicielem wpisu
+    				if ($user->getId() != $this->_user)
+    					return self::ASSERTION_FAILURE;
     				
-    			// użytkownik jest właścicielem wpisu 					
+    				// nie można edytować już zaakceptowanych
+    				if ($this->_accepted)
+						return self::ASSERTION_FAILURE;
+    			} 					
 				
 				if ($privilege == self::ACTION_READ)
-					return self::ASSERT_SUCCESS; 
+				{
+					return self::ASSERT_SUCCESS;
+				}
 					
 				if ($privilege == self::ACTION_UPDATE || $privilege == self::ACTION_CREATE)
 				{
-					// nie może modyfikować już zaakceptowanych
-					if ($this->_accepted)
-						return self::ASSERT_FAILURE;
-						
 					// nie może modyfikować poza godzinami pracy
-					if ((int)time('H') < 9 || (int)time('H') > 17)
-						return self::ASSERT_FAILURE;
+					// FIXME: wyłączone na czas kodzenia
+					//if ((int)time('H') < 9 || (int)time('H') > 17)
+					//	return self::ASSERTION_FAILURE;
 						
-					// tylko z tego tygodnia i nie później niż teraz
-					//if (isCorrectPeriod($this->_date))
-					return self::ASSERT_SUCCESS;
+					//tylko z tego tygodnia i nie później niż teraz
+					//if (isCorrectPeriod($this->_date)
+					return self::ASSERTION_SUCCESS;
 				}
 			}
 			elseif ($user->getRole() == Centixx_Acl::ROLE_GROUP_MANAGER)
-			{
 				if ($privilege == self::ACTION_READ || $privilege == self::ACTION_ACCEPT)
-				{
 					// czy użytkownik proszący o dostęp jest menadżerem grupy użytkownika tego wpisu
 					if ($user->getId() == $this->getUser()->getManager(true))
-						return self::ASSERT_SUCCESS;
-				}
-			}
+						return self::ASSERTION_SUCCESS;
     	}
-    	
     	return parent::_customAclAssertion($role, $privilage);
     }
 }

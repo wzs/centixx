@@ -34,6 +34,11 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	 * @var int
 	 */
 	protected $_account;
+	
+	public function getId()
+	{
+		return $this->_id;
+	}
 
 	protected $_db;
 	
@@ -267,7 +272,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		return parent::_customAclAssertion($role, $privilage);
     }
     
-public function generateTransaction($user, $date) {
+	public function generateTransaction($user, $date) {
 		
 		$datearray = split('-',$date);
 		$month = $datearray[1];
