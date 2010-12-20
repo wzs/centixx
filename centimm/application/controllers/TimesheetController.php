@@ -103,9 +103,9 @@ class TimesheetController extends Centixx_Controller_Action
 		$grid = new Bvb_Grid_Deploy_Table($this->_config);
 
 		$grid->setImagesUrl($this->view->basePath . '/img/');
-		$grid->setPagination(5);
+		//$grid->setPagination(5);
 		$grid->setNoFilters(true);
-		$grid->setExport(array('excel'));
+		$grid->setExport(array());
 		$grid->setGridId('timesheet_grid');
 
 		$select0 = $this->_db->select()

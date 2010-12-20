@@ -339,8 +339,9 @@ span.info {
 
 #timesheet_grid table {
 	width: 80%;
-	margin: 0 auto;
+	/*margin: 0 auto;*/
 }
+
 #timesheet_grid th {
 	text-align: center;
 	background-color: #DFDFC3;

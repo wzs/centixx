@@ -10,10 +10,12 @@ class TimesheetaccController extends Centixx_Controller_Action
 		$this->view->timesheet = $timesheet;
 		
 		$grid = Bvb_Grid::factory('table', $this->_config);
-		$grid->setImagesUrl('/centixx/centimm/public/img/');
-		$grid->setPagination(5);
+		//$grid->setImagesUrl('/centixx/centimm/public/img/');
+		$grid->setImagesUrl($this->view->basePath . '/img/');
+		//$grid->setPagination(5);
 		$grid->setNoFilters(true);
-		$grid->setGridId('massgrid');
+		$grid->setExport(array());
+		$grid->setGridId('timesheet_grid');
 		
 	
 		$select = $this->_db->select()
@@ -39,7 +41,7 @@ class TimesheetaccController extends Centixx_Controller_Action
         //echo $select->__toString();
 		
         //$grid->setRecordsPerPage(5);
-        $grid->setPagination(10);
+        //$grid->setPagination(10);
         $grid->setPaginationInterval(array(10 => 10, 20 => 20, 50 => 50, 100 => 100));
         $grid->setTableGridColumns(array('Grupa', 'Członek', 'Projekt', 'Data', 'Czas', 'Opis'));
         
@@ -60,8 +62,6 @@ class TimesheetaccController extends Centixx_Controller_Action
         $left->position('right')->name('')->decorator("<input type='checkbox' name='checkbox[{{timesheet_id}}]' value='x' >");
         $grid->addExtraColumns($left);
 		
-		
-
 		$timesheet->datagrid = "<form action='".Zend_View_Helper_Url::url(array('controller' => 'timesheetacc', 'action' => 'accept'))."' method='post'>"; 
 		$timesheet->datagrid .= $grid->deploy();
 		$timesheet->datagrid .= "<input type='submit' name='submit' value='Zatwierdź'></form>";
