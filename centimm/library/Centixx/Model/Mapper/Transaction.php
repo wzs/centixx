@@ -47,5 +47,4 @@ class Centixx_Model_Mapper_Transaction extends Centixx_Model_Mapper_Abstract
 		return new Centixx_Model_Mapper_Transaction();
 	}
 	
-	
 }

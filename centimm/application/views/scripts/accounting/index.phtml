@@ -17,33 +17,28 @@
 <tbody>
 <?php foreach ($this->transactions as $transaction): ?>
 <tr>
-	<td id = "id"><?php echo $index++;?></td>
-	<td id = "user"><?php echo $transaction->getUser()?> </td>
-	<td id = "account"><?php echo $transaction->getAccount() ?></td>
-	<td id = "value"><?php echo $transaction->getValue()?></td>
-	<td id = "title"><?php echo $transaction->getTitle() ?></td>
-	<td id = "date"><?php echo $transaction->getDate() ?></td>
-	<td><img alt="Generuj przelew" src="../public/img/edit.png" onclick="popup()"/></td>
+	<td id = "id"><?php echo $transaction->getId()?></td>
+	<td id = "user<?php echo $transaction->getId()?>"><?php echo $transaction->getUser()?> </td>
+	<td id = "account<?php echo $transaction->getId()?>"><?php echo $transaction->getAccount() ?></td>
+	<td id = "value<?php echo $transaction->getId()?>"><?php echo $transaction->getValue()?></td>
+	<td id = "title<?php echo $transaction->getId()?>"><?php echo $transaction->getTitle() ?></td>
+	<td id = "date<?php echo $transaction->getId()?>"><?php echo $transaction->getDate() ?></td>
+	<td><img alt="Generuj przelew" src="../public/img/edit.png" onclick="popup(<?php echo $transaction->getId()?>)"/></td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
-
 <?php endif ?>
+
+<a href="../public/accounting/generate">GENERUJ PRZELEWY</a>
 
 <script type="text/javascript">
 
-function popup(){
+function popup(index){
 	var controller = "accounting";
-	var account = document.getElementById("account").firstChild.nodeValue;
-	var value = document.getElementById("value").firstChild.nodeValue;
-	var tId = document.getElementById("id").firstChild.nodeValue;
-	alert(account);
-	window.open(controller + "/print/id/" + tId);
+	var account = document.getElementById("account" + index).firstChild.nodeValue;
+	var value = document.getElementById("value" + index).firstChild.nodeValue;
+	window.open(controller + "/print/id/" + index);
 }
 
-</script>
-<!--
-
-//-->
 </script>

@@ -145,13 +145,16 @@ function getMonthName($monthNumber){
 
 function getTextAmount($amount){
 	
-	$array = split('.',$amount);
+	$array = split(',',$amount);
 	$zl = $array[0];
 	$gr = $array[1];
 	
 	$zl = getTextFromNumber($zl);
 	$gr = getTextFromNumber($gr);
-	$textAmmount = $zl.' złotych i '.$gr.'groszy'; 
+	$textAmmount = $zl;
+	$textAmmount = $textAmmount." złotych i ";
+	$textAmmount = $textAmmount.$gr;
+	$textAmmount = $textAmmount."groszy"; 
 	return $textAmmount;
 }
 

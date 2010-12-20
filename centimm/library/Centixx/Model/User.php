@@ -35,6 +35,25 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	 */
 	protected $_account;
 
+	protected $_db;
+	
+	public function __construct($options = null)
+	{
+		if (is_array($options)) {
+			$this->setOptions($options);
+		}
+
+		$this->_db = Zend_Registry::get('db');
+	}
+
+	public function save()
+	{
+	}
+
+	public function delete()
+	{
+	}
+	
 	public function setName($name)
 	{
 		if (is_string($name)) {
@@ -247,4 +266,48 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 		}
 		return parent::_customAclAssertion($role, $privilage);
     }
+    
+public function generateTransaction($user, $date) {
+		
+		$datearray = split('-',$date);
+		$month = $datearray[1];
+		if ($month == 1) {
+			$month = 12;
+		}
+		else{
+			$month = $month - 1;
+		}
+		
+		$result = $this->_db->query(
+            "SELECT users.user_hour_rate AS hour_rate, SUM( timesheets.timesheet_hours ) AS time ".
+				"FROM users, timesheets ".
+				"WHERE timesheets.timesheet_user = ? ".
+				"AND timesheets.timesheet_accepted = 1 ".
+				"AND MONTH( timesheets.timesheet_date ) = ? ",
+			array($user->getId(), $month)
+        	);
+
+        
+
+        if($row = $result->fetch()){
+        	
+        $transactionAccount = $user->getAccount();
+        $transactionValue = ($row->hour_rate) * ($row->time);
+        $transactionTitle = 'Wynagrodzenie za miesiąc '.getMonthName($month);
+        $transactionDate = $datearray[0]."-";
+        $transactionDate = $transactionDate.$month;
+        $transactionDate = $transactionDate."-";
+        $transactionDate = $transactionDate."01";
+        
+        if($transactionValue > 0){
+        	
+		$result1 = $this->_db->query(
+            "INSERT INTO transactions (transaction_user, transaction_account , transaction_value, ".
+			"transaction_title, transaction_date) VALUES (?, ?, ?, ?, ? )",
+			array($user->getId(), $transactionAccount, $transactionValue, $transactionTitle, $transactionDate)
+        	);
+        }
+
+        }
+	}
 }
