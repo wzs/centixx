@@ -48,6 +48,18 @@ function my_function($date, $week)
 	return '';
 }
 
+function my_function2($date, $week)
+{
+	static $count = 0;
+	$count++;
+	
+	if ($date)
+		return $date;
+	
+	$hlp_date = date("Y-m-d", datefromweeknr(2010, $week, $count));
+	return $hlp_date;
+}
+
 class TimesheetController extends Centixx_Controller_Action
 {
 	public function indexAction()
@@ -136,14 +148,18 @@ class TimesheetController extends Centixx_Controller_Action
 		if (is_null($this->getRequest()->getParam('_exportTo')))
 			$grid->addExtraRows($rows);
 
-		$edit = "<a href='".Zend_View_Helper_Url::url(
-		array('controller' => 'timesheet', 'action' => 'edit'))."/date/{{Data}}'>Edytuj</a>";
+		//$edit = "<a href='".Zend_View_Helper_Url::url(
+		//array('controller' => 'timesheet', 'action' => 'edit'))."/date/{{Data}}'>Edytuj</a>";
+		
 		$right = new Bvb_Grid_Extra_Column();
 		$right->position('right')->name('edit')->title('Edytuj')
 		//->decorator($edit);
 		->callback(array('function' => 'my_function', 'params' => array('{{Data}}', $week)));
 
 		$grid->addExtraColumns($right);
+		
+		//$grid->updateColumn('Data', array('decorator'=>'-{{Data}}-'));
+		$grid->updateColumn('Data', array('callback' => array('function' => 'my_function2', 'params' => array('{{Data}}', $week))));
 
 		$timesheet->datagrid = $grid->deploy();
 	}
@@ -160,7 +176,12 @@ class TimesheetController extends Centixx_Controller_Action
 		$form = new Application_Form_Timesheet_Edit();
 
 		$projects = Centixx_Model_Mapper_Project::factory()->fetchForDate($date);
-		//var_dump($projects);
+		if (count($projects) == 0)
+		{
+			$this->addFlashMessage('Brak projektów prowadzonych w tym dniu', true, true);
+			$this->_redirect('/timesheet');
+		}
+		
 
 		$form->setValues(array(
 			'projects' => $projects,
@@ -212,6 +233,13 @@ class TimesheetController extends Centixx_Controller_Action
 
 		$projects = Centixx_Model_Mapper_Project::factory()->fetchForDate($date);
 		//var_dump($projects);
+		
+		$projects = Centixx_Model_Mapper_Project::factory()->fetchForDate($date);
+		if (count($projects) == 0)
+		{
+			$this->addFlashMessage('Brak projektów prowadzonych w tym dniu', true, true);
+			$this->_redirect('/timesheet');
+		}
 
 		$form->setValues(array(
 			'projects' => $projects,

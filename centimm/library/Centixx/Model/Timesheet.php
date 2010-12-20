@@ -108,7 +108,10 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract //implements Zend_A
 	public static function isCorrectPeriod($date)
 	{
 		// FIXME: wyłączone na czas kodzenia
-		return true;
+		//return true;
+		
+		if ((int)time('H') < 9 || (int)time('H') > 17)
+			return false;
 
 		$tmp = explode('-', $date);
 		if (count($tmp) < 3)
@@ -157,11 +160,10 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract //implements Zend_A
 				return self::ASSERTION_SUCCESS;
 			}
 		}
-		elseif ($user->hasRole(Centixx_Acl::ROLE_GROUP_MANAGER)) {
+		if ($user->hasRole(Centixx_Acl::ROLE_GROUP_MANAGER)) {
 			if ($privilege == self::ACTION_READ || $privilege == self::ACTION_ACCEPT) {
 				// czy użytkownik proszący o dostęp jest menadżerem grupy użytkownika tego wpisu
-				// FIXME: coś nie tak z _mapper w group
-				//if ($user->getId() == $this->getUser()->getGroup()->getManager(true)->getId())
+				if ($user->getId() == $this->getUser()->getGroup()->getManager()->getId())
 					return self::ASSERTION_SUCCESS;
 			}
     	}

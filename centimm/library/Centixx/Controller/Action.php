@@ -146,7 +146,6 @@ abstract class Centixx_Controller_Action extends Zend_Controller_Action
     	);
 		$options += $params;
     	$url = Zend_View_Helper_Url::url($options);
-
     	$this->_redirect($url);
     }
 
