@@ -10,7 +10,7 @@ function datefromweeknr($aYear, $aWeek, $aDay)
 	return (($StartDate + $Offset - 25569) * 86400 - 3600);
 }
 
-function my_function($date, $week)
+function my_function($date, $week, $hour)
 {
 	/*
 	$tmp = explode('-', $date);
@@ -37,9 +37,11 @@ function my_function($date, $week)
 	$add = "<a href='".Zend_View_Helper_Url::url(
 		array('controller' => 'timesheet', 'action' => 'add', 'date' => $hlp_date))."'>Dodaj</a>";
 
+	//var_dump($date);
 	if (Centixx_Model_Timesheet::isCorrectPeriod($date))
 	{
-		if (empty($date))
+
+		if (empty($hour))
 			return $add;
 		else
 			return $edit;
@@ -154,12 +156,12 @@ class TimesheetController extends Centixx_Controller_Action
 		$right = new Bvb_Grid_Extra_Column();
 		$right->position('right')->name('edit')->title('Edytuj')
 		//->decorator($edit);
-		->callback(array('function' => 'my_function', 'params' => array('{{Data}}', $week)));
+		->callback(array('function' => 'my_function', 'params' => array('{{Data}}', $week, '{{Czas}}')));
 
 		$grid->addExtraColumns($right);
 
 		//$grid->updateColumn('Data', array('decorator'=>'-{{Data}}-'));
-//		$grid->updateColumn('Data', array('callback' => array('function' => 'my_function2', 'params' => array('{{Data}}', $week))));
+		$grid->updateColumn('Data', array('callback' => array('function' => 'my_function2', 'params' => array('{{Data}}', $week))));
 
 		$timesheet->datagrid = $grid->deploy();
 	}
