@@ -9,6 +9,7 @@ class ErrorController extends Centixx_Controller_Action
 			$this->_response->clearBody(); //layout generował się dwa razy
 			$this->getResponse()->setHttpResponseCode(403);
 			$this->view->message = 'Dostęp zabroniony';
+			$this->view->description = '<p>Nie masz wystarczających uprawnień, aby uzyskać dostęp do tej strony. </p><p>Zdarzenie to zostało zapisane, skontaktuj się z administratorem w celu wyjaśnienia.</p>';
 
 			$uri = $errors->request->getRequestUri();
 			$this->log(Centixx_Log::UNAUTHORISED_ACCESS, $uri);
