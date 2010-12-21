@@ -365,7 +365,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 				return self::ASSERTION_SUCCESS;
 			}
 
-			//kierownik grupy moze ogladac profil podwladnego
+			//przelozony moze ogladac profil podwladnego
 			if ($privilage == self::ACTION_READ && $this->isInferiorTo($role)) {
 				return self::ASSERTION_SUCCESS;
 			}

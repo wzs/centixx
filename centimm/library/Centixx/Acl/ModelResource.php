@@ -18,16 +18,6 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		//każdy model sam określa zasady dostępu do niego w metodzie _customAssertion()
 		$this->deny(null, null);
 
-//		$this->deny(null, 'user', 'edit');
-//		$this->allow($roles[self::ROLE_HR], 'user', 'edit');
-//
-//		$this->allow($roles[self::ROLE_USER], 'group', 'view');
-//		$this->allow($roles[self::ROLE_PROJECT_MANAGER], 'group', 'edit');
-//
-//		$this->allow($roles[self::ROLE_PROJECT_MANAGER], 'project', 'view');
-//		$this->allow($roles[self::ROLE_PROJECT_MANAGER], 'project', 'edit');
-
-
 		$this->_initPageAccessRules();
 	}
 
@@ -103,7 +93,7 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 		$this->allow(self::ROLE_ADMIN, 'page-admin');
 
 		$this->allow(self::ROLE_USER, 'page-timesheet');
-		
+
 		$this->allow(self::ROLE_GROUP_MANAGER, 'page-timesheetacc');
 
 
@@ -111,5 +101,7 @@ class Centixx_Acl_ModelResource extends Centixx_Acl
 
 		$this->allow(self::ROLE_CEO, 'page-reports');
 		$this->allow(self::ROLE_DEPARTMENT_CHIEF, 'page-reports');
+		$this->allow(self::ROLE_PROJECT_MANAGER, 'page-reports');
+
 	}
 }

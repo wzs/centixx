@@ -5,9 +5,9 @@ class Application_Form_Timesheet_Edit extends Application_Form_Abstract //Zend_F
 	 * @var Centixx_Model_User
 	 */
 	protected $_projects;
-	
+
 	protected $_date;
-	
+
 	protected $_user;
 	protected $_id;
 
@@ -18,22 +18,22 @@ class Application_Form_Timesheet_Edit extends Application_Form_Abstract //Zend_F
 		$this->addElement('hidden', 'id', array(
 			//'value' => $this->_id,
 		));
-		
+
 		if ($this->_user)
 			$this->addElement('hidden', 'user', array(
 				'value' => $this->_user,
 				'required'	=> true,
 			));
-		
-		
+
+
 		if ($this->_date)
 			$this->addElement('hidden', 'date', array(
 				'value' => $this->_date,
 				'required'	=> true,
 			));
-		
+
 		//var_dump($this->_projects);
-		
+
 		if ($this->_projects)
 			$this->addElement('select', 'project', array(
 				'label' => 'Projekt',
@@ -44,10 +44,10 @@ class Application_Form_Timesheet_Edit extends Application_Form_Abstract //Zend_F
 		$this->addElement('text', 'hours', array(
 			'label'		=> 'Czas pracy',
 			'validators' => array(
-				new Zend_Validate_Float(),
+				new Zend_Validate_Int(),
 			),
 			'required'	=> true,
-			'maxLength' => 3,
+			'maxLength' => 2,
 			'errorMessages'  => array('Niepoprawna wartość'),
 		));
 
@@ -62,13 +62,13 @@ class Application_Form_Timesheet_Edit extends Application_Form_Abstract //Zend_F
 			'label'		=> 'Zapisz',
 			'ignore'	=> true,
 		));
-		
+
 		/*
 		$dbValidatorOptions = array(
 			'table' => 'users',
 			'field' => 'user_email',
 		);
-		
+
 		if ($this->_user) {
 			$dbValidatorOptions['exclude'] = array(
 				'field' => 'user_id',
@@ -137,16 +137,16 @@ class Application_Form_Timesheet_Edit extends Application_Form_Abstract //Zend_F
 	public function setValues($array) {
 		//if (array_key_exists('id', $array))
 		//	$this->_user = $array['id'];
-		
+
 		if (array_key_exists('user', $array))
 			$this->_user = $array['user'];
-		
+
 		if (array_key_exists('date', $array))
 			$this->_date = $array['date'];
-		
+
 		if (array_key_exists('projects', $array))
 			$this->_projects = $array['projects'];
-	
+
 
 		$this->rebuild();
 		return $this;

@@ -147,10 +147,10 @@ class Centixx_Model_Mapper_Group extends Centixx_Model_Mapper_Abstract
 	{
 		//usuwam managera
 		$this->getDbTable()->getAdapter()->query("
-			UPDATE users
-			SET user_role = DEFAULT
-			WHERE user_group = ?",
-			array($model->id));
+			DELETE from users_roles
+			WHERE user_id = ?
+			AND role_id = '".Centixx_Acl::ROLE_GROUP_MANAGER."'",
+			array($model->manager->id));
 
 		return $this->getDbTable()->delete($this->_getPrimaryKey() . ' = ' . $model->id);
 	}

@@ -109,13 +109,17 @@ class Centixx_Model_Timesheet extends Centixx_Model_Abstract //implements Zend_A
 	{
 		// FIXME: wyłączone na czas kodzenia
 		//return true;
-		
-		if ((int)time('H') < 9 || (int)time('H') > 17)
+
+		if ((int)date('H') < 9 || (int)date('H') > 17) {
 			return false;
+		}
 
 		$tmp = explode('-', $date);
-		if (count($tmp) < 3)
-			return;
+		if (count($tmp) < 3) {
+			debug('niepoprawna data');
+//			throw new Exception("Niepoprawna data");
+			return true;
+		}
 		$time = mktime(6, 0, 0, $tmp[1], $tmp[2], $tmp[0]);
 
 		return ($time < time() && date('W', $time) == date('W', time()));

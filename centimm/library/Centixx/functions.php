@@ -120,7 +120,7 @@ function getMonthName($monthNumber){
 	$name;
 	switch ($monthNumber) {
 		case 1:
-			$name = 'Styczń';
+			$name = 'Styczeń';
 			break;
 
 		case 2:
@@ -163,7 +163,7 @@ function getMonthName($monthNumber){
 			$name = 'Listopad';
 			break;
 
-		case 0:
+		case 12:
 			$name = 'Grudzień';
 			break;
 
