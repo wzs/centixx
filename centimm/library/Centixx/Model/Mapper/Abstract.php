@@ -149,10 +149,15 @@ abstract class Centixx_Model_Mapper_Abstract
 	 * Zwraca mapowany model na podstawie klucza glownego
 	 * @param int $id
 	 * @return Centixx_Model_Abstract
+	 * @throws Centixx_ModelNotFoundException gdy nie znaleziono żądanego obiektu
 	 */
 	public function find($id)
 	{
-		return $this->findByField($id, $this->_getPrimaryKey());
+		$ret = $this->findByField($id, $this->_getPrimaryKey());
+		if ($ret == null) {
+			throw new Centixx_ModelNotFoundException("Cannot find model with id = $id");
+		}
+		return $ret;
 	}
 
 	/**

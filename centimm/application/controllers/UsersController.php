@@ -64,7 +64,14 @@ class UsersController extends Centixx_Controller_Action
 		$this->view->header = 'Edycja użytkownika';
 	}
 
-	protected function prepare(Centixx_Model_User $user, $type)
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param Centixx_Model_User $user
+	 * @param string  $type
+	 * @throws Centixx_Acl_AuthenticationException
+	 */
+	protected function prepare($user, $type)
 	{
 		if (!$user->isAllowed($this->_currentUser, Centixx_Model_Abstract::ACTION_UPDATE)) {
 			throw new Centixx_Acl_AuthenticationException();
@@ -75,6 +82,7 @@ class UsersController extends Centixx_Controller_Action
 		$form = new Application_Form_User_Edit();
 
 		$roles = Centixx_Model_Mapper_Abstract::factory('Role')->fetchAll();
+		
 		$departments = Centixx_Model_Mapper_Abstract::factory('Department')->fetchAll();
 		$form->setValues(array(
 			'roles' 		=> $roles,
@@ -82,6 +90,7 @@ class UsersController extends Centixx_Controller_Action
 			'departments' 	=> $departments,
 		));
 
+		$this->view->hasPermission = (int)$this->_currentUser->hasPermission(Centixx_Model_User::ACTION_ADD_CEO);
 		$this->view->editForm = $form;
 
 		if ($this->getRequest()->isPost()) {
@@ -93,12 +102,18 @@ class UsersController extends Centixx_Controller_Action
 					throw new Centixx_Acl_AuthenticationException('Nie masz uprawnień do tworzenia nowych użytkowników');
 				}
 
-				//aby zmienić uprawnienia użytkownika na CEO / zmniejszyć uprawnienia CEO
-				//obecnie zalogowany user MUSI mieć nadane pozwolenie
-				if (
-					($user->hasRole(Centixx_Acl::ROLE_CEO) && !in_array(Centixx_Acl::ROLE_CEO, $data['roles'])) ||
-					(!$user->hasRole(Centixx_Acl::ROLE_CEO) && in_array(Centixx_Acl::ROLE_CEO, $data['roles']))
-				) {
+				//README: wykomentowany nizej warunek pozwalal na edycje CEO bez sesji,
+				//ale tylko kiedy nie zmieniano jego poziomu uprawnien. Teraz ograniczenie jest na jakakolwiek edycje
+				
+//				//aby zmienić uprawnienia użytkownika na CEO / zmniejszyć uprawnienia CEO
+//				//obecnie zalogowany user MUSI mieć nadane pozwolenie
+//				if (
+//					($user->hasRole(Centixx_Acl::ROLE_CEO) && !in_array(Centixx_Acl::ROLE_CEO, $data['roles'])) ||
+//					(!$user->hasRole(Centixx_Acl::ROLE_CEO) && in_array(Centixx_Acl::ROLE_CEO, $data['roles']))
+//				) {
+
+				if ($user->hasRole(Centixx_Acl::ROLE_CEO)) {
+				
 					if (!$user->isAllowed($this->_currentUser, Centixx_Model_User::ACTION_ADD_CEO)) {
 						throw new Centixx_Acl_AuthenticationException("Nie masz uprawnień do edycji członka zarządu");
 					}
@@ -127,14 +142,13 @@ class UsersController extends Centixx_Controller_Action
 				$form->setDefaults($data);
 			}
 		} else {
-				$form->setDefaults($user->toArray());
+			$form->setDefaults($user->toArray());
 
-				//potrzebne ze wzgledu na "dziwne" zachowanie multicheckboksa
-				$form->setDefaults(array(
-					'roles' => array_keys($user->getRoles()),
-				));
+			//potrzebne ze wzgledu na "dziwne" zachowanie multicheckboksa
+			$form->setDefaults(array(
+				'roles' => array_keys($user->getRoles()),
+			));
 		}
-
 
 		$this->view->user = $user;
 	}

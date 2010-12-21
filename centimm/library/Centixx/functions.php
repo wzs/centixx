@@ -108,13 +108,12 @@ function write($array) {
 			if ($key != 5) {
 				imagestring($img, 5, $pos[$key][1]+$i*22.8, $pos[$key][0], strtoupper($val[$i]), $black);
 			}else{
-				imagestring($img, 5, $pos[$key][1]+$i*10, $pos[$key][0], strtolower($val[$i]), $black);
+				imagestring($img, 5, $pos[$key][1]+$i*8, $pos[$key][0], strtolower($val[$i]), $black);
 			}
 		}
 	}
 
-	imagejpeg($img, APPLICATION_PATH . '/../public/img/tmp.jpg');
-	imagedestroy($img);
+	return $img;
 }
 
 function getMonthName($monthNumber){
@@ -177,17 +176,15 @@ function getMonthName($monthNumber){
 }
 
 function getTextAmount($amount){
-
-	$array = split(',',$amount);
+	$array = explode('.', $amount);
 	$zl = $array[0];
 	$gr = $array[1];
-
 	$zl = getTextFromNumber($zl);
 	$gr = getTextFromNumber($gr);
 	$textAmmount = $zl;
 	$textAmmount .= "zlotych i ";
-	$textAmmount .= ($gr > 0) ? $gr : "zero";
-	$textAmmount .= " groszy";
+	$textAmmount .= ($gr != '') ? $gr : "zero ";
+	$textAmmount .= "groszy";
 	return $textAmmount;
 }
 

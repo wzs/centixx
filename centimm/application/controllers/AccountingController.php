@@ -8,17 +8,19 @@ class AccountingController extends Centixx_Controller_Action
 
 	}
 
-
-
+	/**
+	 * Zwraca plik jpg z wypełnionym druczkiem danej transakcji
+	 */
 	public function printAction()
 	{
 		$this->_helper->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+		
 
 		$params = $this->getRequest()->getParams();
 		$id = $params["id"];
 
 		$transaction = Centixx_Model_Mapper_Transaction::factory()->findByField($id,'transaction_id');
-		$user = Centixx_Model_Mapper_User::factory()->findByField($transaction->getUser(),'user_id');
 
 		$splitedDate = split('-',$transaction->getDate());
 
@@ -38,10 +40,10 @@ class AccountingController extends Centixx_Controller_Action
 		}
 
 		$data = array(
-			'odbiorca1' 		=> strip_pl($user->getName().' '.$user->getSurname()),
+			'odbiorca1' 		=> strip_pl($transaction->user->getName().' '.$transaction->user->getSurname()),
 			'odbiorca2' 		=> '',
 //			'odbiorca2' 		=> strip_pl($user->getAddress()),
-			'rachunek1' 		=> $user->getAccount(),
+			'rachunek1' 		=> $transaction->user->getAccount(),
 			'rachunek2' 		=> '',
 			'kwota' 			=> $transaction->getValue(),
 			'slownie'			=> getTextAmount($transaction->getValue()), //trzeba polskie znaczki wywalic
@@ -51,37 +53,32 @@ class AccountingController extends Centixx_Controller_Action
 			'tytul2'			=> strip_pl($title2),
 		);
 
-		write(array_values($data));
-		$this->view->params = $id;
-		$this->view->array = $data;
+		//usuwam stare nagłówki i ustawiam odpowiednie do renderowania obrazka
+		$this->getResponse()->clearAllHeaders()->setHeader('content-type', 'image/jpg');
 
-		$this->view->user = $user;
-		$this->view->transaction = $transaction;
+		//renderowanie obrazka
+		$img = write(array_values($data));
+		imagejpeg($img);
+		imagedestroy($img);
 
-//		$odbiorca1;
-//		$odbiorca2;
-//		$konto1;
-//		$konto2;
-//		$kwota;
-//		$kwotaSlownie;
-//		$zlec1;
-//		$zlec2;
-//		$tyt1;
-//		$tyt2;
 	}
 
-	public function generateAction(){
-
-//		$this->_helper->layout()->disableLayout();        
-		$this->_helper->viewRenderer->setNoRender();
-
+	public function generateAction()
+	{
 		$users = Centixx_Model_Mapper_User::factory()->fetchAll();
+		$success = false;
 		foreach ($users as $user){
-			$user->generateTransaction($user, date("Y-m-d"));
+			$res = $user->generateTransaction($user, date("Y-m-d"));
+			if ($res) {
+				$success = true;
+			}
 		}
 
-		$this->addFlashMessage('Lista przelewów została wygenerowana', false, true);
-
-		$this->_redirect('accounting');
+		if ($success) {
+			$this->addFlashMessage('Lista przelewów została wygenerowana', false, true);
+		} else {
+			$this->addFlashMessage('Nie wygenerowano nowych przelewów', true, true);
+		}
+		$this->redirect('accounting');
 	}
 }

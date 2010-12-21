@@ -1,2 +1,12 @@
+<?php 
+//ukrywam role CEO
+if (!$this->hasPermission): ?>
+<script type="text/javascript">
+$(function() {
+	$('#roles-element').find('br:eq(7),label:eq(7)').css('display', 'none');
+})
+</script>
+<?php endif ?>
+
 <h2><?php echo $this->header ?></h2>
 <?php echo $this->editForm ?>

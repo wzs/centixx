@@ -161,7 +161,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	 */
 	public function getRole()
 	{
-//		trigger_error('Należy użyć getRoles()!');
+		//		trigger_error('Należy użyć getRoles()!');
 		return array_pop($this->roles);
 	}
 
@@ -172,7 +172,7 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	 */
 	public function getRoleName()
 	{
-//		trigger_error('Należy użyć getRoles()!');
+		//		trigger_error('Należy użyć getRoles()!');
 		return $this->_mapper->getRoleName($this->getRole());
 	}
 
@@ -328,19 +328,19 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 
 		//szef działu jest zwierzchnikiem ludzi pracujących w jego dziale
 		if ($user->hasRole(Centixx_Acl::ROLE_DEPARTMENT_CHIEF) && $this->getProject() != null
-			&& $this->getProject()->getDepartment()->getManager()->getId() == $user->id) {
+		&& $this->getProject()->getDepartment()->getManager()->getId() == $user->id) {
 			return true;
 		}
 
 		//szef projektu jest zwierzchnikiem ludzi pracujących w jego projekcie
 		if ($user->hasRole(Centixx_Acl::ROLE_PROJECT_MANAGER) && $this->getProject() != null
-			&& $this->getProject()->getManager()->getId() == $user->id) {
+		&& $this->getProject()->getManager()->getId() == $user->id) {
 			return true;
 		}
 
 		//szef grupy jest zwierzchnikiem ludzi pracujących w jego grupie
 		if ($user->hasRole(Centixx_Acl::ROLE_GROUP_MANAGER) && $this->getGroup() != null
-			&& $this->getGroup()->getManager()->getId() == $user->id) {
+		&& $this->getGroup()->getManager()->getId() == $user->id) {
 			return true;
 		}
 
@@ -351,8 +351,8 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 	 * (non-PHPdoc)
 	 * @see library/Centixx/Model/Centixx_Model_Abstract::_customAclAssertion()
 	 */
-    protected function _customAclAssertion($role, $privilage = null)
-    {
+	protected function _customAclAssertion($role, $privilage = null)
+	{
 		if ($role instanceof Centixx_Model_User) {
 			//HR może edytować/dodawac profil użytkownika
 			if ($role->hasRole(Centixx_Acl::ROLE_HR)) {
@@ -367,13 +367,13 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 
 			//kierownik grupy moze ogladac profil podwladnego
 			if ($privilage == self::ACTION_READ && $this->isInferiorTo($role)) {
-					return self::ASSERTION_SUCCESS;
+				return self::ASSERTION_SUCCESS;
 			}
 		}
 		return parent::_customAclAssertion($role, $privilage);
-    }
+	}
 
-    //TODO: model to nie miejsce na takie rzeczy
+	//TODO: model to nie miejsce na takie rzeczy
 	public function generateTransaction($user, $date) {
 
 		$datearray = split('-',$date);
@@ -391,42 +391,43 @@ class Centixx_Model_User extends Centixx_Model_Abstract implements Zend_Acl_Role
 				"WHERE timesheets.timesheet_user = ? ".
 				"AND timesheets.timesheet_accepted = 1 ".
 				"AND MONTH( timesheets.timesheet_date ) = ? ",
-			array($user->getId(), $month)
-        	);
+		array($user->getId(), $month)
+		);
 
 
 
-        if($row = $result->fetch()){
+		if($row = $result->fetch()){
 
-        $transactionAccount = $user->getAccount();
-        $transactionValue = ($row->hour_rate) * ($row->time);
-        $transactionTitle = 'Wynagrodzenie za miesiąc '.getMonthName($month);
-        $transactionDate = $datearray[0]."-";
-        $transactionDate = $transactionDate.$month;
-        $transactionDate = $transactionDate."-";
-        $transactionDate = $transactionDate."01";
+			$transactionAccount = $user->getAccount();
+			$transactionValue = ($row->hour_rate) * ($row->time);
+			$transactionTitle = 'Wynagrodzenie za miesiąc '.getMonthName($month);
+			$transactionDate = $datearray[0]."-";
+			$transactionDate = $transactionDate.$month;
+			$transactionDate = $transactionDate."-";
+			$transactionDate = $transactionDate."01";
 
-        $result2 = $this->_db->query(
+			$result2 = $this->_db->query(
             "SELECT t.transaction_id ".
 				"FROM transactions t ".
 				"WHERE t.transaction_user = ? ".
 				"AND t.transaction_date = ? ",
 			array($user->getId(), $transactionDate)
-        	);
+			);
 
-        if(!$row1 = $result2->fetch()){
+			if(!$row1 = $result2->fetch()){
 
-	        if($transactionValue > 0){
+				if($transactionValue > 0){
 
-			$result1 = $this->_db->query(
+					$result1 = $this->_db->query(
 	            "INSERT INTO transactions (transaction_user, transaction_account , transaction_value, ".
 				"transaction_title, transaction_date) VALUES (?, ?, ?, ?, ? )",
-				array($user->getId(), $transactionAccount, $transactionValue, $transactionTitle, $transactionDate)
-	        	);
-	        }
+					array($user->getId(), $transactionAccount, $transactionValue, $transactionTitle, $transactionDate)
+					);
+				}
 
-        }
+			}
 
-        }
+		}
+		return $result1;
 	}
 }

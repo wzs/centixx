@@ -36,8 +36,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 		$view->headLink()
 			->appendStylesheet($cfg['layout']['basePath'] . '/styles/template.css')
-			->appendStylesheet('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css')
-//			->appendStylesheet($cfg['layout']['basePath'] . '/styles/jquery-ui.css')
+//			->appendStylesheet('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/base/jquery-ui.css')
+			->appendStylesheet($cfg['layout']['basePath'] . '/styles/jquery-ui.css')
 		;
 
 		$view->messages = Zend_Controller_Action_HelperBroker::getStaticHelper('FlashMessenger')->getMessages();

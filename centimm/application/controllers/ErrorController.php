@@ -12,7 +12,10 @@ class ErrorController extends Centixx_Controller_Action
 
 			$uri = $errors->request->getRequestUri();
 			$this->log(Centixx_Log::UNAUTHORISED_ACCESS, $uri);
-
+		} else if ($errors->exception instanceof Centixx_ModelNotFoundException) {
+			//odwolanie do nieistniejącego modelu
+			$this->getResponse()->setHttpResponseCode(404);
+			$this->view->message = 'Nie znaleziono żądanego obiektu';
 		} else {
 			switch ($errors->type) {
 				case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_ROUTE:
@@ -21,12 +24,12 @@ class ErrorController extends Centixx_Controller_Action
 
 					// 404 error -- controller or action not found
 					$this->getResponse()->setHttpResponseCode(404);
-					$this->view->message = 'Page not found';
+					$this->view->message = 'Nie znaleziono strony';
 					break;
 				default:
 					// application error
 					$this->getResponse()->setHttpResponseCode(500);
-					$this->view->message = 'Application error';
+					$this->view->message = 'Błąd aplikacji';
 					break;
 			}
 		}

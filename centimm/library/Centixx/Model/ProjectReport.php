@@ -108,8 +108,7 @@ class Centixx_Model_ProjectReport extends Centixx_Model_Abstract {
 			}
 
 			//szef projektu ma dostep do raportu dot. swojego projektu
-			if ($role->hasRole(Centixx_Acl::ROLE_PROJECT_MANAGER) && $this->project->manager->id !== $role->id
-			) {
+			if ($role->hasRole(Centixx_Acl::ROLE_PROJECT_MANAGER) && $this->project->manager->id == $role->id) {
 				return self::ASSERTION_SUCCESS;
 			}
 		}

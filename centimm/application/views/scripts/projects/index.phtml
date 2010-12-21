@@ -1,4 +1,5 @@
 <h2>Lista projektów</h2>
+<p><a href="<?php echo $this->url(array('action' => 'new')); ?>" class="button withtext add">Dodaj nowy</a></p>
 <?php if ($this->projects): ?>
 <ul class="list">
 <?php foreach ($this->projects as $project): ?>
@@ -10,5 +11,3 @@
 <?php endforeach; ?>
 </ul>
 <?php endif ?>
-
-<a href="<?php echo $this->url(array('action' => 'new')); ?>" class="button withtext add">Dodaj nowy</a>

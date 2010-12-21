@@ -79,9 +79,13 @@ class Centixx_Model_Transaction extends Centixx_Model_Abstract implements Zend_A
 		return $this;
 	}
 
-	public function getUser()
+	public function getUser($raw = false)
 	{
-		return $this->_user;
+//		return $this->_user;
+		$ret = $raw
+			? $this->_user
+			: $this->_mapper->getRelated($this, 'user', 'User');
+		return $ret;
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 <h2>Transakcje</h2>
 
+<p style="text-align: right;"><a href="<?php echo $this->url(array('controller' => 'accounting', 'action' => 'generate')) ?>" class="button withtext accept">Generuj przelewy</a></p>
 <?php if($this->transactions): ?>
 <?php $index = 1 ?>
 <table class="staffing">
@@ -16,29 +17,27 @@
 </thead>
 <tbody>
 <?php foreach ($this->transactions as $transaction): ?>
-<tr>
-	<td id = "id"><?php echo $transaction->getId()?></td>
-	<td id = "user<?php echo $transaction->getId()?>"><?php echo $transaction->getUser()?> </td>
-	<td id = "account<?php echo $transaction->getId()?>"><?php echo $transaction->getAccount() ?></td>
-	<td id = "value<?php echo $transaction->getId()?>"><?php echo $transaction->getValue()?></td>
-	<td id = "title<?php echo $transaction->getId()?>"><?php echo $transaction->getTitle() ?></td>
-	<td id = "date<?php echo $transaction->getId()?>"><?php echo $transaction->getDate() ?></td>
-	<td><img alt="Generuj przelew" src="../public/img/edit.png" onclick="popup(<?php echo $transaction->getId()?>)"/></td>
+<tr id="id-<?php echo $transaction->getId()?>">
+	<td><?php echo $transaction->getId()?></td>
+	<td><?php echo $transaction->getUser() ?></td>
+	<td><?php echo $transaction->getAccount()?></td>
+	<td><?php echo $transaction->getValue()?> PLN</td>
+	<td><?php echo $transaction->getTitle() ?></td>
+	<td><?php echo $transaction->getDate() ?></td>
+	<td><a href="<?php echo $this->url(array('controller' => 'accounting', 'action' => 'print', 'id' => $transaction->id)) ?>" class="button withtext printer">Generuj blankiet</a></td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
 <?php endif ?>
 
-<a href="<?php echo $this->url(array('controller' => 'accounting', 'action' => 'generate')) ?>">GENERUJ PRZELEWY</a>
 
 <script type="text/javascript">
-
-function popup(index){
-	var controller = "accounting";
-	var account = document.getElementById("account" + index).firstChild.nodeValue;
-	var value = document.getElementById("value" + index).firstChild.nodeValue;
-	window.open(controller + "/print/id/" + index);
-}
+$(function() {
+	$('a.button.printer').click(function() {
+		window.open(this.href);
+		return false;	
+	});
+})
 
 </script>

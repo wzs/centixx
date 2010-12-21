@@ -6,7 +6,6 @@
 <?php if ($this->project->isAllowed($this->currentUser, 'edit')): ?>
 	<p>
 		<a href="<?php echo $this->project->getUrl('edit') ?>" class="button withtext edit">Edytuj</a></p>
-		<a href="<?php echo $this->url(array('controller' => 'reports', 'action' => 'show', 'id' => $this->project->id)) ?>"  class="button withtext chartcurve">Zobacz zestawienie dziennego czasu pracy</a>
 	</p>
 <?php endif ?>
 

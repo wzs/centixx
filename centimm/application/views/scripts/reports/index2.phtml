@@ -5,9 +5,9 @@
 	<?php if ($project->getReport()->isAllowed($this->currentUser)): ?>
 	<li>
 		<a href="<?php echo $project->getUrl() ?>"><?php echo $project ?></a>
-		<a href="<?php echo $this->url(array('action' => 'show', 'id' => $project->id, 'type' => 'time')) ?>" class="button chartcurve" title="Czas pracy">Czas pracy</a>
+		<a href="<?php echo $this->url(array('action' => 'show', 'id' => $project->id, 'type' => 'time')) ?>" class="button chartpie" title="Czas pracy">Czas pracy</a>
 		<a href="<?php echo $this->url(array('action' => 'show', 'id' => $project->id, 'type' => 'cash')) ?>" class="button chartbar" title="Koszty">Koszty</a>
-		<a href="<?php echo $this->url(array('action' => 'show', 'id' => $project->id, 'type' => 'dailytime')) ?>" class="button chartpie" title="Dzienny czas pracy">Dzienny czas pracy</a>
+		<a href="<?php echo $this->url(array('action' => 'show', 'id' => $project->id, 'type' => 'dailytime')) ?>" class="button chartcurve" title="Dzienny czas pracy">Dzienny czas pracy</a>
 	</li>
 	<?php endif ?>
 <?php endforeach; ?>
