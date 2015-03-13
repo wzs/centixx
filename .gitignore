@@ -1,0 +1,17 @@
+
+# /centimm/
+/centimm/.buildpath
+/centimm/.project
+/centimm/.settings
+
+# /centimm/application/configs/
+/centimm/application/configs/application.ini
+
+# /centimm/data/cache/
+/centimm/data/cache/*
+
+# /centimm/data/dump/
+/centimm/data/dump/*.sql
+
+# /centimm/data/logs/backups/
+/centimm/data/logs/backups/*.zip
